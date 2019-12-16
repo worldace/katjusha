@@ -1,0 +1,204 @@
+@charset "utf-8";
+
+*{
+    box-sizing: border-box;
+}
+html{
+    width: 100%;
+    height: 100%;
+}
+body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+}
+#ヘッダメニュー{
+    background-color: #f0f0f0;
+    width: 100%;
+    height: 24px;
+    display: flex;
+    user-select: none;
+    border-bottom: solid 1px #a0a0a0;
+}
+#ヘッダメニュー-アイコン{
+    display: flex;
+    align-items: center;
+}
+#ヘッダメニュー-アイコン img{
+    box-sizing: content-box;
+    padding: 2px 2px;
+    margin: 0 1px;
+    border: solid 1px #f0f0f0;
+}
+#ヘッダメニュー-アイコン img:hover{
+    cursor: pointer;
+    border-top: solid 1px #fff;
+    border-left: solid 1px #fff;
+    border-bottom: solid 1px #a0a0a0;
+    border-right: solid 1px #a0a0a0;
+}
+#ヘッダメニュー-アイコン img:active{
+    cursor: pointer;
+    border-top: solid 1px #a0a0a0;
+    border-left: solid 1px #a0a0a0;
+    border-bottom: solid 1px #fff;
+    border-right: solid 1px #fff;
+    transform: translate(1px, 1px);
+}
+#ヘッダメニュー-板ボタン{
+    flex: 1;
+}
+#ヘッダメニュー-アニメ{
+    z-index: 2;
+}
+
+
+#hr1{
+    height: 7px;
+    margin-top: 1px;
+    background-color: #f0f0f0;
+    border-bottom: solid 1px #a0a0a0;
+    border-left: none;
+    border-top: none;
+}
+
+
+#板一覧{
+    width: 130px;
+    flex: 1;
+    border:solid 1px #000;
+    padding-top: 3px;
+}
+#板一覧 details{
+    box-sizing: content-box;
+}
+#板一覧 summary{
+    outline: none;
+    font-size: 14px;
+    font-family: 'MS PGothic', sans-serif;
+    padding: 1 1px;
+}
+#板一覧 ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#板一覧 li{
+    color: #000;
+    font-size: 14px;
+    font-family: 'MS PGothic', sans-serif;
+    margin: 1px 0;
+}
+#板一覧 a{
+    text-decoration: none;
+    color: #000;
+    display: block;
+    padding: 1px 8px;
+}
+#板一覧 [data-selected]{
+    color: #fff;
+    background-color: #0078d7;
+}
+#板一覧 details:nth-of-type(33n+1){
+    border-left: 4px solid #ffffff;
+}
+#板一覧 details:nth-of-type(33n+2){
+    border-left: 4px solid #985a62;
+}
+#板一覧 details:nth-of-type(33n+3){
+    border-left: 4px solid #ddffdd;
+}
+#板一覧 details:nth-of-type(33n+4){
+    border-left: 4px solid #ffd7ff;
+}
+#板一覧 details:nth-of-type(33n+5){
+    border-left: 4px solid #519db0;
+}
+#板一覧 details:nth-of-type(33n+6){
+    border-left: 4px solid #d7d7ff;
+}
+#板一覧 details:nth-of-type(33n+7){
+    border-left: 4px solid #008080;
+}
+#板一覧 details:nth-of-type(33n+8){
+    border-left: 4px solid #ff0000;
+}
+#板一覧 details:nth-of-type(33n+9){
+    border-left: 4px solid #baa047;
+}
+#板一覧 details:nth-of-type(33n+10){
+    border-left: 4px solid #ff8686;
+}
+#板一覧 details:nth-of-type(33n+11){
+    border-left: 4px solid #c2b1ba;
+}
+#板一覧 details:nth-of-type(33n+12){
+    border-left: 4px solid #8b3f78;
+}
+#板一覧 details:nth-of-type(33n+13){
+    border-left: 4px solid #a9ba32;
+}
+#板一覧 details:nth-of-type(33n+14){
+    border-left: 4px solid #a096de;
+}
+#板一覧 details:nth-of-type(33n+15){
+    border-left: 4px solid #d3c48d;
+}
+#板一覧 details:nth-of-type(33n+16){
+    border-left: 4px solid #ff00ff;
+}
+#板一覧 details:nth-of-type(33n+17){
+    border-left: 4px solid #ffff00;
+}
+#板一覧 details:nth-of-type(33n+18){
+    border-left: 4px solid #8f8c91;
+}
+#板一覧 details:nth-of-type(33n+19){
+    border-left: 4px solid #ffa2ff;
+}
+#板一覧 details:nth-of-type(33n+20){
+    border-left: 4px solid #0000ff;
+}
+#板一覧 details:nth-of-type(33n+21){
+    border-left: 4px solid #d022c4;
+}
+#板一覧 details:nth-of-type(33n+22){
+    border-left: 4px solid #b3ffb3;
+}
+#板一覧 details:nth-of-type(33n+23){
+    border-left: 4px solid #37e6d9;
+}
+#板一覧 details:nth-of-type(33n+24){
+    border-left: 4px solid #9595ff;
+}
+#板一覧 details:nth-of-type(33n+25){
+    border-left: 4px solid #5b30c2;
+}
+#板一覧 details:nth-of-type(33n+26){
+    border-left: 4px solid #c8f1ff;
+}
+#板一覧 details:nth-of-type(33n+27){
+    border-left: 4px solid #00ff00;
+}
+#板一覧 details:nth-of-type(33n+28){
+    border-left: 4px solid #28caff;
+}
+#板一覧 details:nth-of-type(33n+29){
+    border-left: 4px solid #ffffd2;
+}
+#板一覧 details:nth-of-type(33n+30){
+    border-left: 4px solid #ffd0d0;
+}
+#板一覧 details:nth-of-type(33n+31){
+    border-left: 4px solid #008cbb;
+}
+#板一覧 details:nth-of-type(33n+32){
+    border-left: 4px solid #ea8aac;
+}
+#板一覧 details:nth-of-type(33n+33){
+    border-left: 4px solid #000000;
+}
