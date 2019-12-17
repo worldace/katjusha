@@ -384,10 +384,9 @@ li.tab-selected::after{
 
 section{
     font-size: 18px;
-    font-family: 'MS PGothic', sans-serif;
 }
 .no{
-    color: blue;s
+    color: blue;
 }
 .name{
     color: forestgreen;
