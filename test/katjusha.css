@@ -378,16 +378,34 @@ li.tab-selected::after{
 
 
 
-
-
-
-
-
-
-
-
-
-
 #スレッド{
     flex: 1;
+}
+
+section{
+    font-size: 18px;
+    font-family: 'MS PGothic', sans-serif;
+}
+.no{
+    color: blue;s
+}
+.name{
+    color: forestgreen;
+    font-weight: bold;
+    margin-left: 4px;
+}
+.name::before{
+    content: '名前：';
+    color: #000;
+    font-weight: normal;
+}
+date{
+    margin-left: 4px;
+}
+date::before{
+    content: '投稿日：';
+}
+p{
+    margin-top: 3px;
+    margin-left: 38px;
 }
