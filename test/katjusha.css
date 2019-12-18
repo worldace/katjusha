@@ -332,7 +332,7 @@ h1{
 
 
 .tab-bar{
-    height: 26px;
+    height: 24px;
     list-style: none;
     cursor: default;
     display: flex;
@@ -365,8 +365,8 @@ h1{
 li.tab-selected{
     color: #000;
     z-index: 2;
-    height: 24px;
-    line-height: 24px;
+    height: 22px;
+    line-height: 22px;
 }
 li.tab-selected::before{
     box-shadow: 2px 2px 0 #fff;
