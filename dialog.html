@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+html{
+    font-size: 14px;
+}
+.ダイアログ{
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    border: solid 1px #2982cc;
+    width: 400px;
+    height: 290px;
+    background-color: #f0f0f0;
+}
+.ダイアログ-ヘッダ{
+    border: solid 1px #2982cc;
+    background-color: #2982cc;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-repeat: no-repeat;
+    background-image: url('test/favicon.png');
+    background-size: 16px;
+    background-position: 6px center;
+}
+.ダイアログ-タイトル{
+    color: #fff;
+    font-size: 14px;
+    margin-left: 18px;
+}
+.ダイアログ-閉じるボタン{
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-image: url('test/close.svg');
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.ダイアログ-コンテンツ{
+}
+.ダイアログ [type="text"]{
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    outline: none;
+    padding-left: 2px;
+    height: 18px;
+    margin-left: 6px;
+}
+.ダイアログ .subject-line{
+    margin: 10px 10px 8px 10px;
+    display: flex;
+    align-items: center;
+}
+.ダイアログ .FROM-line{
+    margin: 8px 10px 10px 25px;
+    display: flex;
+    align-items: center;
+}
+.ダイアログ [name="subject"]{
+    width: 330px;
+}
+.ダイアログ [name="FROM"]{
+    width: 115px;
+    margin-right: 6px;
+}
+
+
+.ダイアログ [name="mail"]{
+    width: 115px;
+    margin-right: 6px;
+}
+.ダイアログ label{
+    margin-right: 8px;
+}
+
+.ダイアログ textarea{
+    width: 380px;
+    height: 135px;
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    margin: 0 10px 10px 10px;
+    overflow: scroll;
+    outline: none;
+    padding-left: 4px;
+    resize: none;
+}
+
+.ダイアログ button{
+    background-color: transparent;
+    width: 80px;
+    font-size: 12px;
+    border-left: solid 1px #e3e3e3;
+    border-top: solid 1px #e3e3e3;
+    border-right: solid 1px #a0a0a0;
+    border-bottom: solid 1px #a0a0a0;
+    box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;
+}
+.ダイアログ button:active{
+    transform: translate(1px, 1px);
+}
+
+.ダイアログ .button-line{
+    text-align: center;
+    margin-top: -5px;
+}
+
+[data-dialog] .ダイアログ{
+    display: block;
+}
+
+</style>
+<link rel="stylesheet" href="test/katjusha.css">
+
+</head>
+<body data-dialog>
+
+  <div class="ダイアログ">
+    <div class="ダイアログ-ヘッダ">
+      <div class="ダイアログ-タイトル">将棋タイム</div>
+      <div class="ダイアログ-閉じるボタン"></div>
+    </div>
+    <div class="ダイアログ-コンテンツ"><ul class="tab-bar">
+    <li class="tab-selected">書き込み</li>
+    <li>ローカルルール</li>
+    </ul>
+    <form method="POST" action="test/bbs.cgi">
+     <div class="subject-line">タイトル<input type="text" name="subject"></div>
+     <div class="FROM-line">名前<input type="text" name="FROM">メール<input type="text" name="mail"><input id="sage" type="checkbox"><label for="sage">sage</label></div>
+     <textarea name="MESSAGE"></textarea>
+     <div class="button-line"><button type="submit">書き込む</button>
+     <button type="reset">キャンセル</button></div>
+     <input type="hidden" name="bbs">
+     <input type="hidden" name="key");
+    </form>
+    </div>
+  </div>
+
+</body>
+</html>
