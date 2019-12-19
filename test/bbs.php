@@ -1,0 +1,229 @@
+<?php
+
+/*
+トリップ
+管理者
+管理モード
+二重書き込み
+*/
+
+if(!isset($_POST['submit']) or $_POST['submit'] !== '書き込む'){
+    mb_convert_variables('utf-8', 'shift-jis', $_POST);
+}
+
+
+$bbs     = $_POST['bbs'] ?? '';
+$key     = $_POST['key'] ?? '';
+$from    = $_POST['FROM'] ?? '';
+$mail    = $_POST['mail'] ?? '';
+$subject = $_POST['subject'] ?? '';
+$message = $_POST['MESSAGE'] ?? '';
+
+$is_thread = (bool)$key;
+$bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
+$dat_path  = sprintf('%s/dat/%s.dat', $bbs_path, $key);
+
+//$kako_path = sprintf('%s/kako/%s/%s/%s.dat', $bbs_path, substr($key,0,4), substr($key,0,5), $key);
+
+
+
+if(!$bbs){
+    error('bbsが存在しません');
+}
+if(strpos($bbs, '/') !== false){
+    error('bbsが不正です');
+}
+if(!is_dir($bbs_path)){
+    error('板が存在しません');
+}
+
+if(!$is_thread and preg_match('/[^\d]/', $key)){
+    error('keyが不正です');
+}
+if(!$is_thread and !is_file($dat_path)){
+    error('スレが存在しないかDAT落ちです');
+}
+
+if($is_thread and !$subject){
+    error('タイトルを入力してください');
+}
+if($is_thread and mb_strlen($subject) > 50){
+    error('タイトルが長すぎます');
+}
+
+if(mb_strlen($from) > 20){
+    error('名前が長すぎます');
+}
+
+if(mb_strlen($mail) > 50){
+    error('メールが長すぎます');
+}
+
+if(!$message){
+    error('本文を入力してください');
+}
+if(mb_strlen($message) > 500){
+    error('本文が長すぎます');
+}
+
+
+
+$from    = html_escape($from);
+$mail    = html_escape($mail);
+$message = html_escape($message, '<br>');
+
+if($is_thread){
+    $subject = html_escape($subject);
+}
+
+$date = create_date();
+$dat  = "$from<>$mail<>$date<> $message <>$subject\n";
+$dat  = mb_convert_encoding($dat, 'shift-jis');
+
+
+
+if($is_thread){
+    $key = $_SERVER['REQUEST_TIME'];
+
+    if(!file_put_contents($dat_path, $dat, LOCK_EX)){
+        error('DATファイルが作成できません');
+    }
+    file_edit("$bbs_path/subject.txt", function($subjects) use($key, $subject){
+        $subject = mb_convert_encoding($subject, 'shift-jis');
+        array_unshift($subjects, "$key.dat<>$subject (1)\n");
+        return $subjects;
+    });
+}
+else{
+    file_edit("$bbs_path/subject.txt", function($subjects) use($key, $dat_path, $dat){
+        $num = 0;
+        foreach($subjects as $i => $v){
+            if(strpos($v, "$key.") === 0){
+                preg_match('/(\d+)\)$/', $v, $m);
+                $num = $m[1];
+                break;
+            }
+        }
+        if(!$num){
+            error('このスレッドは存在しません');
+        }
+        if($num >= 1000){
+            error('このスレッドにはもう書き込めません');
+        }
+
+        file_put_contents($dat_path, $dat, FILE_APPEND|LOCK_EX);//重複チェックが
+
+        $num++;
+        $line = preg_replace('/\d+\)$/', "$num)", $v);
+
+        array_splice($subjects, $i, 1);
+	    array_unshift($subjects, $line);
+
+        return $subjects;
+    });
+}
+
+
+success($bbs, $key, $from, $mail);
+
+
+
+
+
+function success($bbs, $key, $from, $mail){
+    setcookie('FROM', $from, $_SERVER['REQUEST_TIME']+60*60*24*180, '/');
+    setcookie('mail', $mail, $_SERVER['REQUEST_TIME']+60*60*24*180, '/');
+
+    header('Cache-Control: no-cache');
+    header('Content-type: text/html; charset=shift_jis');
+
+    $html = <<<END
+    <html><!-- 2ch_X:true -->
+    <head>
+      <title>書きこみました。</title>
+      <meta http-equiv="refresh" content="1;URL=read.cgi/$bbs/$key/">
+    </head>
+    <body>
+      書きこみが終わりました。<br><br>
+      <a href="read.cgi/$bbs/$key/">画面を切り替える</a>までしばらくお待ち下さい。
+    </body>
+    </html>
+    END;
+
+    print mb_convert_encoding($html, 'shift-jis');
+	exit;
+}
+
+
+
+function error($str){
+	header('Cache-Control: no-cache');
+	header('Content-Type: text/html; charset=shift_jis');
+
+    $html = <<<END
+    <html><!-- 2ch_X:error -->
+    <head>
+      <title>ＥＲＲＯＲ！</title>
+    </head>
+    <body>
+      <b>ＥＲＲＯＲ：$str</b><br>
+      <a href="javascript:history.back()">戻る</a>
+    </body>
+    </html>
+    END;
+
+    print mb_convert_encoding($html, 'shift-jis');
+    exit;
+}
+
+
+
+function create_date(){
+	$week = ['日','月','火','水','木','金','土'][date('w', $_SERVER['REQUEST_TIME'])];
+	return date("Y/m/d($week) H:i:s", $_SERVER['REQUEST_TIME']);
+}
+
+
+
+function html_eacape($str, $n = ''){
+    $str = str_replace("\r", '', $str);
+    $str = str_replace("\n", $n, $str);
+    $str = str_replace('<', '&lt;', $str);
+    $str = str_replace('>', '&gt;', $str);
+    $str = str_replace('"', '&quot;', $str);
+    $str = str_replace("'", '&apos;', $str);
+
+	return $str;
+}
+
+
+
+function edit_file(string $file, callable $fn, ...$args){
+    $fp = fopen($file, 'cb+');
+    if(!$fp){
+        return false;
+    }
+    flock($fp, LOCK_EX);
+
+    $contents = [];
+    while(($line = fgets($fp)) !== false){
+        $contents[] = $line;
+    }
+
+    $contents = $fn($contents, ...$args);
+
+    if(is_array($contents)){
+        $contents = implode('', $contents);
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, $contents);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return true;
+    }
+    else{
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return false;
+    }
+}
