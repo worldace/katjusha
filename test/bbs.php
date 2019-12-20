@@ -1,13 +1,18 @@
 <?php
 
 /*
+
+名無し
 トリップ
 管理者
 管理モード
 二重書き込み
+>>11
+
 */
 
-if(!isset($_POST['submit']) or $_POST['submit'] !== '書き込む'){
+
+if($_POST['submit'] !== '書き込む'){
     mb_convert_variables('utf-8', 'shift-jis', $_POST);
 }
 
@@ -19,11 +24,16 @@ $mail    = $_POST['mail'] ?? '';
 $subject = $_POST['subject'] ?? '';
 $message = $_POST['MESSAGE'] ?? '';
 
-$is_thread = (bool)$key;
-$bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
-$dat_path  = sprintf('%s/dat/%s.dat', $bbs_path, $key);
+$is_thread = $key ? false : true;
 
-//$kako_path = sprintf('%s/kako/%s/%s/%s.dat', $bbs_path, substr($key,0,4), substr($key,0,5), $key);
+if($is_thread){
+    $key = $_SERVER['REQUEST_TIME'];
+}
+
+$bbs_path     = sprintf('%s/../%s', __DIR__, $bbs);
+$subject_path = sprintf('%s/subject.txt', $bbs_path);
+$dat_path     = sprintf('%s/dat/%s.dat', $bbs_path, $key);
+$kako_path    = sprintf('%s/kako/%s/%s/%s.dat', $bbs_path, substr($key,0,4), substr($key,0,5), $key);
 
 
 
@@ -33,14 +43,14 @@ if(!$bbs){
 if(strpos($bbs, '/') !== false){
     error('bbsが不正です');
 }
-if(!is_dir($bbs_path)){
+if(!file_exists($subject_path)){
     error('板が存在しません');
 }
 
 if(!$is_thread and preg_match('/[^\d]/', $key)){
     error('keyが不正です');
 }
-if(!$is_thread and !is_file($dat_path)){
+if(!$is_thread and !file_exists($dat_path)){
     error('スレが存在しないかDAT落ちです');
 }
 
@@ -83,19 +93,19 @@ $dat  = mb_convert_encoding($dat, 'shift-jis');
 
 
 if($is_thread){
-    $key = $_SERVER['REQUEST_TIME'];
+    file_edit($subject_path, function($subjects) use($dat_path, $dat, $key, $subject){
+        if(file_exists($dat_path)){
+            error('再度スレッドを立ててください');
+        }
+        file_put_contents($dat_path, $dat, LOCK_EX);
 
-    if(!file_put_contents($dat_path, $dat, LOCK_EX)){
-        error('DATファイルが作成できません');
-    }
-    file_edit("$bbs_path/subject.txt", function($subjects) use($key, $subject){
         $subject = mb_convert_encoding($subject, 'shift-jis');
         array_unshift($subjects, "$key.dat<>$subject (1)\n");
         return $subjects;
     });
 }
 else{
-    file_edit("$bbs_path/subject.txt", function($subjects) use($key, $dat_path, $dat){
+    file_edit($subject_path, function($subjects) use($dat_path, $dat, $key){
         $num = 0;
         foreach($subjects as $i => $v){
             if(strpos($v, "$key.") === 0){
@@ -108,10 +118,10 @@ else{
             error('このスレッドは存在しません');
         }
         if($num >= 1000){
-            error('このスレッドにはもう書き込めません');
+            error('このスレッドにはこれ以上書き込めません');
         }
 
-        file_put_contents($dat_path, $dat, FILE_APPEND|LOCK_EX);//重複チェックが
+        file_put_contents($dat_path, $dat, LOCK_EX|FILE_APPEND);//重複チェックが
 
         $num++;
         $line = preg_replace('/\d+\)$/', "$num)", $v);
@@ -185,9 +195,9 @@ function create_date(){
 
 
 
-function html_eacape($str, $n = ''){
+function html_eacape($str, $br = ''){
     $str = str_replace("\r", '', $str);
-    $str = str_replace("\n", $n, $str);
+    $str = str_replace("\n", $br, $str);
     $str = str_replace('<', '&lt;', $str);
     $str = str_replace('>', '&gt;', $str);
     $str = str_replace('"', '&quot;', $str);

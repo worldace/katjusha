@@ -26,6 +26,8 @@
     投稿フォーム_メール欄.value   = ''
     投稿フォーム_本文欄.value     = ''
 
+    投稿フォーム_タイトル欄.disabled = false
+
     katjusha.dataset.投稿フォーム = 'スレ'
 
     const form = 投稿フォーム.getBoundingClientRect()
