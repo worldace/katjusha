@@ -1,4 +1,6 @@
 RewriteEngine on
+RewriteRule ^/$ index.html [L]
+
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteCond %{REQUEST_FILENAME}/subject.txt -f
 RewriteRule ^ index.html [L]

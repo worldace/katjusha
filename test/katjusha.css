@@ -99,30 +99,21 @@ body{
     width: 150px;
     padding-top: 3px;
     border-right: solid 5px #f0f0f0;
-    box-shadow: 1px 0  0 #a0a0a0;
+    box-shadow: 1px 0 0 #a0a0a0;
     margin-right: 1px;
 }
 #板一覧 details{
-    box-sizing: content-box;
 }
 #板一覧 summary{
     outline: none;
-    padding: 1 1px;
-}
-#板一覧 ul{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-#板一覧 li{
-    color: #000;
-    margin: 1px 0;
+    padding: 1px 1px;
 }
 #板一覧 a{
     text-decoration: none;
     color: #000;
-    display: block;
     padding: 1px 8px;
+    margin: 1px 0;
+    display: block;
 }
 #板一覧 [data-selected]{
     color: #fff;
@@ -510,7 +501,7 @@ p{
     resize: none;
 }
 
-#投稿フォーム button{
+#投稿フォーム .button-line input{
     background-color: transparent;
     width: 80px;
     font-size: 12px;
@@ -520,7 +511,7 @@ p{
     border-bottom: solid 1px #a0a0a0;
     box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;
 }
-#投稿フォーム button:active{
+#投稿フォーム .button-line input:active{
     transform: translate(1px, 1px);
 }
 

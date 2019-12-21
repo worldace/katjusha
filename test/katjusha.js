@@ -1,32 +1,80 @@
 
+katjusha.dataset.サイト名 = document.title
+
+
 板一覧.onclick = function(event){
     event.preventDefault()
     if(event.target.tagName !== 'A'){
         return
     }
-    
-    const selected = document.querySelector("#板一覧 [data-selected]");
-    if(selected){
-        delete selected.dataset.selected
+
+    const before = document.querySelector("#板一覧 [data-selected]")
+    if(before){
+        delete before.dataset.selected
     }
     event.target.dataset.selected = 'selected'
 
-    const dir  = event.target.href.split('/')
-    const 板名 = dir[dir.length-2]
+    const dir = event.target.href.split('/')
+
+    katjusha.dataset.板url = event.target.href
+    katjusha.dataset.板名  = event.target.textContent
+    katjusha.dataset.板bbs = dir[dir.length-2]
+
+    document.title = `${katjusha.dataset.サイト名} [${event.target.textContent}]`
+
+    go_bbs(event.target.href)
 }
+
+
+function go_bbs(url){
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET', `${url}subject.txt?${Date.now()}`)
+    xhr.timeout    = 30 * 1000
+    xhr.onloadend  = loadend
+    xhr.overrideMimeType('text/plain; charset=shift_jis')
+    xhr.send()
+
+    function loadend(){
+        if(xhr.status !== 200){
+            スレッド一覧_tbody.innerHTML = ''
+            return
+        }
+
+        let html = '';
+        let no   = 1;
+        for(let v of xhr.responseText.split("\n")){
+            if(!v){
+                continue
+            }
+            const [key, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+            html += `<tr><td>${no}</td><td>${subject}</td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
+            no++
+        }
+
+        スレッド一覧_tbody.innerHTML = html
+    }
+}
+
+
+
 
 
 スレ投稿ボタン.onclick = function (event){
     if(katjusha.dataset.投稿フォーム){
         return
     }
+    if(!katjusha.dataset.板bbs){
+        return
+    }
 
-    投稿フォーム_タイトル欄.value = ''
-    投稿フォーム_名前欄.value     = ''
-    投稿フォーム_メール欄.value   = ''
-    投稿フォーム_本文欄.value     = ''
+    投稿フォーム_タイトル.textContent = `『${katjusha.dataset.板名}』に新規スレッド`
 
+    投稿フォーム_タイトル欄.value    = ''
     投稿フォーム_タイトル欄.disabled = false
+    投稿フォーム_名前欄.value        = ''
+    投稿フォーム_メール欄.value      = ''
+    投稿フォーム_本文欄.value        = ''
+    投稿フォーム_bbs.value           = katjusha.dataset.板bbs
 
     katjusha.dataset.投稿フォーム = 'スレ'
 
@@ -59,6 +107,33 @@
 
     投稿フォーム_本文欄.focus()
 }
+
+
+
+投稿フォーム_form.onsubmit = function (event){
+    event.preventDefault();
+
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', event.target.getAttribute('action'))
+    xhr.timeout    = 30 * 1000
+    xhr.onloadend  = postend
+    xhr.overrideMimeType('text/html; charset=shift_jis')
+    xhr.send(new FormData(event.target))
+
+    function postend(){
+        if(xhr.status !== 200){
+            alert('投稿できませんでした')
+            return
+        }
+        if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
+            alert(xhr.responseText.match(/<b>(.+?)</i)[1])
+            return
+        }
+        delete katjusha.dataset.投稿フォーム
+        go_bbs(katjusha.dataset.板url)
+    }
+}
+
 
 
 投稿フォーム_キャンセルボタン.onclick = function (event){

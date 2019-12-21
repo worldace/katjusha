@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja" id="katjusha">
 <head>
+  <base href="http://127.0.0.1/katjusha/">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
   <title>かちゅぼ～ど</title>
   <link rel="icon" href="test/favicon.png" type="image/png">
   <link rel="stylesheet" href="test/katjusha.css">
@@ -38,24 +40,18 @@
 <div id="grid1">
   <nav id="板一覧">
     <details open>
-    <summary>ニュース</summary>
-    <ul>
-      <li><a href="headline/">ヘッドライン</a></li>
-      <li><a href="geinou/">芸能速報</a></li>
-    </ul>
+      <summary>ニュース</summary>
+      <a href="headline/">ヘッドライン</a>
+      <a href="geinou/">芸能速報</a>
     </details>
     <details open>
-    <summary>ギャンブル</summary>
-    <ul>
-      <li><a href="mahjong/">麻雀</a></li>
-      <li><a href="keiba/">競馬</a></li>
-    </ul>
+      <summary>ギャンブル</summary>
+      <a href="mahjong/">麻雀</a>
+      <a href="keiba/">競馬</a>
     </details>
     <details open>
-    <summary>案内</summary>
-    <ul>
-      <li><a href="rounge/">ラウンジ</a></li>
-    </ul>
+      <summary>案内</summary>
+      <a href="rounge/">ラウンジ</a>
     </details>
   </nav>
 
@@ -64,7 +60,7 @@
     <div id="grid3">
       <table id="スレッド一覧">
         <thead><tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr></thead>
-        <tbody><tr><td>1</td><td>なんでここに先生が</td><td>123</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
+        <tbody id="スレッド一覧_tbody"><tr><td>1</td><td>なんでここに先生が</td><td>123</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
         <tr><td>2</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
         <tr><td>3</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
         <tr><td>4</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
@@ -121,14 +117,14 @@
 
 <div id="投稿フォーム">
   <header id="投稿フォーム_ヘッダ">
-    <h1 id="投稿フォーム_タイトル">将棋タイム</h1>
+    <h1 id="投稿フォーム_タイトル"></h1>
     <span id="投稿フォーム_閉じるボタン"></span>
   </header>
   <ul id="投稿フォーム_タブ">
     <li class="選択">書き込み</li>
     <li>ローカルルール</li>
   </ul>
-  <form method="POST" action="test/bbs.cgi">
+  <form method="POST" action="test/bbs.cgi" id="投稿フォーム_form">
     <div class="subject-line">タイトル<input type="text" name="subject" id="投稿フォーム_タイトル欄"></div>
     <div class="FROM-line">
       名前<input type="text" name="FROM" id="投稿フォーム_名前欄">
@@ -138,9 +134,10 @@
     <textarea id="投稿フォーム_本文欄" name="MESSAGE"></textarea>
     <input type="hidden" name="bbs" id="投稿フォーム_bbs">
     <input type="hidden" name="key" id="投稿フォーム_key">
+    <input type="hidden" name="submit" value="書き込む">
     <div class="button-line">
-      <button id="投稿フォーム_書き込みボタン" type="submit" name="submit">書き込む</button>
-      <button id="投稿フォーム_キャンセルボタン" type="button">キャンセル</button>
+      <input type="submit" id="投稿フォーム_書き込みボタン" value="書き込む">
+      <input type="reset" id="投稿フォーム_キャンセルボタン" value="キャンセル">
     </div>
   </form>
 </div>

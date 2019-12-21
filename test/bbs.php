@@ -12,8 +12,10 @@
 */
 
 
-if($_POST['submit'] !== '書き込む'){
-    mb_convert_variables('utf-8', 'shift-jis', $_POST);
+$submit = $_POST['submit'] ?? '';
+
+if($submit !== '書き込む'){
+    mb_convert_variables('utf-8', 'sjis', $_POST);
 }
 
 
@@ -35,7 +37,7 @@ $subject_path = sprintf('%s/subject.txt', $bbs_path);
 $dat_path     = sprintf('%s/dat/%s.dat', $bbs_path, $key);
 $kako_path    = sprintf('%s/kako/%s/%s/%s.dat', $bbs_path, substr($key,0,4), substr($key,0,5), $key);
 
-
+file_put_contents("o.txt", "$from$message");
 
 if(!$bbs){
     error('bbsが存在しません');
@@ -57,22 +59,22 @@ if(!$is_thread and !file_exists($dat_path)){
 if($is_thread and !$subject){
     error('タイトルを入力してください');
 }
-if($is_thread and mb_strlen($subject) > 50){
+if($is_thread and strlen($subject) > 96){
     error('タイトルが長すぎます');
 }
 
-if(mb_strlen($from) > 20){
+if(strlen($from) > 32){
     error('名前が長すぎます');
 }
 
-if(mb_strlen($mail) > 50){
+if(strlen($mail) > 64){
     error('メールが長すぎます');
 }
 
 if(!$message){
     error('本文を入力してください');
 }
-if(mb_strlen($message) > 500){
+if(strlen($message) > 800){
     error('本文が長すぎます');
 }
 
@@ -88,24 +90,24 @@ if($is_thread){
 
 $date = create_date();
 $dat  = "$from<>$mail<>$date<> $message <>$subject\n";
-$dat  = mb_convert_encoding($dat, 'shift-jis');
+$dat  = mb_convert_encoding($dat, 'sjis', 'utf-8');
 
 
 
 if($is_thread){
-    file_edit($subject_path, function($subjects) use($dat_path, $dat, $key, $subject){
+    edit_file($subject_path, function($subjects) use($dat_path, $dat, $key, $subject){
         if(file_exists($dat_path)){
             error('再度スレッドを立ててください');
         }
         file_put_contents($dat_path, $dat, LOCK_EX);
 
-        $subject = mb_convert_encoding($subject, 'shift-jis');
+        $subject = mb_convert_encoding($subject, 'sjis', 'utf-8');
         array_unshift($subjects, "$key.dat<>$subject (1)\n");
         return $subjects;
     });
 }
 else{
-    file_edit($subject_path, function($subjects) use($dat_path, $dat, $key){
+    edit_file($subject_path, function($subjects) use($dat_path, $dat, $key){
         $num = 0;
         foreach($subjects as $i => $v){
             if(strpos($v, "$key.") === 0){
@@ -160,7 +162,7 @@ function success($bbs, $key, $from, $mail){
     </html>
     END;
 
-    print mb_convert_encoding($html, 'shift-jis');
+    print mb_convert_encoding($html, 'sjis', 'utf-8');
 	exit;
 }
 
@@ -182,7 +184,7 @@ function error($str){
     </html>
     END;
 
-    print mb_convert_encoding($html, 'shift-jis');
+    print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
 }
 
@@ -195,7 +197,7 @@ function create_date(){
 
 
 
-function html_eacape($str, $br = ''){
+function html_escape($str, $br = ''){
     $str = str_replace("\r", '', $str);
     $str = str_replace("\n", $br, $str);
     $str = str_replace('<', '&lt;', $str);
