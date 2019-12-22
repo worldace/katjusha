@@ -111,6 +111,22 @@ for(const el of document.querySelectorAll('#板一覧 a')){
 
 
 
+スレッドヘッダ_板名.onclick = function (event){
+    event.preventDefault()
+    if(!this.textContent){
+        return
+    }
+    const bbsurl = this.querySelector("a").href
+
+    for(const el of document.querySelectorAll('#板一覧 a')){
+        if(el.href === bbsurl){
+            el.click()
+            break
+        }
+    }
+}
+
+
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
     ajax(this.getAttribute('action'), this.dataset.bbsurl, new FormData(this), cgi_loadend)
@@ -193,6 +209,7 @@ function dat_loadend(xhr){
     const bbaname = katjusha.bbslist[xhr.bbsurl].name
     スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
     スレッドヘッダ_タイトル.innerHTML = `${list[0].split('<>').pop()} (${list.length-1})`
+    スレッドヘッダ.dataset.key = xhr.key
 }
 
 
@@ -226,10 +243,10 @@ function ajax(url, bbsurl, body, fn){
         xhr.key = body.get('key')
     }
     else{
-        [fn, body] = [body, fn]
         xhr.open('GET', `${url}?${Date.now()}`)
         const file = url.split('/').pop()
-        xhr.key = file.replace(/\..*/, '')
+        xhr.key = file.replace(/\..*/, '');
+        [fn, body] = [body, fn]
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
