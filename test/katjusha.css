@@ -318,16 +318,16 @@ body{
     line-height: 20px;
     box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
 }
-#タブ .tab-selected{
+#タブ [data-selected]{
     color: #000;
     z-index: 2;
     height: 22px;
     line-height: 22px;
 }
-#タブ .tab-selected::before{
+#タブ [data-selected]::before{
     box-shadow: 2px 2px 0 #fff;
 }
-#タブ  .tab-selected::after{
+#タブ [data-selected]::after{
     box-shadow: -2px 2px 0 #fff;
 }
 
