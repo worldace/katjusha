@@ -188,6 +188,8 @@ function subject_loadend(xhr){
     }
     スレッド一覧_tbody.innerHTML = html
     スレッド一覧_tbody.dataset.bbsurl = xhr.bbsurl
+    
+    grid3.scrollTop = 0
 }
 
 
@@ -211,8 +213,11 @@ function dat_loadend(xhr){
     スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
     スレッドヘッダ_タイトル.innerHTML = `${subject} (${list.length-1})`
     スレッドヘッダ.dataset.key = xhr.key
-    
-    タブ.querySelector('[data-selected]').innerHTML = subject
+
+    const tab = タブ.querySelector('[data-selected]')
+    tab.innerHTML      = subject
+    tab.dataset.key    = xhr.key
+    tab.dataset.bbsurl = xhr.bbsurl
 }
 
 
