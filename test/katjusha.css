@@ -56,8 +56,17 @@ body{
 #ヘッダメニュー-板ボタン{
     flex: 1;
 }
-#ヘッダメニュー-アニメ{
+#ヘッダ_アニメ{
+    width: 32px;
+    height: 32px;
+    background-image: url('katjusha.gif');
+    background-repeat: no-repeat;
+    background-size: 32px;
+    background-position: 50% 50%;
     z-index: 2;
+}
+#ヘッダ_アニメ[data-ajax="0"]{
+    background-image: url('katjusha.png');
 }
 
 #grid1{

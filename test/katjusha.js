@@ -22,41 +22,8 @@ katjusha.dataset.サイト名 = document.title
 
     document.title = `${katjusha.dataset.サイト名} [${event.target.textContent}]`
 
-    go_bbs(event.target.href)
+    ajax(`${event.target.href}subject.txt`, subject_loaded)
 }
-
-
-function go_bbs(url){
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', `${url}subject.txt?${Date.now()}`)
-    xhr.timeout    = 30 * 1000
-    xhr.onloadend  = loadend
-    xhr.overrideMimeType('text/plain; charset=shift_jis')
-    xhr.send()
-
-    function loadend(){
-        if(xhr.status !== 200){
-            スレッド一覧_tbody.innerHTML = ''
-            return
-        }
-
-        let html = '';
-        let no   = 1;
-        for(let v of xhr.responseText.split("\n")){
-            if(!v){
-                continue
-            }
-            const [key, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-            html += `<tr><td>${no}</td><td>${subject}</td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
-            no++
-        }
-
-        スレッド一覧_tbody.innerHTML = html
-    }
-}
-
-
-
 
 
 スレ投稿ボタン.onclick = function (event){
@@ -111,27 +78,8 @@ function go_bbs(url){
 
 
 投稿フォーム_form.onsubmit = function (event){
-    event.preventDefault();
-
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', event.target.getAttribute('action'))
-    xhr.timeout    = 30 * 1000
-    xhr.onloadend  = postend
-    xhr.overrideMimeType('text/html; charset=shift_jis')
-    xhr.send(new FormData(event.target))
-
-    function postend(){
-        if(xhr.status !== 200){
-            alert('投稿できませんでした')
-            return
-        }
-        if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
-            alert(xhr.responseText.match(/<b>(.+?)</i)[1])
-            return
-        }
-        delete katjusha.dataset.投稿フォーム
-        go_bbs(katjusha.dataset.板url)
-    }
+    event.preventDefault()
+    ajax(event.target.getAttribute('action'), new FormData(event.target), cgi_loaded)
 }
 
 
@@ -172,3 +120,59 @@ function go_bbs(url){
     document.removeEventListener('mousemove', 投稿フォーム_ヘッダ.mousemove)
 }
 
+
+function subject_loaded(xhr){
+    if(xhr.status !== 200){
+        スレッド一覧_tbody.innerHTML = ''
+        return
+    }
+
+    let html = '';
+    let no   = 1;
+    for(let v of xhr.responseText.split("\n")){
+        if(!v){
+            continue
+        }
+        const [key, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        html += `<tr><td>${no}</td><td>${subject}</td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
+        no++
+    }
+
+    スレッド一覧_tbody.innerHTML = html
+}
+
+
+
+function cgi_loaded(xhr){
+    if(xhr.status !== 200){
+        alert('投稿できませんでした')
+        return
+    }
+    if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
+        alert(xhr.responseText.match(/<b>(.+?)</i)[1])
+        return
+    }
+    delete katjusha.dataset.投稿フォーム
+    ajax(`${katjusha.dataset.板url}subject.txt`, subject_loaded)
+}
+
+
+
+function ajax(url, body, fn){
+    ヘッダ_アニメ.dataset.ajax = Number(ヘッダ_アニメ.dataset.ajax) + 1
+    const xhr = new XMLHttpRequest()
+    if(url.endsWith('cgi')){
+        xhr.open('POST', url)
+    }
+    else{
+        [fn, body] = [body, fn]
+        xhr.open('GET', `${url}?${Date.now()}`)
+    }
+    xhr.overrideMimeType('text/plain; charset=shift_jis')
+    xhr.timeout = 30 * 1000
+    xhr.onloadend = function(event){
+        ヘッダ_アニメ.dataset.ajax = Number(ヘッダ_アニメ.dataset.ajax) - 1
+        fn(event.target)
+    }
+    xhr.send(body)
+}
