@@ -223,10 +223,13 @@ function ajax(url, bbsurl, body, fn){
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
+        xhr.key = body.get('key')
     }
     else{
         [fn, body] = [body, fn]
         xhr.open('GET', `${url}?${Date.now()}`)
+        const file = url.split('/').pop()
+        xhr.key = file.replace(/\..*/, '')
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
