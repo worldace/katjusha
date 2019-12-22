@@ -121,7 +121,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
     for(const el of document.querySelectorAll('#板一覧 a')){
         if(el.href === bbsurl){
             el.click()
-            break
+            return
         }
     }
 }
@@ -207,9 +207,12 @@ function dat_loadend(xhr){
     スレッド.innerHTML = html
 
     const bbaname = katjusha.bbslist[xhr.bbsurl].name
+    const subject = list[0].split('<>').pop()
     スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
-    スレッドヘッダ_タイトル.innerHTML = `${list[0].split('<>').pop()} (${list.length-1})`
+    スレッドヘッダ_タイトル.innerHTML = `${subject} (${list.length-1})`
     スレッドヘッダ.dataset.key = xhr.key
+    
+    タブ.querySelector('[data-selected]').innerHTML = subject
 }
 
 
