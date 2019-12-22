@@ -31,6 +31,9 @@ $is_thread = $key ? false : true;
 if($is_thread){
     $key = $_SERVER['REQUEST_TIME'];
 }
+else{
+    $subject = '';
+}
 
 $bbs_path     = sprintf('%s/../%s', __DIR__, $bbs);
 $subject_path = sprintf('%s/subject.txt', $bbs_path);

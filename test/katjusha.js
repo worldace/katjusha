@@ -92,11 +92,27 @@ for(const el of document.querySelectorAll('#板一覧 a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
+    const tab    = タブ.querySelector('[data-selected]')
+    const bbsurl = tab.dataset.bbsurl
+    const key    = tab.dataset.key
 
-    投稿フォーム_タイトル欄.value = ''
+    if(!bbsurl || !key){
+        return
+    }
+
+    const bbs = katjusha.bbslist[bbsurl]
+
+    投稿フォーム_form.dataset.bbsurl = bbs.url;
+    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+
+    投稿フォーム_タイトル.textContent = `「${tab.innerHTML}」にレス`
+
+    投稿フォーム_タイトル欄.value = tab.innerHTML
     投稿フォーム_名前欄.value     = ''
     投稿フォーム_メール欄.value   = ''
     投稿フォーム_本文欄.value     = ''
+    投稿フォーム_bbs.value        = bbs.key
+    投稿フォーム_key.value        = key
 
     投稿フォーム_タイトル欄.disabled = true
 
