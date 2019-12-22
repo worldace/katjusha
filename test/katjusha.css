@@ -20,58 +20,6 @@ body{
     -ms-user-select: none;
     cursor: default;
 }
-.icon{
-    box-sizing: content-box;
-    padding: 2px 2px;
-    margin: 0 1px;
-    border: solid 1px #f0f0f0;
-}
-.icon:hover{
-    border-top: solid 1px #fff;
-    border-left: solid 1px #fff;
-    border-bottom: solid 1px #a0a0a0;
-    border-right: solid 1px #a0a0a0;
-}
-.icon:active{
-    border-top: solid 1px #a0a0a0;
-    border-left: solid 1px #a0a0a0;
-    border-bottom: solid 1px #fff;
-    border-right: solid 1px #fff;
-    transform: translate(1px, 1px);
-}
-.separate{
-    margin: 0 3px;
-}
-
-
-
-#grid1{
-    flex: 1;
-    display: flex;
-}
-#grid2{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-#grid3{
-    height: 195px;
-    overflow-y: scroll;
-}
-#grid4{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-#hr1{
-    height: 7px;
-    margin-top: 1px;
-    background-color: #f0f0f0;
-    border-bottom: solid 1px #a0a0a0;
-    border-left: none;
-    border-top: none;
-}
-
 
 
 #ナビ{
@@ -327,10 +275,7 @@ body{
     border-top: 1px solid #c0c0c0;
     box-shadow: 0 1px 0 0 #fff inset;
 }
-#スレッドヘッダ_タイトル{
-    margin: 0;
-    font-weight: normal;
-    font-size: 12px;
+#スレッドヘッダ_板名{
     margin-left: 8px;
 }
 #スレッドヘッダ_アイコン{
@@ -339,7 +284,7 @@ body{
 }
 
 
-.tab-bar{
+#タブ{
     height: 24px;
     list-style: none;
     cursor: default;
@@ -350,7 +295,7 @@ body{
     padding-left: 10px;
     border-bottom: 1px solid #c0c0c0;
 }
-.tab-bar > li{
+#タブ > li{
     text-align: left;
     border-top: 1px solid #e3e3e3;
     border-left: 1px solid #e3e3e3;
@@ -369,17 +314,16 @@ body{
     line-height: 20px;
     box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
 }
-
-li.tab-selected{
+#タブ .tab-selected{
     color: #000;
     z-index: 2;
     height: 22px;
     line-height: 22px;
 }
-li.tab-selected::before{
+#タブ .tab-selected::before{
     box-shadow: 2px 2px 0 #fff;
 }
-li.tab-selected::after{
+#タブ  .tab-selected::after{
     box-shadow: -2px 2px 0 #fff;
 }
 
@@ -501,7 +445,6 @@ p{
 #投稿フォーム_sage{
 
 }
-
 #投稿フォーム_本文欄{
     width: 380px;
     height: 120px;
@@ -578,4 +521,59 @@ p{
 }
 #投稿フォーム_タブ .選択::after{
     box-shadow: -2px 2px 0 #fff;
+}
+
+
+
+
+#grid1{
+    flex: 1;
+    display: flex;
+}
+#grid2{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+#grid3{
+    height: 195px;
+    overflow-y: scroll;
+}
+#grid4{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+#hr1{
+    height: 7px;
+    margin-top: 1px;
+    background-color: #f0f0f0;
+    border-bottom: solid 1px #a0a0a0;
+    border-left: none;
+    border-top: none;
+}
+
+
+
+.icon{
+    box-sizing: content-box;
+    padding: 2px 2px;
+    margin: 0 1px;
+    border: solid 1px #f0f0f0;
+}
+.icon:hover{
+    border-top: solid 1px #fff;
+    border-left: solid 1px #fff;
+    border-bottom: solid 1px #a0a0a0;
+    border-right: solid 1px #a0a0a0;
+}
+.icon:active{
+    border-top: solid 1px #a0a0a0;
+    border-left: solid 1px #a0a0a0;
+    border-bottom: solid 1px #fff;
+    border-right: solid 1px #fff;
+    transform: translate(1px, 1px);
+}
+.icon-separate{
+    margin: 0 3px;
 }
