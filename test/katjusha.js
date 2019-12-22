@@ -1,6 +1,19 @@
 
 katjusha.dataset.サイト名 = document.title
 
+katjusha.bbslist = {}
+for(const el of document.querySelectorAll('#板一覧 a')){
+    const dir = el.href.split('/')
+
+    katjusha.bbslist[el.href] = {}
+    katjusha.bbslist[el.href].url  = el.href
+    katjusha.bbslist[el.href].name = el.textContent
+    katjusha.bbslist[el.href].key  = dir[dir.length-2]
+    dir.splice(-2)
+    katjusha.bbslist[el.href].home = dir.join('/') + '/'
+}
+
+
 
 板一覧.onclick = function(event){
     event.preventDefault()
@@ -14,15 +27,10 @@ katjusha.dataset.サイト名 = document.title
     }
     event.target.dataset.selected = 'selected'
 
-    const dir = event.target.href.split('/')
-
-    katjusha.dataset.板url = event.target.href
-    katjusha.dataset.板名  = event.target.textContent
-    katjusha.dataset.板bbs = dir[dir.length-2]
-
     document.title = `${katjusha.dataset.サイト名} [ ${event.target.textContent} ]`
 
-    ajax(`${event.target.href}subject.txt`, subject_loadend)
+    katjusha.dataset.bbsurl = event.target.href
+    ajax(`${event.target.href}subject.txt`, event.target.href, subject_loadend)
 }
 
 
@@ -33,15 +41,17 @@ katjusha.dataset.サイト名 = document.title
     if(!tr){
         return
     }
+    if(!this.dataset.bbsurl){
+        return
+    }
+
     const before = スレッド一覧.querySelector('[data-selected]')
     if(before){
         delete before.dataset.selected
     }
     tr.dataset.selected = 'selected'
 
-    const a  = tr.querySelector('a')
-
-    console.dir(a.href)
+    ajax(`${this.dataset.bbsurl}/dat/${tr.dataset.key}.dat?${Date.now()}`, this.dataset.bbsurl, dat_loadend)
 }
 
 
@@ -49,18 +59,22 @@ katjusha.dataset.サイト名 = document.title
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    if(!katjusha.dataset.板bbs){
+    const bbs = katjusha.bbslist[katjusha.dataset.bbsurl]
+    if(!bbs){
         return
     }
 
-    投稿フォーム_タイトル.textContent = `『${katjusha.dataset.板名}』に新規スレッド`
+    投稿フォーム_form.dataset.bbsurl = bbs.url;
+    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+
+    投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
 
     投稿フォーム_タイトル欄.value    = ''
     投稿フォーム_タイトル欄.disabled = false
     投稿フォーム_名前欄.value        = ''
     投稿フォーム_メール欄.value      = ''
     投稿フォーム_本文欄.value        = ''
-    投稿フォーム_bbs.value           = katjusha.dataset.板bbs
+    投稿フォーム_bbs.value           = bbs.key
 
     katjusha.dataset.投稿フォーム = 'スレッド'
 
@@ -70,6 +84,7 @@ katjusha.dataset.サイト名 = document.title
 
     投稿フォーム_タイトル欄.focus()
 }
+
 
 
 
@@ -98,7 +113,7 @@ katjusha.dataset.サイト名 = document.title
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(event.target.getAttribute('action'), new FormData(event.target), cgi_loadend)
+    ajax(this.getAttribute('action'), this.dataset.bbsurl, new FormData(this), cgi_loadend)
 }
 
 
@@ -147,13 +162,37 @@ function subject_loadend(xhr){
     }
 
     const list = xhr.responseText.split("\n")
-    const bbs  = katjusha.dataset.板bbs;
+    const bbs  = katjusha.bbslist[xhr.bbsurl]
+
     let   html = '';
     for(let i = 0; i < list.length-1; i++){
-        const [key, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        html += `<tr><td>${i+1}</td><td><a href="test/read.cgi/${bbs}/${key.replace('.dat','')}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
+        const [dat, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key = dat.replace('.dat', '')
+        html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
     }
     スレッド一覧_tbody.innerHTML = html
+    スレッド一覧_tbody.dataset.bbsurl = xhr.bbsurl
+}
+
+
+
+function dat_loadend(xhr){
+    if(xhr.status !== 200){
+        return
+    }
+
+    const list = xhr.responseText.split("\n")
+    let   html = '';
+    for(let i = 0; i < list.length-1; i++){
+        const [from, mail, date, message, subject] = list[i].split('<>');
+        html += `<section><header><i>${i+1}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header>`
+        html += `<p>${message}</p></section>`
+    }
+    スレッド.innerHTML = html
+
+    const bbaname = katjusha.bbslist[xhr.bbsurl].name
+    スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
+    スレッドヘッダ_タイトル.innerHTML = `${list[0].split('<>').pop()} (${list.length-1})`
 }
 
 
@@ -169,7 +208,7 @@ function cgi_loadend(xhr){
     }
 
     if(katjusha.dataset.投稿フォーム === 'スレッド'){
-        ajax(`${katjusha.dataset.板url}subject.txt`, subject_loadend)
+        ajax(`${xhr.bbsurl}subject.txt`, xhr.bbsurl, subject_loadend)
     }
     else{
         
@@ -179,7 +218,7 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, body, fn){
+function ajax(url, bbsurl, body, fn){
     ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
@@ -195,5 +234,6 @@ function ajax(url, body, fn){
         ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
         fn(event.target)
     }
+    xhr.bbsurl = bbsurl
     xhr.send(body)
 }

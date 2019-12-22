@@ -278,6 +278,10 @@ body{
 #スレッドヘッダ_板名{
     margin-left: 8px;
 }
+#スレッドヘッダ_板名 a{
+    color: #000;
+    text-decoration: none;
+}
 #スレッドヘッダ_アイコン{
     display: flex;
     align-items: center;
@@ -336,29 +340,22 @@ body{
     cursor: text;
 }
 
-section{
+#スレッド section{
     margin: 16px 8px;
 }
-.no{
+#スレッド i{
     color: blue;
+    font-style: normal;
 }
-.name{
+#スレッド b{
     color: forestgreen;
     font-weight: bold;
     margin-left: 4px;
 }
-.name::before{
-    content: '名前：';
-    color: #000;
-    font-weight: normal;
-}
-date{
+#スレッド date{
     margin-left: 4px;
 }
-date::before{
-    content: '投稿日：';
-}
-p{
+#スレッド p{
     margin-top: 3px;
     margin-left: 36px;
 }

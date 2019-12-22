@@ -198,12 +198,12 @@ function create_date(){
 
 
 function html_escape($str, $br = ''){
-    $str = str_replace("\r", '', $str);
-    $str = str_replace("\n", $br, $str);
     $str = str_replace('<', '&lt;', $str);
     $str = str_replace('>', '&gt;', $str);
     $str = str_replace('"', '&quot;', $str);
     $str = str_replace("'", '&apos;', $str);
+    $str = str_replace("\r", '', $str);
+    $str = str_replace("\n", $br, $str);
 
 	return $str;
 }
