@@ -11,14 +11,14 @@
 </head>
 <body>
 
-<nav id="ヘッダメニュー">
-  <div id="ヘッダメニュー-アイコン">
+<nav id="ナビ">
+  <div id="ナビ_アイコン">
     <img src="test/online.png" width="16" height="16" class="icon">
     <img src="test/save.png" width="16" height="16" class="icon">
     <img src="test/separate.png" width="2" height="16" class="separate">
     <img src="test/search.png" width="16" height="16" class="icon">
     <img src="test/update.png" width="16" height="16" class="icon">
-    <img src="test/post.png" width="16" height="16" class="icon" id="スレ投稿ボタン">
+    <img src="test/post.png" width="16" height="16" class="icon" id="スレッド投稿ボタン">
     <img src="test/separate.png" width="2" height="16" class="separate">
     <img src="test/column.png" width="16" height="16" class="icon">
     <img src="test/grid1.png" width="16" height="16" class="icon">
@@ -29,8 +29,8 @@
     <img src="test/help.png" width="16" height="16" class="icon">
     <img src="test/separate.png" width="2" height="16" class="separate">
   </div>
-  <div id="ヘッダメニュー-板ボタン"></div>
-  <div id="ヘッダ_アニメ" data-ajax="0"></div>
+  <div id="ナビ_板ボタン"></div>
+  <div id="ナビ_アニメ" data-ajax="0"></div>
 </nav>
 
 <div id="hr1"></div>
@@ -59,37 +59,25 @@
     <div id="grid3">
       <table id="スレッド一覧">
         <thead><tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr></thead>
-        <tbody id="スレッド一覧_tbody"><tr><td>1</td><td>なんでここに先生が</td><td>123</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>2</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>3</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>4</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>5</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>6</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr data-selected><td>7</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>8</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>9</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>10</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>11</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>12</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr>
-        <tr><td>13</td><td>ひょっとこサブ太郎を投げ出してみれ</td><td>103</td><td></td><td></td><td>2019/12/12 15:12:12</td><td></td><td></td></tr></tbody>
+        <tbody id="スレッド一覧_tbody"></tbody>
       </table>
     </div><!-- /grid3 -->
 
     <div id="grid4">
       <header id="スレッドヘッダ">
-        <h1>[アニメ] なんでここに先生が (132)</h1>
-          <div id="res_icon">
-            <img src="test/list.png" width="16" height="16" class="icon">
-            <img src="test/separate.png" width="2" height="16" class="separate">
-            <img src="test/download.png" width="16" height="16" class="icon">
-            <img src="test/stop.png" width="16" height="16" class="icon">
-            <img src="test/separate.png" width="2" height="16" class="separate">
-            <img src="test/res.png" width="16" height="16" class="icon" id="レス投稿ボタン">
-            <img src="test/bookmark.png" width="16" height="16" class="icon">
-            <img src="test/separate.png" width="2" height="16" class="separate">
-            <img src="test/trash.png" width="16" height="16" class="icon">
-            <img src="test/close.png" width="16" height="16" class="icon">
-          </div>
+        <h1 id="スレッドヘッダ_タイトル"><span id="スレッドタイトル_板名">[アニメ]</span> なんでここに先生が (132)</h1>
+        <div id="スレッドヘッダ_アイコン">
+          <img src="test/list.png" width="16" height="16" class="icon">
+          <img src="test/separate.png" width="2" height="16" class="separate">
+          <img src="test/download.png" width="16" height="16" class="icon">
+          <img src="test/stop.png" width="16" height="16" class="icon">
+          <img src="test/separate.png" width="2" height="16" class="separate">
+          <img src="test/res.png" width="16" height="16" class="icon" id="レス投稿ボタン">
+          <img src="test/bookmark.png" width="16" height="16" class="icon">
+          <img src="test/separate.png" width="2" height="16" class="separate">
+          <img src="test/trash.png" width="16" height="16" class="icon">
+          <img src="test/close.png" width="16" height="16" class="icon">
+        </div>
       </header>
       <ul class="tab-bar">
         <li class="tab-selected">私、能力値は平均値以下</li>

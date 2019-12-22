@@ -8,7 +8,7 @@ katjusha.dataset.サイト名 = document.title
         return
     }
 
-    const before = document.querySelector("#板一覧 [data-selected]")
+    const before = 板一覧.querySelector('[data-selected]')
     if(before){
         delete before.dataset.selected
     }
@@ -20,13 +20,32 @@ katjusha.dataset.サイト名 = document.title
     katjusha.dataset.板名  = event.target.textContent
     katjusha.dataset.板bbs = dir[dir.length-2]
 
-    document.title = `${katjusha.dataset.サイト名} [${event.target.textContent}]`
+    document.title = `${katjusha.dataset.サイト名} [ ${event.target.textContent} ]`
 
-    ajax(`${event.target.href}subject.txt`, subject_loaded)
+    ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
 
 
-スレ投稿ボタン.onclick = function (event){
+
+スレッド一覧_tbody.onclick = function(event){
+    event.preventDefault()
+    const tr = event.target.closest('tr')
+    if(!tr){
+        return
+    }
+    const before = スレッド一覧.querySelector('[data-selected]')
+    if(before){
+        delete before.dataset.selected
+    }
+    tr.dataset.selected = 'selected'
+
+    const a  = tr.querySelector('a')
+
+    console.dir(a.href)
+}
+
+
+スレッド投稿ボタン.onclick = function (event){
     if(katjusha.dataset.投稿フォーム){
         return
     }
@@ -43,7 +62,7 @@ katjusha.dataset.サイト名 = document.title
     投稿フォーム_本文欄.value        = ''
     投稿フォーム_bbs.value           = katjusha.dataset.板bbs
 
-    katjusha.dataset.投稿フォーム = 'スレ'
+    katjusha.dataset.投稿フォーム = 'スレッド'
 
     const form = 投稿フォーム.getBoundingClientRect()
     投稿フォーム.style.left = (innerWidth/2  - form.width/2)  + 'px'
@@ -79,7 +98,7 @@ katjusha.dataset.サイト名 = document.title
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(event.target.getAttribute('action'), new FormData(event.target), cgi_loaded)
+    ajax(event.target.getAttribute('action'), new FormData(event.target), cgi_loadend)
 }
 
 
@@ -121,29 +140,25 @@ katjusha.dataset.サイト名 = document.title
 }
 
 
-function subject_loaded(xhr){
+function subject_loadend(xhr){
     if(xhr.status !== 200){
         スレッド一覧_tbody.innerHTML = ''
         return
     }
 
-    let html = '';
-    let no   = 1;
-    for(let v of xhr.responseText.split("\n")){
-        if(!v){
-            continue
-        }
-        const [key, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        html += `<tr><td>${no}</td><td>${subject}</td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
-        no++
+    const list = xhr.responseText.split("\n")
+    const bbs  = katjusha.dataset.板bbs;
+    let   html = '';
+    for(let i = 0; i < list.length-1; i++){
+        const [key, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        html += `<tr><td>${i+1}</td><td><a href="test/read.cgi/${bbs}/${key.replace('.dat','')}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
     }
-
     スレッド一覧_tbody.innerHTML = html
 }
 
 
 
-function cgi_loaded(xhr){
+function cgi_loadend(xhr){
     if(xhr.status !== 200){
         alert('投稿できませんでした')
         return
@@ -152,14 +167,20 @@ function cgi_loaded(xhr){
         alert(xhr.responseText.match(/<b>(.+?)</i)[1])
         return
     }
+
+    if(katjusha.dataset.投稿フォーム === 'スレッド'){
+        ajax(`${katjusha.dataset.板url}subject.txt`, subject_loadend)
+    }
+    else{
+        
+    }
     delete katjusha.dataset.投稿フォーム
-    ajax(`${katjusha.dataset.板url}subject.txt`, subject_loaded)
 }
 
 
 
 function ajax(url, body, fn){
-    ヘッダ_アニメ.dataset.ajax = Number(ヘッダ_アニメ.dataset.ajax) + 1
+    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
@@ -171,7 +192,7 @@ function ajax(url, body, fn){
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
     xhr.onloadend = function(event){
-        ヘッダ_アニメ.dataset.ajax = Number(ヘッダ_アニメ.dataset.ajax) - 1
+        ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
         fn(event.target)
     }
     xhr.send(body)
