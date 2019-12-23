@@ -2,15 +2,16 @@
 katjusha.dataset.サイト名 = document.title
 
 katjusha.bbslist = {}
-for(const el of document.querySelectorAll('#板一覧 a')){
+for(const el of 板一覧.querySelectorAll('a')){
     const dir = el.href.split('/')
+    dir.pop()
 
-    katjusha.bbslist[el.href] = {}
-    katjusha.bbslist[el.href].url  = el.href
-    katjusha.bbslist[el.href].name = el.textContent
-    katjusha.bbslist[el.href].key  = dir[dir.length-2]
-    dir.splice(-2)
-    katjusha.bbslist[el.href].home = dir.join('/') + '/'
+    katjusha.bbslist[el.href] = {
+        url : el.href,
+        name: el.textContent,
+        key : dir.pop(),
+        home: dir.join('/') + '/',
+    }
 }
 
 
