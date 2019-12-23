@@ -29,8 +29,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
 
     document.title = `${katjusha.dataset.サイト名} [ ${event.target.textContent} ]`
 
-    katjusha.dataset.bbsurl = event.target.href
-    ajax(`${event.target.href}subject.txt`, event.target.href, subject_loadend)
+    ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
 
 
@@ -51,7 +50,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
     }
     tr.dataset.selected = 'selected'
 
-    ajax(`${this.dataset.bbsurl}/dat/${tr.dataset.key}.dat?${Date.now()}`, this.dataset.bbsurl, dat_loadend)
+    ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
 }
 
 
@@ -59,7 +58,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    const bbs = katjusha.bbslist[katjusha.dataset.bbsurl]
+    const bbs = katjusha.bbslist[スレッド一覧_tbody.dataset.bbsurl]
     if(!bbs){
         return
     }
@@ -145,7 +144,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(this.getAttribute('action'), this.dataset.bbsurl, new FormData(this), cgi_loadend)
+    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this))
 }
 
 
@@ -249,7 +248,7 @@ function cgi_loadend(xhr){
     }
 
     if(katjusha.dataset.投稿フォーム === 'スレッド'){
-        ajax(`${xhr.bbsurl}subject.txt`, xhr.bbsurl, subject_loadend)
+        ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
     }
     else{
         
@@ -259,18 +258,18 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, bbsurl, body, fn){
+function ajax(url, fn, body){
     ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
-        xhr.key = body.get('key')
+        xhr.bbsurl = url.replace('test/bbs.cgi', body.get('bbs') + '/')
+        xhr.key    = body.get('key')
     }
     else{
         xhr.open('GET', `${url}?${Date.now()}`)
-        const file = url.split('/').pop()
-        xhr.key = file.replace(/\..*/, '');
-        [fn, body] = [body, fn]
+        xhr.bbsurl = url.endsWith('txt') ? url.replace('subject.txt', '') : url.replace(/\/(dat|kako)\/\d.*/, '/')
+        xhr.key    = url.split('/').pop().replace(/\..*/, '')
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
@@ -278,6 +277,5 @@ function ajax(url, bbsurl, body, fn){
         ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
         fn(event.target)
     }
-    xhr.bbsurl = bbsurl
     xhr.send(body)
 }

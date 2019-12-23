@@ -31,16 +31,13 @@ $is_thread = $key ? false : true;
 if($is_thread){
     $key = $_SERVER['REQUEST_TIME'];
 }
-else{
-    $subject = '';
-}
 
 $bbs_path     = sprintf('%s/../%s', __DIR__, $bbs);
 $subject_path = sprintf('%s/subject.txt', $bbs_path);
 $dat_path     = sprintf('%s/dat/%s.dat', $bbs_path, $key);
 $kako_path    = sprintf('%s/kako/%s/%s/%s.dat', $bbs_path, substr($key,0,4), substr($key,0,5), $key);
 
-file_put_contents("o.txt", "$from$message");
+
 
 if(!$bbs){
     error('bbsが存在しません');
@@ -86,10 +83,7 @@ if(strlen($message) > 800){
 $from    = html_escape($from);
 $mail    = html_escape($mail);
 $message = html_escape($message, '<br>');
-
-if($is_thread){
-    $subject = html_escape($subject);
-}
+$subject = $is_thread ? html_escape($subject) : '';
 
 $date = create_date();
 $dat  = "$from<>$mail<>$date<> $message <>$subject\n";
