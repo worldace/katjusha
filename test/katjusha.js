@@ -1,12 +1,11 @@
 
-katjusha.dataset.サイト名 = document.title
-
-katjusha.bbslist = {}
+katjusha.site = document.title
+katjusha.home = document.querySelector('base').href
+katjusha.bbs  = {}
 for(const el of 板一覧.querySelectorAll('a')){
     const dir = el.href.split('/')
     dir.pop()
-
-    katjusha.bbslist[el.href] = {
+    katjusha.bbs[el.href] = {
         url : el.href,
         name: el.textContent,
         key : dir.pop(),
@@ -24,7 +23,7 @@ for(const el of 板一覧.querySelectorAll('a')){
 
     change_selected(event.target, 板一覧)
 
-    document.title = `${katjusha.dataset.サイト名} [ ${event.target.textContent} ]`
+    document.title = `${katjusha.site} [ ${event.target.textContent} ]`
 
     ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
@@ -49,20 +48,22 @@ for(const el of 板一覧.querySelectorAll('a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    const bbs = katjusha.bbslist[スレッド一覧_tbody.dataset.bbsurl]
+    const bbs = katjusha.bbs[スレッド一覧_tbody.dataset.bbsurl]
     if(!bbs){
         return
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+    set_value(投稿フォーム, {
+        subject : '',
+        FROM    : '',
+        mail    : '',
+        MESSAGE : '',
+        bbs     : bbs.key,
+        key     : '',
+    })
 
-    投稿フォーム_タイトル欄.disabled = false
-    投稿フォーム_タイトル欄.value    = ''
-    投稿フォーム_名前欄.value        = ''
-    投稿フォーム_メール欄.value      = ''
-    投稿フォーム_本文欄.value        = ''
-    投稿フォーム_bbs.value           = bbs.key
-
+    投稿フォーム_タイトル欄.disabled  = false
     投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
     katjusha.dataset.投稿フォーム = 'スレッド'
     centering(投稿フォーム)
@@ -76,23 +77,24 @@ for(const el of 板一覧.querySelectorAll('a')){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
-    const bbs = katjusha.bbslist[tab.dataset.bbsurl]
+    const bbs = katjusha.bbs[tab.dataset.bbsurl]
 
     if(!tab.dataset.key){
         return
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+    set_value(投稿フォーム, {
+        subject : tab.innerHTML,
+        FROM    : '',
+        mail    : '',
+        MESSAGE : '',
+        bbs     : bbs.key,
+        key     : tab.dataset.key
+    })
 
     投稿フォーム_タイトル欄.disabled = true
-    投稿フォーム_タイトル欄.value    = tab.innerHTML
-    投稿フォーム_名前欄.value        = ''
-    投稿フォーム_メール欄.value      = ''
-    投稿フォーム_本文欄.value        = ''
-    投稿フォーム_bbs.value           = bbs.key
-    投稿フォーム_key.value           = tab.dataset.key
-
-    投稿フォーム_タイトル.textContent = `「${tab.innerHTML}」にレス`
+    投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
     katjusha.dataset.投稿フォーム = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
@@ -123,7 +125,7 @@ for(const el of 板一覧.querySelectorAll('a')){
 
 
 
-投稿フォーム_キャンセルボタン.onclick = function (event){
+投稿フォーム_form.onreset = function (event){
     delete katjusha.dataset.投稿フォーム
 }
 
@@ -143,7 +145,7 @@ for(const el of 板一覧.querySelectorAll('a')){
     投稿フォーム.limitY = innerHeight - form.height - 1
 
     document.addEventListener('mousemove', 投稿フォーム_ヘッダ.mousemove, {passive:true})
-    document.addEventListener('mouseup'  , 投稿フォーム_ヘッダ.mouseup, {once:true})
+    document.addEventListener('mouseup'  , 投稿フォーム_ヘッダ.mouseup,   {once:true})
 }
 
 
@@ -167,7 +169,7 @@ function subject_loadend(xhr){
     }
 
     const list = xhr.responseText.split("\n")
-    const bbs  = katjusha.bbslist[xhr.bbsurl]
+    const bbs  = katjusha.bbs[xhr.bbsurl]
 
     let   html = '';
     for(let i = 0; i < list.length-1; i++){
@@ -177,7 +179,7 @@ function subject_loadend(xhr){
     }
     スレッド一覧_tbody.innerHTML = html
     スレッド一覧_tbody.dataset.bbsurl = xhr.bbsurl
-    
+
     grid3.scrollTop = 0
 }
 
@@ -197,7 +199,7 @@ function dat_loadend(xhr){
     }
     スレッド.innerHTML = html
 
-    const bbaname = katjusha.bbslist[xhr.bbsurl].name
+    const bbaname = katjusha.bbs[xhr.bbsurl].name
     const subject = list[0].split('<>').pop()
     スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
     スレッドヘッダ_タイトル.innerHTML = `${subject} (${list.length-1})`
@@ -269,4 +271,16 @@ function centering(el){
     const {width, height} = el.getBoundingClientRect()
     el.style.left = (innerWidth/2  - width/2)  + 'px'
     el.style.top  = (innerHeight/2 - height/2) + 'px'
+}
+
+
+
+
+
+function set_value(form, value){
+    for(const el of form.querySelectorAll('[name]')){
+        if(el.name in value){
+            el.value = value[el.name]
+        }
+    }
 }
