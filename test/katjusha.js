@@ -21,17 +21,12 @@ for(const el of document.querySelectorAll('#板一覧 a')){
         return
     }
 
-    const before = 板一覧.querySelector('[data-selected]')
-    if(before){
-        delete before.dataset.selected
-    }
-    event.target.dataset.selected = 'selected'
+    change_selected(event.target, 板一覧)
 
     document.title = `${katjusha.dataset.サイト名} [ ${event.target.textContent} ]`
 
     ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
-
 
 
 スレッド一覧_tbody.onclick = function(event){
@@ -44,12 +39,7 @@ for(const el of document.querySelectorAll('#板一覧 a')){
         return
     }
 
-    const before = スレッド一覧.querySelector('[data-selected]')
-    if(before){
-        delete before.dataset.selected
-    }
-    tr.dataset.selected = 'selected'
-
+    change_selected(tr, スレッド一覧)
     ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
 }
 
@@ -63,27 +53,20 @@ for(const el of document.querySelectorAll('#板一覧 a')){
         return
     }
 
-    投稿フォーム_form.dataset.bbsurl = bbs.url;
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
 
-    投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
-
-    投稿フォーム_タイトル欄.value    = ''
     投稿フォーム_タイトル欄.disabled = false
+    投稿フォーム_タイトル欄.value    = ''
     投稿フォーム_名前欄.value        = ''
     投稿フォーム_メール欄.value      = ''
     投稿フォーム_本文欄.value        = ''
     投稿フォーム_bbs.value           = bbs.key
 
+    投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
     katjusha.dataset.投稿フォーム = 'スレッド'
-
-    const form = 投稿フォーム.getBoundingClientRect()
-    投稿フォーム.style.left = (innerWidth/2  - form.width/2)  + 'px'
-    投稿フォーム.style.top  = (innerHeight/2 - form.height/2) + 'px'
-
+    centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
-
 
 
 
@@ -91,36 +74,26 @@ for(const el of document.querySelectorAll('#板一覧 a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    const tab    = タブ.querySelector('[data-selected]')
-    const bbsurl = tab.dataset.bbsurl
-    const key    = tab.dataset.key
+    const tab = タブ.querySelector('[data-selected]')
+    const bbs = katjusha.bbslist[tab.dataset.bbsurl]
 
-    if(!bbsurl || !key){
+    if(!tab.dataset.key){
         return
     }
 
-    const bbs = katjusha.bbslist[bbsurl]
-
-    投稿フォーム_form.dataset.bbsurl = bbs.url;
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
 
-    投稿フォーム_タイトル.textContent = `「${tab.innerHTML}」にレス`
-
-    投稿フォーム_タイトル欄.value = tab.innerHTML
-    投稿フォーム_名前欄.value     = ''
-    投稿フォーム_メール欄.value   = ''
-    投稿フォーム_本文欄.value     = ''
-    投稿フォーム_bbs.value        = bbs.key
-    投稿フォーム_key.value        = key
-
     投稿フォーム_タイトル欄.disabled = true
+    投稿フォーム_タイトル欄.value    = tab.innerHTML
+    投稿フォーム_名前欄.value        = ''
+    投稿フォーム_メール欄.value      = ''
+    投稿フォーム_本文欄.value        = ''
+    投稿フォーム_bbs.value           = bbs.key
+    投稿フォーム_key.value           = tab.dataset.key
 
+    投稿フォーム_タイトル.textContent = `「${tab.innerHTML}」にレス`
     katjusha.dataset.投稿フォーム = 'レス'
-
-    const form = 投稿フォーム.getBoundingClientRect()
-    投稿フォーム.style.left = (innerWidth/2  - form.width/2)  + 'px'
-    投稿フォーム.style.top  = (innerHeight/2 - form.height/2) + 'px'
-
+    centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
 
@@ -278,4 +251,21 @@ function ajax(url, fn, body){
         fn(event.target)
     }
     xhr.send(body)
+}
+
+
+
+function change_selected(el, parent){
+    const before = parent.querySelector('[data-selected]')
+    if(before){
+        delete before.dataset.selected
+    }
+    el.dataset.selected = 'selected'
+}
+
+
+function centering(el){
+    const {width, height} = el.getBoundingClientRect()
+    el.style.left = (innerWidth/2  - width/2)  + 'px'
+    el.style.top  = (innerHeight/2 - height/2) + 'px'
 }
