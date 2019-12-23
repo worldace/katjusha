@@ -53,7 +53,7 @@ for(const el of 板一覧.querySelectorAll('a')){
         return
     }
 
-    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
         subject : '',
         FROM    : '',
@@ -83,7 +83,7 @@ for(const el of 板一覧.querySelectorAll('a')){
         return
     }
 
-    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`);
+    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
         subject : tab.innerHTML,
         FROM    : '',
@@ -135,30 +135,41 @@ for(const el of 板一覧.querySelectorAll('a')){
 }
 
 
+投稿フォーム_sage.onchange = function (event){
+    if(event.target.checked){
+        投稿フォーム_メール欄.disabled = true
+        投稿フォーム_メール欄.value    = 'sage'
+    }
+    else{
+        投稿フォーム_メール欄.disabled = false
+        投稿フォーム_メール欄.value    = ''
+    }
+}
+
 
 投稿フォーム_ヘッダ.onmousedown = function (event){
-    const form = 投稿フォーム.getBoundingClientRect()
+    const {left, top, width, height} = 投稿フォーム.getBoundingClientRect()
 
-    投稿フォーム.startX = form.left   - event.pageX
-    投稿フォーム.startY = form.top    - event.pageY
-    投稿フォーム.limitX = innerWidth  - form.width  - 1
-    投稿フォーム.limitY = innerHeight - form.height - 1
+    投稿フォーム.startX = left - event.pageX
+    投稿フォーム.startY = top  - event.pageY
+    投稿フォーム.limitX = innerWidth  - width  - 1
+    投稿フォーム.limitY = innerHeight - height - 1
 
-    document.addEventListener('mousemove', 投稿フォーム_ヘッダ.mousemove, {passive:true})
-    document.addEventListener('mouseup'  , 投稿フォーム_ヘッダ.mouseup,   {once:true})
+    document.addEventListener('mousemove', 投稿フォーム.移動,     {passive:true})
+    document.addEventListener('mouseup'  , 投稿フォーム.移動解除, {once:true})
 }
 
 
 
-投稿フォーム_ヘッダ.mousemove = function (event){
+投稿フォーム.移動 = function (event){
     投稿フォーム.style.left = Math.min(Math.max(0, 投稿フォーム.startX+event.pageX), 投稿フォーム.limitX) + 'px'
     投稿フォーム.style.top  = Math.min(Math.max(0, 投稿フォーム.startY+event.pageY), 投稿フォーム.limitY) + 'px'
 }
 
 
 
-投稿フォーム_ヘッダ.mouseup = function (event){
-    document.removeEventListener('mousemove', 投稿フォーム_ヘッダ.mousemove)
+投稿フォーム.移動解除 = function (event){
+    document.removeEventListener('mousemove', 投稿フォーム.移動)
 }
 
 
@@ -171,7 +182,7 @@ function subject_loadend(xhr){
     const list = xhr.responseText.split("\n")
     const bbs  = katjusha.bbs[xhr.bbsurl]
 
-    let   html = '';
+    let html = ''
     for(let i = 0; i < list.length-1; i++){
         const [dat, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key = dat.replace('.dat', '')
@@ -191,9 +202,9 @@ function dat_loadend(xhr){
     }
 
     const list = xhr.responseText.split("\n")
-    let   html = '';
+    let   html = ''
     for(let i = 0; i < list.length-1; i++){
-        const [from, mail, date, message, subject] = list[i].split('<>');
+        const [from, mail, date, message, subject] = list[i].split('<>')
         html += `<section><header><i>${i+1}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header>`
         html += `<p>${message}</p></section>`
     }
@@ -227,7 +238,7 @@ function cgi_loadend(xhr){
         ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
     }
     else{
-        
+        // 未作成
     }
     delete katjusha.dataset.投稿フォーム
 }
@@ -272,8 +283,6 @@ function centering(el){
     el.style.left = (innerWidth/2  - width/2)  + 'px'
     el.style.top  = (innerHeight/2 - height/2) + 'px'
 }
-
-
 
 
 
