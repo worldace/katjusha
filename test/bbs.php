@@ -80,7 +80,7 @@ if(strlen($message) > 800){
 
 
 
-$from    = html_escape($from);
+$from    = $from !== '' ? html_escape($from) : '名無しさん';
 $mail    = html_escape($mail);
 $message = html_escape($message, '<br>');
 $subject = $is_thread ? html_escape($subject) : '';
