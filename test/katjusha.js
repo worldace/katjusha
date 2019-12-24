@@ -118,6 +118,12 @@ for(const el of 板一覧.querySelectorAll('a')){
 }
 
 
+スレッド.onscroll = function (event){
+    this.thread.scroll = this.scrollTop
+}
+
+
+
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
     ajax(this.getAttribute('action'), cgi_loadend, new FormData(this))
@@ -194,56 +200,65 @@ function subject_loadend(xhr){
     grid3.scrollTop = 0
 }
 
+function parse_dat(responseText, num){
+    const dat  = {html: ''}
+    const list = responseText.split("\n")
+    list.pop()
+
+    dat.num     = list.length
+    dat.subject = list[0].split('<>').pop()
+
+    for(const v of list){
+        const [from, mail, date, message, subject] = v.split('<>')
+        dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        num++
+    }
+    return dat
+}
+
+
+
+function render_thread(thread){
+    const tab = タブ.querySelector(`[data-url="${thread.url}"]`) || タブ.querySelector('[data-selected]')
+    tab.innerHTML      = thread.subject
+    tab.dataset.bbsurl = thread.bbsurl
+    tab.dataset.key    = thread.key
+    tab.dataset.url    = thread.url
+
+    スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
+    スレッドヘッダ_板名.innerHTML     = `<a href="${thread.bbsurl}">[${板一覧[thread.bbsurl].name}]</a>`
+
+    スレッド.innerHTML = thread.html
+    スレッド.thread    = thread
+    スレッド.scrollTop = thread.scroll || 0
+}
+
 
 
 function dat_loadend(xhr){
-    /*if(xhr.status >= 300){
-        return
-    }*/
-
-
     const thread  = state[xhr.bbsurl][xhr.key]
-    const list    = xhr.responseText.split("\n")
-    let   num     = thread.num ? thread.num+1 : 1
-    let   html    = ''
-
-    list.pop()
-    for(const v of list){
-        const [from, mail, date, message, subject] = v.split('<>')
-        html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
-        num++
-    }
 
     if(xhr.status === 200){
-        thread.el           = document.createElement('article')
-        thread.el.id        = 'スレッド'
-        thread.el.innerHTML = html
-        thread.byte         = Number(xhr.getResponseHeader('Content-Length'))
-        thread.subject      = list[0].split('<>').pop()
-        thread.num          = list.length
+        const dat = parse_dat(xhr.responseText, 1)
+
+        thread.key     = xhr.key
+        thread.bbsurl  = xhr.bbsurl
+        thread.url     = `${xhr.bbsurl}${xhr.key}/`
+        thread.scroll  = 0
+        thread.subject = dat.subject
+        thread.html    = dat.html
+        thread.num     = dat.num
+        thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
     }
     else if(xhr.status === 206){
-        thread.el.innerHTML += html
-        thread.byte         += Number(xhr.getResponseHeader('Content-Length') || 0)
-        thread.num          += list.length
-    }
-    console.dir(thread);
-    スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${板一覧[xhr.bbsurl].name}]</a>`
-    スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
-    スレッドヘッダ.dataset.key        = xhr.key
+        const dat = parse_dat(xhr.responseText, thread.num+1)
 
-    const tab = タブ.querySelector('[data-selected]')
-
-    if(tab.dataset.bbsurl){
-        state[tab.dataset.bbsurl][tab.dataset.key].el = スレッド.parentNode.replaceChild(thread.el, スレッド)
-    }
-    else{
-        スレッド.parentNode.replaceChild(thread.el, スレッド)
+        thread.html   += dat.html
+        thread.num    += dat.num
+        thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
     }
 
-    tab.innerHTML      = thread.subject
-    tab.dataset.bbsurl = xhr.bbsurl
-    tab.dataset.key    = xhr.key
+    render_thread(thread)
 }
 
 
@@ -258,7 +273,7 @@ function cgi_loadend(xhr){
         return
     }
 
-   xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
+    xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
 
     delete katjusha.dataset.投稿フォーム
 }
