@@ -1,11 +1,11 @@
 
-katjusha.site = document.title
-katjusha.home = document.querySelector('base').href
-katjusha.bbs  = {}
+const state = {}
+katjusha.dataset.title = document.title
+
 for(const el of 板一覧.querySelectorAll('a')){
     const dir = el.href.split('/')
     dir.pop()
-    katjusha.bbs[el.href] = {
+    板一覧[el.href] = {
         url : el.href,
         name: el.textContent,
         key : dir.pop(),
@@ -23,7 +23,7 @@ for(const el of 板一覧.querySelectorAll('a')){
 
     change_selected(event.target, 板一覧)
 
-    document.title = `${katjusha.site} [ ${event.target.textContent} ]`
+    document.title = `${katjusha.dataset.title} [ ${event.target.textContent} ]`
 
     ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
@@ -48,7 +48,7 @@ for(const el of 板一覧.querySelectorAll('a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    const bbs = katjusha.bbs[スレッド一覧_tbody.dataset.bbsurl]
+    const bbs = 板一覧[スレッド一覧_tbody.dataset.bbsurl]
     if(!bbs){
         return
     }
@@ -77,7 +77,7 @@ for(const el of 板一覧.querySelectorAll('a')){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
-    const bbs = katjusha.bbs[tab.dataset.bbsurl]
+    const bbs = 板一覧[tab.dataset.bbsurl]
 
     if(!tab.dataset.key){
         return
@@ -180,7 +180,7 @@ function subject_loadend(xhr){
     }
 
     const list = xhr.responseText.split("\n")
-    const bbs  = katjusha.bbs[xhr.bbsurl]
+    const bbs  = 板一覧[xhr.bbsurl]
 
     let html = ''
     for(let i = 0; i < list.length-1; i++){
@@ -197,29 +197,48 @@ function subject_loadend(xhr){
 
 
 function dat_loadend(xhr){
-    if(xhr.status !== 200){
+    /*if(xhr.status >= 300){
         return
-    }
+    }*/
 
-    const list = xhr.responseText.split("\n")
-    let   html = ''
+
+    const this_state = state[xhr.bbsurl][xhr.key]
+    const list       = xhr.responseText.split("\n")
+    const subject    = list[0].split('<>').pop()
+    let   html       = ''
+
     for(let i = 0; i < list.length-1; i++){
         const [from, mail, date, message, subject] = list[i].split('<>')
-        html += `<section><header><i>${i+1}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header>`
-        html += `<p>${message}</p></section>`
+        html += `<section><header><i>${i+1}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
     }
-    スレッド.innerHTML = html
 
-    const bbaname = katjusha.bbs[xhr.bbsurl].name
-    const subject = list[0].split('<>').pop()
-    スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${bbaname}]</a>`
+    if(xhr.status == 200){
+        this_state.el           = document.createElement('article')
+        this_state.el.id        = 'スレッド'
+        this_state.el.innerHTML = html
+        this_state.byte         = xhr.getResponseHeader('Content-Length')
+    }
+    else if(xhr.status == 206){
+        this_state.el.innerHTML += html
+        this_state.byte         += xhr.getResponseHeader('Content-Length') || 0
+    }
+    
+    スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${板一覧[xhr.bbsurl].name}]</a>`
     スレッドヘッダ_タイトル.innerHTML = `${subject} (${list.length-1})`
     スレッドヘッダ.dataset.key = xhr.key
 
     const tab = タブ.querySelector('[data-selected]')
+
+    if(tab.dataset.bbsurl){
+        state[tab.dataset.bbsurl][tab.dataset.key].el = スレッド.parentNode.replaceChild(this_state.el, スレッド)
+    }
+    else{
+        スレッド.parentNode.replaceChild(this_state.el, スレッド)
+    }
+
     tab.innerHTML      = subject
-    tab.dataset.key    = xhr.key
     tab.dataset.bbsurl = xhr.bbsurl
+    tab.dataset.key    = xhr.key
 }
 
 
@@ -234,19 +253,14 @@ function cgi_loadend(xhr){
         return
     }
 
-    if(katjusha.dataset.投稿フォーム === 'スレッド'){
-        ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
-    }
-    else{
-        // 未作成
-    }
+   xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
+
     delete katjusha.dataset.投稿フォーム
 }
 
 
 
 function ajax(url, fn, body){
-    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
@@ -257,13 +271,23 @@ function ajax(url, fn, body){
         xhr.open('GET', `${url}?${Date.now()}`)
         xhr.bbsurl = url.endsWith('txt') ? url.replace('subject.txt', '') : url.replace(/\/(dat|kako)\/\d.*/, '/')
         xhr.key    = url.split('/').pop().replace(/\..*/, '')
+        if(state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key] && state[xhr.bbsurl][xhr.key].byte){
+            xhr.setRequestHeader('Range', `bytes=${state[xhr.bbsurl][xhr.key].byte}-`)
+        }
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
-    xhr.onloadend = function(event){
+    xhr.onloadend = function(){
         ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
-        fn(event.target)
+        if(!state[xhr.bbsurl]){
+            state[xhr.bbsurl] = {};
+        }
+        if(!state[xhr.bbsurl][xhr.key] && xhr.key){
+            state[xhr.bbsurl][xhr.key] = {};
+        }
+        fn(xhr)
     }
+    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
     xhr.send(body)
 }
 

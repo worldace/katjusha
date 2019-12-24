@@ -17,7 +17,6 @@ body{
     display: flex;
     flex-direction: column;
     user-select: none;
-    -ms-user-select: none;
     cursor: default;
 }
 
@@ -431,11 +430,12 @@ body{
     width: 115px;
     margin-right: 6px;
 }
-
-
 #投稿フォーム_メール欄{
     width: 115px;
     margin-right: 6px;
+}
+#投稿フォーム_メール欄:disabled{
+    background-color: #fff;
 }
 #投稿フォーム label{
     margin-right: 8px;
