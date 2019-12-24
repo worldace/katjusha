@@ -202,41 +202,46 @@ function dat_loadend(xhr){
     }*/
 
 
-    const this_state = state[xhr.bbsurl][xhr.key]
-    const list       = xhr.responseText.split("\n")
-    const subject    = list[0].split('<>').pop()
-    let   html       = ''
+    const thread  = state[xhr.bbsurl][xhr.key]
+    const list    = xhr.responseText.split("\n")
+    let   num     = thread.num ? thread.num+1 : 1
+    let   html    = ''
 
-    for(let i = 0; i < list.length-1; i++){
-        const [from, mail, date, message, subject] = list[i].split('<>')
-        html += `<section><header><i>${i+1}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+    list.pop()
+    for(const v of list){
+        const [from, mail, date, message, subject] = v.split('<>')
+        html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        num++
     }
 
-    if(xhr.status == 200){
-        this_state.el           = document.createElement('article')
-        this_state.el.id        = 'スレッド'
-        this_state.el.innerHTML = html
-        this_state.byte         = xhr.getResponseHeader('Content-Length')
+    if(xhr.status === 200){
+        thread.el           = document.createElement('article')
+        thread.el.id        = 'スレッド'
+        thread.el.innerHTML = html
+        thread.byte         = Number(xhr.getResponseHeader('Content-Length'))
+        thread.subject      = list[0].split('<>').pop()
+        thread.num          = list.length
     }
-    else if(xhr.status == 206){
-        this_state.el.innerHTML += html
-        this_state.byte         += xhr.getResponseHeader('Content-Length') || 0
+    else if(xhr.status === 206){
+        thread.el.innerHTML += html
+        thread.byte         += Number(xhr.getResponseHeader('Content-Length') || 0)
+        thread.num          += list.length
     }
-    
+    console.dir(thread);
     スレッドヘッダ_板名.innerHTML     = `<a href="${xhr.bbsurl}">[${板一覧[xhr.bbsurl].name}]</a>`
-    スレッドヘッダ_タイトル.innerHTML = `${subject} (${list.length-1})`
-    スレッドヘッダ.dataset.key = xhr.key
+    スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
+    スレッドヘッダ.dataset.key        = xhr.key
 
     const tab = タブ.querySelector('[data-selected]')
 
     if(tab.dataset.bbsurl){
-        state[tab.dataset.bbsurl][tab.dataset.key].el = スレッド.parentNode.replaceChild(this_state.el, スレッド)
+        state[tab.dataset.bbsurl][tab.dataset.key].el = スレッド.parentNode.replaceChild(thread.el, スレッド)
     }
     else{
-        スレッド.parentNode.replaceChild(this_state.el, スレッド)
+        スレッド.parentNode.replaceChild(thread.el, スレッド)
     }
 
-    tab.innerHTML      = subject
+    tab.innerHTML      = thread.subject
     tab.dataset.bbsurl = xhr.bbsurl
     tab.dataset.key    = xhr.key
 }

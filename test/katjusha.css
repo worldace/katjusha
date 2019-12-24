@@ -277,7 +277,7 @@ body{
     box-shadow: 0 1px 0 0 #fff inset;
 }
 #スレッドヘッダ_板名{
-    margin-left: 8px;
+    margin-left: 14px;
 }
 #スレッドヘッダ_板名 a{
     color: #000;
@@ -336,15 +336,16 @@ body{
 #スレッド{
     font-size: 18px;
     user-select: text;
-    cursor: text;
+    cursor: auto;
     flex: 1;
     overflow-y: scroll;
     max-height: calc(100vh - 276px);
     padding: 2px 12px 24px 6px;
+    word-break:break-all;
 }
 
 #スレッド section{
-    margin: 16px 8px;
+    margin: 20px 8px;
 }
 #スレッド i{
     color: blue;
