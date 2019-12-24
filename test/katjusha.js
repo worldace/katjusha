@@ -249,6 +249,7 @@ function dat_loadend(xhr){
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
+        thread.etag    = xhr.getResponseHeader('ETag')
     }
     else if(xhr.status === 206){
         const dat = parse_dat(xhr.responseText, thread.num+1)
@@ -256,6 +257,7 @@ function dat_loadend(xhr){
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
+        thread.etag    = xhr.getResponseHeader('ETag')
     }
 
     render_thread(thread)
@@ -291,8 +293,9 @@ function ajax(url, fn, body){
         xhr.open('GET', `${url}?${Date.now()}`)
         xhr.bbsurl = url.endsWith('txt') ? url.replace('subject.txt', '') : url.replace(/\/(dat|kako)\/\d.*/, '/')
         xhr.key    = url.split('/').pop().replace(/\..*/, '')
-        if(state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key] && state[xhr.bbsurl][xhr.key].byte){
-            xhr.setRequestHeader('Range', `bytes=${state[xhr.bbsurl][xhr.key].byte}-`)
+        if(url.endsWith('dat') && state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key]){
+            xhr.setRequestHeader('Range', `bytes=${state[xhr.bbsurl][xhr.key].byte || 0}-`)
+            xhr.setRequestHeader('If-None-Match', state[xhr.bbsurl][xhr.key].etag)
         }
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
