@@ -215,6 +215,8 @@ function render_thread(thread){
     スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
     スレッドヘッダ_板名.innerHTML     = `<a href="${thread.bbsurl}">[${板一覧[thread.bbsurl].name}]</a>`
 
+    document.title = thread.subject
+
     スレッド.innerHTML = thread.html
     スレッド.thread    = thread
     スレッド.scrollTop = thread.scroll || 0
