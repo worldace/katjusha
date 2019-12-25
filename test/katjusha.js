@@ -3,7 +3,7 @@ ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 */
-const state = {}; //Threadに改名したい
+const Thread = {}
 base.title = document.title
 
 for(const el of 板一覧.querySelectorAll('a')){
@@ -35,11 +35,7 @@ if(document.URL !== base.href){
     if(event.target.tagName !== 'A'){
         return
     }
-
     change_selected(event.target, 板一覧)
-
-    document.title = `${base.title} [ ${event.target.textContent} ]`
-
     ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
 
@@ -119,13 +115,9 @@ if(document.URL !== base.href){
 
 スレッドヘッダ_板名.onclick = function (event){
     event.preventDefault()
-    if(!this.textContent){
-        return
-    }
     const bbsurl = this.querySelector("a").href
-
     if(板一覧[bbsurl]){
-        板一覧[bbsurl].el.click()
+        ajax(`${bbsurl}subject.txt`, subject_loadend)
     }
 }
 
@@ -231,7 +223,7 @@ function render_thread(thread){
 
 
 function dat_loadend(xhr){
-    const thread  = state[xhr.bbsurl][xhr.key]
+    const thread  = Thread[xhr.bbsurl][xhr.key]
 
     if(xhr.status === 200){
         const dat = parse_dat(xhr.responseText, 1)
@@ -290,8 +282,12 @@ function subject_loadend(xhr){
         const key = dat.replace('.dat', '')
         html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
     }
+
     サブジェクト一覧_tbody.innerHTML = html
     サブジェクト一覧_tbody.dataset.bbsurl = xhr.bbsurl
+
+    document.title = `${base.title} [ ${bbs.name} ]`
+    change_selected(bbs.el, 板一覧)
 
     grid3.scrollTop = 0
 }
@@ -331,20 +327,20 @@ function ajax(url, fn, body){
         xhr.bbsurl = url.replace(/\/(dat|kako)\/\d.*/, '/')
         xhr.key    = url.split('/').pop().replace(/\..*/, '')
         history.replaceState(null, null, thread_url(xhr.bbsurl, xhr.key))
-        if(state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key]){
-            xhr.setRequestHeader('Range', `bytes=${state[xhr.bbsurl][xhr.key].byte || 0}-`)
-            xhr.setRequestHeader('If-None-Match', state[xhr.bbsurl][xhr.key].etag)
+        if(Thread[xhr.bbsurl] && Thread[xhr.bbsurl][xhr.key]){
+            xhr.setRequestHeader('Range', `bytes=${Thread[xhr.bbsurl][xhr.key].byte || 0}-`)
+            xhr.setRequestHeader('If-None-Match', Thread[xhr.bbsurl][xhr.key].etag)
         }
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
     xhr.onloadend = function(){
         ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
-        if(!state[xhr.bbsurl]){
-            state[xhr.bbsurl] = {};
+        if(!Thread[xhr.bbsurl]){
+            Thread[xhr.bbsurl] = {};
         }
-        if(!state[xhr.bbsurl][xhr.key] && xhr.key){
-            state[xhr.bbsurl][xhr.key] = {};
+        if(!Thread[xhr.bbsurl][xhr.key] && xhr.key){
+            Thread[xhr.bbsurl][xhr.key] = {};
         }
         fn(xhr)
     }
