@@ -1,15 +1,30 @@
+/*
+ajaxにタブも送る
 
-const state = {}
-katjusha.dataset.title = document.title
+bbs.php thread($bbs, $subject, $from, $mail, $body) res()
+*/
+const state = {}; //Threadに改名したい
+base.title = document.title
 
 for(const el of 板一覧.querySelectorAll('a')){
     const dir = el.href.split('/')
     dir.pop()
     板一覧[el.href] = {
-        url : el.href,
-        name: el.textContent,
-        key : dir.pop(),
-        home: dir.join('/') + '/',
+        url  : el.href,
+        name : el.textContent,
+        key  : dir.pop(),
+        home : dir.join('/') + '/',
+        el   : el,
+    }
+}
+
+if(document.URL !== base.href){
+    if(板一覧[document.URL]){
+        ajax(`${document.URL}subject.txt`, subject_loadend)
+    }
+    else{
+        const {bbsurl, key} = thread_url(document.URL)
+        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
 }
 
@@ -23,13 +38,13 @@ for(const el of 板一覧.querySelectorAll('a')){
 
     change_selected(event.target, 板一覧)
 
-    document.title = `${katjusha.dataset.title} [ ${event.target.textContent} ]`
+    document.title = `${base.title} [ ${event.target.textContent} ]`
 
     ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
 
 
-スレッド一覧_tbody.onclick = function(event){
+サブジェクト一覧_tbody.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(!tr){
@@ -39,7 +54,7 @@ for(const el of 板一覧.querySelectorAll('a')){
         return
     }
 
-    change_selected(tr, スレッド一覧)
+    change_selected(tr, サブジェクト一覧)
     ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
 }
 
@@ -48,7 +63,7 @@ for(const el of 板一覧.querySelectorAll('a')){
     if(katjusha.dataset.投稿フォーム){
         return
     }
-    const bbs = 板一覧[スレッド一覧_tbody.dataset.bbsurl]
+    const bbs = 板一覧[サブジェクト一覧_tbody.dataset.bbsurl]
     if(!bbs){
         return
     }
@@ -109,11 +124,8 @@ for(const el of 板一覧.querySelectorAll('a')){
     }
     const bbsurl = this.querySelector("a").href
 
-    for(const el of document.querySelectorAll('#板一覧 a')){
-        if(el.href === bbsurl){
-            el.click()
-            return
-        }
+    if(板一覧[bbsurl]){
+        板一覧[bbsurl].el.click()
     }
 }
 
@@ -178,28 +190,6 @@ for(const el of 板一覧.querySelectorAll('a')){
     document.removeEventListener('mousemove', 投稿フォーム.移動)
 }
 
-
-function subject_loadend(xhr){
-    if(xhr.status !== 200){
-        スレッド一覧_tbody.innerHTML = ''
-        return
-    }
-
-    const list = xhr.responseText.split("\n")
-    const bbs  = 板一覧[xhr.bbsurl]
-
-    let html = ''
-    for(let i = 0; i < list.length-1; i++){
-        const [dat, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key = dat.replace('.dat', '')
-        html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
-    }
-    スレッド一覧_tbody.innerHTML = html
-    スレッド一覧_tbody.dataset.bbsurl = xhr.bbsurl
-
-    grid3.scrollTop = 0
-}
-
 function parse_dat(responseText, num){
     const dat  = {html: ''}
     const list = responseText.split("\n")
@@ -214,6 +204,11 @@ function parse_dat(responseText, num){
         num++
     }
     return dat
+}
+
+
+function render_subject(bbsurl){
+    
 }
 
 
@@ -243,7 +238,7 @@ function dat_loadend(xhr){
 
         thread.key     = xhr.key
         thread.bbsurl  = xhr.bbsurl
-        thread.url     = `${xhr.bbsurl}${xhr.key}/`
+        thread.url     = thread_url(xhr.bbsurl, xhr.key)
         thread.scroll  = 0
         thread.subject = dat.subject
         thread.html    = dat.html
@@ -263,6 +258,43 @@ function dat_loadend(xhr){
     render_thread(thread)
 }
 
+function thread_url(bbsurl, key){
+    if(key){
+        const dir = bbsurl.split('/').slice(0, -1)
+        const bbs = dir.pop()
+        return `${dir.join('/')}/test/read.cgi/${bbs}/${key}/`
+    }
+    else{
+        const threadurl = bbsurl
+        const dir = bbsurl.split('/').slice(0, -1)
+        const key = dir.pop()
+        const bbs = dir.pop()
+        dir.pop()
+        dir.pop()
+        return {bbsurl:`${dir.join('/')}/${bbs}/`, key}
+    }
+}
+
+function subject_loadend(xhr){
+    if(xhr.status !== 200){
+        サブジェクト一覧_tbody.innerHTML = ''
+        return
+    }
+
+    const list = xhr.responseText.split("\n")
+    const bbs  = 板一覧[xhr.bbsurl]
+
+    let html = ''
+    for(let i = 0; i < list.length-1; i++){
+        const [dat, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key = dat.replace('.dat', '')
+        html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
+    }
+    サブジェクト一覧_tbody.innerHTML = html
+    サブジェクト一覧_tbody.dataset.bbsurl = xhr.bbsurl
+
+    grid3.scrollTop = 0
+}
 
 
 function cgi_loadend(xhr){
@@ -289,11 +321,17 @@ function ajax(url, fn, body){
         xhr.bbsurl = url.replace('test/bbs.cgi', body.get('bbs') + '/')
         xhr.key    = body.get('key')
     }
+    else if(url.endsWith('txt')){
+        xhr.open('GET', `${url}?${Date.now()}`)
+        xhr.bbsurl = url.replace('subject.txt', '')
+        history.replaceState(null, null, xhr.bbsurl);
+    }
     else{
         xhr.open('GET', `${url}?${Date.now()}`)
-        xhr.bbsurl = url.endsWith('txt') ? url.replace('subject.txt', '') : url.replace(/\/(dat|kako)\/\d.*/, '/')
+        xhr.bbsurl = url.replace(/\/(dat|kako)\/\d.*/, '/')
         xhr.key    = url.split('/').pop().replace(/\..*/, '')
-        if(url.endsWith('dat') && state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key]){
+        history.replaceState(null, null, thread_url(xhr.bbsurl, xhr.key))
+        if(state[xhr.bbsurl] && state[xhr.bbsurl][xhr.key]){
             xhr.setRequestHeader('Range', `bytes=${state[xhr.bbsurl][xhr.key].byte || 0}-`)
             xhr.setRequestHeader('If-None-Match', state[xhr.bbsurl][xhr.key].etag)
         }
