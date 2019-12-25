@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <style>
+.menu{
+    position: absolute;
+}
+.menu ul{
+    z-index: 20;
+    min-width: 160px;
+    margin: 0;
+    padding: 2px 0;
+    list-style: none;
+    background-color: #f0f0f0;
+    border: 1px solid #999;
+    border-radius: 2px;
+    box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);
+}
+.menu li{
+    font-family: 'MS PGothic', sans-serif;
+    font-size: 12px;
+}
+.menu li:empty{
+    height: 2px;
+    margin: 3px 1px;
+    background-color: #e5e5e5;
+    box-shadow: 0 1px 0 #fff;
+}
+
+.menu span{
+    display: block;
+    padding: 1px 20px;
+    line-height: 18px;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.menu span:hover,
+.menu-sub:hover > span{
+    color: #fff;
+    background-color: #0081c2;
+    background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+}
+
+.menu-sub{
+    position: relative;
+}
+.menu-sub > span::after{
+    position: absolute;
+    right: 5px;
+    width: 0;
+    height: 0;
+    margin-top: 5px;
+    border: solid 5px transparent;
+    border-left: solid 5px #333;
+    content: '';
+}
+.menu-sub > ul{
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-top: -4px;
+    margin-left: -1px;
+    border-radius: 2px;
+    display: none;
+}
+.menu-sub:hover > ul{
+    display: block;
+}
+</style>
+</head>
+<body>
+<nav class="menu">
+<ul>
+  <li><span>ホーム</span></li>
+  <li><span>検索</span></li>
+  <li><span>カテゴリリスト</span></li>
+  <li class="menu-sub"><span>最近見た記事</span>
+    <ul>
+      <li><span>(なし)</span></li>
+    </ul>
+  </li>
+  <li></li>
+  <li><span>ログイン</span></li>
+</ul>
+</nav>
+<script>
+
+</script>
+
+</body>
+</html>
