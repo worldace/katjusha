@@ -214,7 +214,7 @@ body{
 #サブジェクト一覧 th:nth-of-type(2){
     text-align: left;
     padding-left: 8px;
-    width: 500px;
+    width: 450px;
     overflow: hidden;
 }
 #サブジェクト一覧 th:nth-of-type(3){

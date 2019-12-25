@@ -11,6 +11,11 @@
 */
 
 
+if(!$_POST){
+    $_POST = raw_post();
+}
+
+
 $submit = $_POST['submit'] ?? '';
 
 if($submit !== '書き込む'){
@@ -234,4 +239,14 @@ function edit_file(string $file, callable $fn, ...$args){
         fclose($fp);
         return false;
     }
+}
+
+
+function raw_post(){
+    $post = [];
+    foreach(explode('&', file_get_contents('php://input')) as $kv){
+        [$key, $value] = explode('=', $kv);
+        $post[$key]    = urldecode($value);
+    }
+    return $post;
 }
