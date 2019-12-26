@@ -568,9 +568,7 @@ body{
 }
 .menu span:hover,
 .menu-sub:hover > span{
-    color: #fff;
-    background-color: #0081c2;
-    background-image: linear-gradient(to bottom, #0088cc, #0077b3);
+    background-color: #91c9f7;
 }
 
 .menu-sub{

@@ -30,6 +30,11 @@ if(document.URL !== base.href){
 
 
 
+ナビ.oncontextmenu = function (event){
+    event.preventDefault()
+}
+
+
 板一覧.onclick = function(event){
     event.preventDefault()
     if(event.target.tagName !== 'A'){
@@ -50,6 +55,10 @@ if(document.URL !== base.href){
     コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
 }
 
+
+grid3.oncontextmenu = function (event){
+    event.preventDefault()
+}
 
 
 
@@ -140,6 +149,11 @@ if(document.URL !== base.href){
 
 
 
+スレッドヘッダ.oncontextmenu = function (event){
+    event.preventDefault()
+}
+
+
 スレッドヘッダ_板名.onclick = function (event){
     event.preventDefault()
     const bbsurl = this.querySelector('a').href
@@ -151,6 +165,13 @@ if(document.URL !== base.href){
 
 スレッド.addEventListener('scroll', () => スレッド.thread.scroll = スレッド.scrollTop, {passive:true});
 
+
+
+投稿フォーム.oncontextmenu = function (event){
+    if(event.target.tagName !== 'TEXTAREA'){
+        event.preventDefault()
+    }
+}
 
 
 
@@ -217,6 +238,7 @@ if(document.URL !== base.href){
     コンテキスト.style.left    = `${x}px`
     コンテキスト.style.top     = `${y}px`
     コンテキスト.style.display = 'block'
+    /* 右と下にオーバーフローする場合の対処 */
 }
 
 
