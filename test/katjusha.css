@@ -35,6 +35,11 @@ body{
 }
 #ナビ_板ボタン{
     flex: 1;
+    display: flex;
+    align-items: center;
+}
+#ナビ_板ボタン span{
+    padding: 2px 6px;
 }
 #ナビ_アニメ{
     width: 32px;
@@ -529,15 +534,17 @@ body{
 #コンテキスト{
     display: none;
     position: absolute;
+    z-index: 20;
 }
-
+[data-コンテキスト] #コンテキスト{
+    display: block;
+}
 #コンテキスト_サブジェクト一覧{
     width: 220px;
 }
 
 
-.menu{
-    z-index: 20;
+#コンテキスト ul{
     min-width: 160px;
     margin: 0;
     padding: 2px 0;
@@ -586,10 +593,8 @@ body{
 }
 .menu-sub > ul{
     position: absolute;
-    top: 0;
+    top: -2px;
     left: 100%;
-    margin-top: -3px;
-    margin-left: -1px;
     border-radius: 2px;
     display: none;
 }

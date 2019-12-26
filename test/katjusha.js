@@ -3,30 +3,6 @@ ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 */
-const Thread = {}
-base.title = document.title
-
-for(const el of 板一覧.querySelectorAll('a')){
-    const dir = el.href.split('/')
-    dir.pop()
-    板一覧[el.href] = {
-        url  : el.href,
-        name : el.textContent,
-        key  : dir.pop(),
-        home : dir.join('/') + '/',
-        el   : el,
-    }
-}
-
-if(document.URL !== base.href){
-    if(板一覧[document.URL]){
-        ajax(`${document.URL}subject.txt`, subject_loadend)
-    }
-    else{
-        const {bbsurl, key} = thread_url(document.URL)
-        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
-    }
-}
 
 
 
@@ -34,25 +10,42 @@ if(document.URL !== base.href){
     event.preventDefault()
 }
 
+ナビ_全板ボタン.onclick = function(){
+    event.stopPropagation()
+    コンテキスト.表示('コンテキスト_全板ボタン', this, event.pageX, event.pageY)
+}
+
+ナビ_全板ボタン.タグ作成 = function (){
+    let html = ''
+    for(const el of 板一覧.querySelectorAll('*')){
+        if(el.tagName === 'SUMMARY'){
+            html += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
+        }
+        else if(el.tagName === 'A'){
+            html += `<li><span onclick="go_bbs('${el.href}')">${el.textContent}</span></li>`
+        }
+    }
+    html = `<ul id="コンテキスト_全板ボタン" class="menu">${html.slice(10)}</ul>`
+    document.querySelector('[data-id="コンテキスト_全板ボタン"]').innerHTML = html
+}
+
 
 板一覧.onclick = function(event){
     event.preventDefault()
-    if(event.target.tagName !== 'A'){
-        return
+    if(event.target.tagName === 'A'){
+        change_selected(event.target, 板一覧)
+        ajax(`${event.target.href}subject.txt`, subject_loadend)
     }
-    change_selected(event.target, 板一覧)
-    ajax(`${event.target.href}subject.txt`, subject_loadend)
 }
 
 
 
 板一覧.oncontextmenu = function (event){
     event.preventDefault()
-    if(event.target.tagName !== 'A'){
-        return
+    if(event.target.tagName === 'A'){
+        change_selected(event.target, 板一覧)
+        コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
     }
-    change_selected(event.target, 板一覧)
-    コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
 }
 
 
@@ -65,26 +58,20 @@ grid3.oncontextmenu = function (event){
 サブジェクト一覧_tbody.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
-    if(!tr){
-        return
+    if(tr && this.dataset.bbsurl){
+        change_selected(tr, サブジェクト一覧)
+        ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
     }
-    if(!this.dataset.bbsurl){
-        return
-    }
-
-    change_selected(tr, サブジェクト一覧)
-    ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
 }
 
 
 サブジェクト一覧_tbody.oncontextmenu = function (event){
     event.preventDefault()
     const tr = event.target.closest('tr')
-    if(!tr){
-        return
+    if(tr){
+        change_selected(tr, サブジェクト一覧)
+        コンテキスト.表示('コンテキスト_サブジェクト一覧', tr.querySelector('a'), event.pageX, event.pageY)
     }
-    change_selected(tr, サブジェクト一覧)
-    コンテキスト.表示('コンテキスト_サブジェクト一覧', tr, event.pageX, event.pageY)
 }
 
 
@@ -163,7 +150,8 @@ grid3.oncontextmenu = function (event){
 }
 
 
-スレッド.addEventListener('scroll', () => スレッド.thread.scroll = スレッド.scrollTop, {passive:true});
+
+スレッド.addEventListener('scroll', function(event){ スレッド.thread.scroll = スレッド.scrollTop}, {passive:true});
 
 
 
@@ -237,17 +225,21 @@ grid3.oncontextmenu = function (event){
     コンテキスト.target        = el
     コンテキスト.style.left    = `${x}px`
     コンテキスト.style.top     = `${y}px`
-    コンテキスト.style.display = 'block'
+
+    katjusha.dataset.コンテキスト = id
     /* 右と下にオーバーフローする場合の対処 */
 }
 
 
 
 コンテキスト.onclick = function (event){
-    if(event.target.tagName === 'SPAN'){
-        コンテキスト.style.display = 'none'
+    event.stopPropagation()
+    if(event.target.onclick){
+        delete katjusha.dataset.コンテキスト
+        delete コンテキスト.target
     }
 }
+
 
 
 コンテキスト.oncontextmenu = function (event){
@@ -258,8 +250,12 @@ grid3.oncontextmenu = function (event){
 
 
 document.body.addEventListener('click', function(event){
-    コンテキスト.style.display = 'none'
-});
+    if(katjusha.dataset.コンテキスト){
+        delete katjusha.dataset.コンテキスト
+        delete コンテキスト.target
+    }
+})
+
 
 
 
@@ -447,8 +443,8 @@ function change_selected(el, parent){
 
 function centering(el){
     const {width, height} = el.getBoundingClientRect()
-    el.style.left = (innerWidth/2  - width/2)  + 'px'
-    el.style.top  = (innerHeight/2 - height/2) + 'px'
+    el.style.left = `${innerWidth/2 - width/2}px`
+    el.style.top  = `${innerHeight/2 - height/2}px`
 }
 
 
@@ -462,17 +458,43 @@ function set_value(form, value){
 }
 
 
-function copy_bbs(){
-    const el = コンテキスト.target
-    if(el){
-        navigator.clipboard.writeText(`${el.innerHTML}\n${el.href}`)
-    }
+function copy_url_title(){
+    navigator.clipboard.writeText(`${コンテキスト.target.innerHTML}\n${コンテキスト.target.href}\n`)
 }
 
 
-function copy_subject(){
-    const el = コンテキスト.target.querySelector('td:nth-of-type(2) > a')
-    if(el){
-        navigator.clipboard.writeText(`${el.innerHTML}\n${el.href}`)
+function go_bbs(bbsurl){
+    板一覧[bbsurl].el.click()
+}
+
+
+
+
+
+const Thread = {}
+
+base.title = document.title
+ナビ_全板ボタン.textContent = `▽${document.title}`
+ナビ_全板ボタン.タグ作成()
+
+for(const el of 板一覧.querySelectorAll('a')){
+    const dir = el.href.split('/')
+    dir.pop()
+    板一覧[el.href] = {
+        url  : el.href,
+        name : el.textContent,
+        key  : dir.pop(),
+        home : dir.join('/') + '/',
+        el   : el,
+    }
+}
+
+if(document.URL !== base.href){
+    if(板一覧[document.URL]){
+        ajax(`${document.URL}subject.txt`, subject_loadend)
+    }
+    else{
+        const {bbsurl, key} = thread_url(document.URL)
+        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
 }
