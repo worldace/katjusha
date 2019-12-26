@@ -12,7 +12,8 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 
 ナビ_全板ボタン.onclick = function(){
     event.stopPropagation()
-    コンテキスト.表示('コンテキスト_全板ボタン', this, event.pageX, event.pageY)
+    const {left, bottom} = this.getBoundingClientRect()
+    コンテキスト.表示('コンテキスト_全板ボタン', this, left, bottom)
 }
 
 ナビ_全板ボタン.タグ作成 = function (){
