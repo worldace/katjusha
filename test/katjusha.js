@@ -40,6 +40,19 @@ if(document.URL !== base.href){
 }
 
 
+
+板一覧.oncontextmenu = function (event){
+    event.preventDefault()
+    if(event.target.tagName !== 'A'){
+        return
+    }
+    change_selected(event.target, 板一覧)
+    コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
+}
+
+
+
+
 サブジェクト一覧_tbody.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
@@ -53,6 +66,20 @@ if(document.URL !== base.href){
     change_selected(tr, サブジェクト一覧)
     ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
 }
+
+
+サブジェクト一覧_tbody.oncontextmenu = function (event){
+    event.preventDefault()
+    const tr = event.target.closest('tr')
+    if(!tr){
+        return
+    }
+    change_selected(tr, サブジェクト一覧)
+    コンテキスト.表示('コンテキスト_サブジェクト一覧', tr, event.pageX, event.pageY)
+}
+
+
+
 
 
 スレッド投稿ボタン.onclick = function (event){
@@ -115,16 +142,15 @@ if(document.URL !== base.href){
 
 スレッドヘッダ_板名.onclick = function (event){
     event.preventDefault()
-    const bbsurl = this.querySelector("a").href
+    const bbsurl = this.querySelector('a').href
     if(板一覧[bbsurl]){
         ajax(`${bbsurl}subject.txt`, subject_loadend)
     }
 }
 
 
-スレッド.onscroll = function (event){
-    this.thread.scroll = this.scrollTop
-}
+スレッド.addEventListener('scroll', () => スレッド.thread.scroll = スレッド.scrollTop, {passive:true});
+
 
 
 
@@ -181,6 +207,39 @@ if(document.URL !== base.href){
 投稿フォーム.移動解除 = function (event){
     document.removeEventListener('mousemove', 投稿フォーム.移動)
 }
+
+
+コンテキスト.表示 = function (id, el, x, y){
+    const menu = コンテキスト.querySelector(`[data-id="${id}"]`).content.cloneNode(true)
+    コンテキスト.replaceChild(menu, コンテキスト.firstElementChild)
+
+    コンテキスト.target        = el
+    コンテキスト.style.left    = `${x}px`
+    コンテキスト.style.top     = `${y}px`
+    コンテキスト.style.display = 'block'
+}
+
+
+
+コンテキスト.onclick = function (event){
+    if(event.target.tagName === 'SPAN'){
+        コンテキスト.style.display = 'none'
+    }
+}
+
+
+コンテキスト.oncontextmenu = function (event){
+    event.preventDefault()
+    event.target.click()
+}
+
+
+
+document.body.addEventListener('click', function(event){
+    コンテキスト.style.display = 'none'
+});
+
+
 
 function parse_dat(responseText, num){
     const dat  = {html: ''}
@@ -247,6 +306,9 @@ function dat_loadend(xhr){
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
         thread.etag    = xhr.getResponseHeader('ETag')
+    }
+    else if(xhr.status === 404){
+        // URLに/kako/が含まれていなければリトライ
     }
 
     render_thread(thread)
@@ -374,5 +436,21 @@ function set_value(form, value){
         if(el.name in value){
             el.value = value[el.name]
         }
+    }
+}
+
+
+function copy_bbs(){
+    const el = コンテキスト.target
+    if(el){
+        navigator.clipboard.writeText(`${el.innerHTML}\n${el.href}`)
+    }
+}
+
+
+function copy_subject(){
+    const el = コンテキスト.target.querySelector('td:nth-of-type(2) > a')
+    if(el){
+        navigator.clipboard.writeText(`${el.innerHTML}\n${el.href}`)
     }
 }

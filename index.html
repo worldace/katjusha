@@ -7,7 +7,7 @@
   <base href="http://127.0.0.1/katjusha/" id="base">
   <link rel="icon" href="test/favicon.png" type="image/png">
   <link rel="stylesheet" href="test/katjusha.css">
-  <script type="module" src="test/katjusha.js"></script>
+  <script src="test/katjusha.js" async></script>
 </head>
 <body>
 
@@ -56,14 +56,14 @@
 
 
   <div id="grid2">
-    <div id="grid3">
+    <nav id="grid3">
       <table id="サブジェクト一覧">
         <thead><tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr></thead>
         <tbody id="サブジェクト一覧_tbody"></tbody>
       </table>
-    </div><!-- /grid3 -->
+    </nav><!-- /grid3 -->
 
-    <div id="grid4">
+    <main id="grid4">
       <header id="スレッドヘッダ">
         <div>
           <span id="スレッドヘッダ_板名"></span>
@@ -86,7 +86,7 @@
         <li data-selected></li>
       </ul>
       <article id="スレッド"></article>
-    </div><!-- /grid4 -->
+    </main><!-- /grid4 -->
 
   </div><!-- /grid2 -->
 </div><!-- /grid1 -->
@@ -118,6 +118,22 @@
     </div>
   </form>
 </div>
+
+
+<nav id="コンテキスト">
+  <ul></ul>
+  <template data-id="コンテキスト_板一覧">
+    <ul id="コンテキスト_板一覧" class="menu">
+      <li><span onclick="copy_bbs()">タイトルとURLをコピー</span></li>
+    </ul>
+  </template>
+  <template data-id="コンテキスト_サブジェクト一覧">
+    <ul id="コンテキスト_サブジェクト一覧" class="menu">
+      <li><span onclick="copy_subject()">タイトルとURLをコピー</span></li>
+    </ul>
+  </template>
+</nav>
+
 
 
 </body>
