@@ -10,11 +10,20 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
     event.preventDefault()
 }
 
+
+
 ナビ_全板ボタン.onclick = function(){
     event.stopPropagation()
+    
+    if(!this.ready){
+        ナビ_全板ボタン.タグ作成()
+        this.ready = true
+    }
     const {left, bottom} = this.getBoundingClientRect()
     コンテキスト.表示('コンテキスト_全板ボタン', this, left, bottom)
 }
+
+
 
 ナビ_全板ボタン.タグ作成 = function (){
     let html = ''
@@ -27,8 +36,9 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
         }
     }
     html = `<ul id="コンテキスト_全板ボタン" class="menu">${html.slice(10)}</ul>`
-    document.querySelector('[data-id="コンテキスト_全板ボタン"]').innerHTML = html
+    コンテキスト.querySelector('[data-id="コンテキスト_全板ボタン"]').innerHTML = html
 }
+
 
 
 板一覧.onclick = function(event){
@@ -476,7 +486,6 @@ const Thread = {}
 
 base.title = document.title
 ナビ_全板ボタン.textContent = `▽${document.title}`
-ナビ_全板ボタン.タグ作成()
 
 for(const el of 板一覧.querySelectorAll('a')){
     const dir = el.href.split('/')
