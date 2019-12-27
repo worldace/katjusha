@@ -2,6 +2,7 @@
 ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
+
 */
 
 
@@ -15,9 +16,8 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 ナビ_全板ボタン.onclick = function(){
     event.stopPropagation()
     
-    if(!this.ready){
+    if(!コンテキスト_全板ボタン_template.textContent){
         ナビ_全板ボタン.タグ作成()
-        this.ready = true
     }
     const {left, bottom} = this.getBoundingClientRect()
     コンテキスト.表示('コンテキスト_全板ボタン', this, left, bottom)
@@ -26,17 +26,17 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 
 
 ナビ_全板ボタン.タグ作成 = function (){
-    let html = ''
+    let ul = ''
     for(const el of 板一覧.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
-            html += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
+            ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
         else if(el.tagName === 'A'){
-            html += `<li><span onclick="go_bbs('${el.href}')">${el.textContent}</span></li>`
+            ul += `<li><span onclick="go_bbs('${el.href}')">${el.textContent}</span></li>`
         }
     }
-    html = `<ul id="コンテキスト_全板ボタン" class="menu">${html.slice(10)}</ul>`
-    コンテキスト.querySelector('[data-id="コンテキスト_全板ボタン"]').innerHTML = html
+    ul = `<ul id="コンテキスト_全板ボタン" class="menu">${ul.slice(10)}</ul>`
+    コンテキスト_全板ボタン_template.innerHTML = ul
 }
 
 
@@ -90,7 +90,7 @@ grid3.oncontextmenu = function (event){
 
 
 スレッド投稿ボタン.onclick = function (event){
-    if(katjusha.dataset.投稿フォーム){
+    if(投稿フォーム.dataset.open){
         return
     }
     const bbs = 板一覧[サブジェクト一覧_tbody.dataset.bbsurl]
@@ -110,7 +110,7 @@ grid3.oncontextmenu = function (event){
 
     投稿フォーム_タイトル欄.disabled  = false
     投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
-    katjusha.dataset.投稿フォーム = 'スレッド'
+    投稿フォーム.dataset.open = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
@@ -118,7 +118,7 @@ grid3.oncontextmenu = function (event){
 
 
 レス投稿ボタン.onclick = function (event){
-    if(katjusha.dataset.投稿フォーム){
+    if(投稿フォーム.dataset.open){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
@@ -140,7 +140,7 @@ grid3.oncontextmenu = function (event){
 
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
-    katjusha.dataset.投稿フォーム = 'レス'
+    投稿フォーム.dataset.open = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
@@ -182,12 +182,12 @@ grid3.oncontextmenu = function (event){
 
 
 投稿フォーム_form.onreset = function (event){
-    delete katjusha.dataset.投稿フォーム
+    delete 投稿フォーム.dataset.open
 }
 
 
 投稿フォーム_閉じるボタン.onclick = function (event){
-    delete katjusha.dataset.投稿フォーム
+    delete 投稿フォーム.dataset.open
 }
 
 
@@ -230,15 +230,13 @@ grid3.oncontextmenu = function (event){
 
 
 コンテキスト.表示 = function (id, el, x, y){
-    const menu = コンテキスト.querySelector(`[data-id="${id}"]`).content.cloneNode(true)
+    const menu = document.getElementById(`${id}_template`).content.cloneNode(true)
     コンテキスト.replaceChild(menu, コンテキスト.firstElementChild)
 
     コンテキスト.target        = el
     コンテキスト.style.left    = `${x}px`
     コンテキスト.style.top     = `${y}px`
-
-    katjusha.dataset.コンテキスト = id
-    /* 右と下にオーバーフローする場合の対処 */
+    コンテキスト.dataset.open  = id
 }
 
 
@@ -246,7 +244,7 @@ grid3.oncontextmenu = function (event){
 コンテキスト.onclick = function (event){
     event.stopPropagation()
     if(event.target.onclick){
-        delete katjusha.dataset.コンテキスト
+        delete コンテキスト.dataset.open
         delete コンテキスト.target
     }
 }
@@ -261,8 +259,8 @@ grid3.oncontextmenu = function (event){
 
 
 document.body.addEventListener('click', function(event){
-    if(katjusha.dataset.コンテキスト){
-        delete katjusha.dataset.コンテキスト
+    if(コンテキスト.dataset.open){
+        delete コンテキスト.dataset.open
         delete コンテキスト.target
     }
 })
@@ -398,7 +396,7 @@ function cgi_loadend(xhr){
 
     xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
 
-    delete katjusha.dataset.投稿フォーム
+    delete 投稿フォーム.dataset.open
 }
 
 

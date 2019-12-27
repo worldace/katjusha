@@ -19,6 +19,8 @@ body{
     user-select: none;
     cursor: default;
     line-height: 1;
+    position: relative;
+    overflow: hidden;
 }
 
 
@@ -373,13 +375,13 @@ body{
 #投稿フォーム{
     display: none;
     position: absolute;
-    z-index: 10;
+    z-index: 5;
     border: solid 1px #2982cc;
     min-width: 400px;
     height: 272px;
     background-color: #f0f0f0;
 }
-[data-投稿フォーム] #投稿フォーム{
+#投稿フォーム[data-open]{
     display: block;
 }
 #投稿フォーム header{
@@ -534,9 +536,9 @@ body{
 #コンテキスト{
     display: none;
     position: absolute;
-    z-index: 20;
+    z-index: 10;
 }
-[data-コンテキスト] #コンテキスト{
+#コンテキスト[data-open]{
     display: block;
 }
 #コンテキスト_サブジェクト一覧{
