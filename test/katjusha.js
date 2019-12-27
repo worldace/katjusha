@@ -90,7 +90,7 @@ grid3.oncontextmenu = function (event){
 
 
 スレッド投稿ボタン.onclick = function (event){
-    if(投稿フォーム.dataset.open){
+    if(katjusha.dataset.dialog){
         return
     }
     const bbs = 板一覧[サブジェクト一覧_tbody.dataset.bbsurl]
@@ -110,7 +110,7 @@ grid3.oncontextmenu = function (event){
 
     投稿フォーム_タイトル欄.disabled  = false
     投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
-    投稿フォーム.dataset.open = 'スレッド'
+    katjusha.dataset.dialog = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
@@ -118,7 +118,7 @@ grid3.oncontextmenu = function (event){
 
 
 レス投稿ボタン.onclick = function (event){
-    if(投稿フォーム.dataset.open){
+    if(katjusha.dataset.dialog){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
@@ -140,7 +140,7 @@ grid3.oncontextmenu = function (event){
 
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
-    投稿フォーム.dataset.open = 'レス'
+    katjusha.dataset.dialog = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
@@ -182,12 +182,12 @@ grid3.oncontextmenu = function (event){
 
 
 投稿フォーム_form.onreset = function (event){
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.dialog
 }
 
 
 投稿フォーム_閉じるボタン.onclick = function (event){
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.dialog
 }
 
 
@@ -396,7 +396,7 @@ function cgi_loadend(xhr){
 
     xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
 
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.dialog
 }
 
 
