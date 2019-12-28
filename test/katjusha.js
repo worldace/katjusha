@@ -3,6 +3,7 @@ ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 
+書き込み後に 416エラー
 */
 
 
@@ -336,7 +337,7 @@ function dat_loadend(xhr){
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
-        thread.etag    = xhr.getResponseHeader('ETag')
+        thread.mtime   = xhr.getResponseHeader('Last-Modified')
 
         thread.既得    = dat.num
         thread.新着    = dat.num
@@ -348,7 +349,7 @@ function dat_loadend(xhr){
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
-        thread.etag    = xhr.getResponseHeader('ETag')
+        thread.mtime   = xhr.getResponseHeader('Last-Modified')
 
         thread.既得    = thread.num
         thread.新着    = dat.num
@@ -441,7 +442,7 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, fn, body){
+function ajax(url, fn, body){console.dir(Thread)
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
@@ -460,7 +461,7 @@ function ajax(url, fn, body){
         history.replaceState(null, null, thread_url(xhr.bbsurl, xhr.key))
         if(Thread[xhr.bbsurl] && Thread[xhr.bbsurl][xhr.key]){
             xhr.setRequestHeader('Range', `bytes=${Thread[xhr.bbsurl][xhr.key].byte || 0}-`)
-            xhr.setRequestHeader('If-None-Match', Thread[xhr.bbsurl][xhr.key].etag)
+            xhr.setRequestHeader('If-Modified-Since', Thread[xhr.bbsurl][xhr.key].mtime)
         }
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
