@@ -442,7 +442,7 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, fn, body){console.dir(Thread)
+function ajax(url, fn, body){
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
