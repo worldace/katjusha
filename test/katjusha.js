@@ -2,7 +2,6 @@
 ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
-Thread.最終取得 など
 
 */
 
@@ -429,7 +428,13 @@ function cgi_loadend(xhr){
         return
     }
 
-    xhr.key ? ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend) : ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
+    if(xhr.key){
+        Thread[xhr.bbsurl][xhr.key].最終書き込み = date()
+        ajax(`${xhr.bbsurl}dat/${xhr.key}.dat`, dat_loadend)
+    }
+    else{
+        ajax(`${xhr.bbsurl}subject.txt`, subject_loadend)
+    }
 
     delete katjusha.dataset.dialog
 }
