@@ -349,7 +349,7 @@ body{
     overflow-y: scroll;
     max-height: calc(100vh - 276px);
     padding: 2px 12px 24px 6px;
-    word-break:break-all;
+    word-break: break-all;
 }
 
 #スレッド section{

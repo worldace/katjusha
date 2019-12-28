@@ -69,10 +69,10 @@ grid3.oncontextmenu = function (event){
 サブジェクト一覧.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
-    if(tr && this.dataset.bbsurl){
+    if(tr){
         change_selected(tr, サブジェクト一覧)
-        // hrefから取るべし
-        ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
+        const {bbsurl, key} = thread_url(tr.querySelector('a').href)
+        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
 }
 
@@ -87,6 +87,17 @@ grid3.oncontextmenu = function (event){
 }
 
 
+
+サブジェクト一覧.更新 = function (thread){
+    const td = サブジェクト一覧.querySelectorAll(`[data-url="${thread.url}"] > td`)
+    if(td.length){
+        td[2].textContent = thread.num || ''
+        td[3].textContent = thread.既得 || ''
+        td[4].textContent = thread.新着 || ''
+        td[5].textContent = thread.最終取得 || ''
+        td[6].textContent = thread.最終書き込み || ''
+    }
+}
 
 
 
@@ -327,6 +338,10 @@ function dat_loadend(xhr){
         thread.num     = dat.num
         thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
         thread.etag    = xhr.getResponseHeader('ETag')
+
+        thread.既得    = dat.num
+        thread.新着    = dat.num
+        thread.最終取得= date()
     }
     else if(xhr.status === 206){
         const dat = parse_dat(xhr.responseText, thread.num+1)
@@ -335,13 +350,23 @@ function dat_loadend(xhr){
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
         thread.etag    = xhr.getResponseHeader('ETag')
+
+        thread.既得    = thread.num
+        thread.新着    = dat.num
+        thread.最終取得= date()
+   }
+    else if(xhr.status === 304){
+        thread.新着    = 0
     }
     else if(xhr.status === 404){
         // URLに/kako/が含まれていなければリトライ
     }
 
+    サブジェクト一覧.更新(thread)
     render_thread(thread)
 }
+
+
 
 function thread_url(bbsurl, key){
     if(key){
@@ -360,20 +385,28 @@ function thread_url(bbsurl, key){
     }
 }
 
+
+
 function subject_loadend(xhr){
     if(xhr.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
     }
 
-    const list = xhr.responseText.split("\n")
-    const bbs  = 板一覧[xhr.bbsurl]
+    const list   = xhr.responseText.split("\n")
+    const bbs    = 板一覧[xhr.bbsurl]
 
     let html = ''
     for(let i = 0; i < list.length-1; i++){
-        const [dat, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key = dat.replace('.dat', '')
-        html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
+        const [file, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key = file.replace('.dat', '')
+        const url = `${bbs.home}test/read.cgi/${bbs.key}/${key}/`
+
+        const thread = Thread[xhr.bbsurl][key] || {}
+        if(num == thread.既得){
+            thread.新着 = 0
+        }
+        html += `<tr data-url="${url}"><td>${i+1}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
     }
 
     サブジェクト一覧.innerHTML = html
@@ -413,7 +446,7 @@ function ajax(url, fn, body){
     else if(url.endsWith('txt')){
         xhr.open('GET', `${url}?${Date.now()}`)
         xhr.bbsurl = url.replace('subject.txt', '')
-        history.replaceState(null, null, xhr.bbsurl);
+        history.replaceState(null, null, xhr.bbsurl)
     }
     else{
         xhr.open('GET', `${url}?${Date.now()}`)
@@ -478,6 +511,20 @@ function go_bbs(bbsurl){
     板一覧[bbsurl].el.click()
 }
 
+
+
+function date(){
+    const d = new Date()
+
+    const 年 = d.getFullYear()
+    const 月 = String(d.getMonth()+1).padStart(2, 0)
+    const 日 = String(d.getDate()).padStart(2, 0)
+    const 時 = String(d.getHours()).padStart(2, 0)
+    const 分 = String(d.getMinutes()).padStart(2, 0)
+    const 秒 = String(d.getSeconds()).padStart(2, 0)
+
+    return `${年}/${月}/${日} ${時}:${分}:${秒}`
+}
 
 
 
