@@ -230,6 +230,7 @@ function edit_file(string $file, callable $fn, ...$args){
         ftruncate($fp, 0);
         rewind($fp);
         fwrite($fp, $contents);
+        fflush($fp);
         flock($fp, LOCK_UN);
         fclose($fp);
         return true;

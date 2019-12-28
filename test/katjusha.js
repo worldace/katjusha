@@ -2,6 +2,7 @@
 ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
+Thread.最終取得 など
 
 */
 
@@ -35,8 +36,7 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
             ul += `<li><span onclick="go_bbs('${el.href}')">${el.textContent}</span></li>`
         }
     }
-    ul = `<ul id="コンテキスト_全板ボタン" class="menu">${ul.slice(10)}</ul>`
-    コンテキスト_全板ボタン_template.innerHTML = ul
+    コンテキスト_全板ボタン_template.innerHTML = `<ul id="コンテキスト_全板ボタン" class="menu">${ul.slice(10)}</ul>`
 }
 
 
@@ -66,17 +66,18 @@ grid3.oncontextmenu = function (event){
 
 
 
-サブジェクト一覧_tbody.onclick = function(event){
+サブジェクト一覧.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(tr && this.dataset.bbsurl){
         change_selected(tr, サブジェクト一覧)
+        // hrefから取るべし
         ajax(`${this.dataset.bbsurl}dat/${tr.dataset.key}.dat`, dat_loadend)
     }
 }
 
 
-サブジェクト一覧_tbody.oncontextmenu = function (event){
+サブジェクト一覧.oncontextmenu = function (event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(tr){
@@ -93,7 +94,7 @@ grid3.oncontextmenu = function (event){
     if(katjusha.dataset.dialog){
         return
     }
-    const bbs = 板一覧[サブジェクト一覧_tbody.dataset.bbsurl]
+    const bbs = 板一覧[サブジェクト一覧.dataset.bbsurl]
     if(!bbs){
         return
     }
@@ -226,14 +227,15 @@ grid3.oncontextmenu = function (event){
 
 投稿フォーム.移動解除 = function (event){
     document.removeEventListener('mousemove', 投稿フォーム.移動)
+    投稿フォーム_本文欄.focus()
 }
 
 
-コンテキスト.表示 = function (id, el, x, y){
+コンテキスト.表示 = function (id, target, x, y){
     const menu = document.getElementById(`${id}_template`).content.cloneNode(true)
     コンテキスト.replaceChild(menu, コンテキスト.firstElementChild)
 
-    コンテキスト.target        = el
+    コンテキスト.target        = target
     コンテキスト.style.left    = `${x}px`
     コンテキスト.style.top     = `${y}px`
     コンテキスト.dataset.open  = id
@@ -360,7 +362,7 @@ function thread_url(bbsurl, key){
 
 function subject_loadend(xhr){
     if(xhr.status !== 200){
-        サブジェクト一覧_tbody.innerHTML = ''
+        サブジェクト一覧.innerHTML = ''
         return
     }
 
@@ -374,8 +376,8 @@ function subject_loadend(xhr){
         html += `<tr data-key="${key}"><td>${i+1}</td><td><a href="${bbs.home}test/read.cgi/${bbs.key}/${key}/">${subject}</a></td><td>${num}</td><td></td><td></td><td></td><td></td><td></td></tr>`
     }
 
-    サブジェクト一覧_tbody.innerHTML = html
-    サブジェクト一覧_tbody.dataset.bbsurl = xhr.bbsurl
+    サブジェクト一覧.innerHTML = html
+    サブジェクト一覧.dataset.bbsurl = xhr.bbsurl
 
     document.title = `${base.title} [ ${bbs.name} ]`
     change_selected(bbs.el, 板一覧)
