@@ -2,9 +2,44 @@
 ajaxにタブも送る
 
 bbs.php thread($bbs, $subject, $from, $mail, $body) res()
+bbs.php cookie name -> 元の
 
 書き込み後に 416エラー
+板URLがサブドメインでも対応
 */
+
+const Thread = {}
+
+base.title = document.title
+ナビ_全板ボタン.textContent = `▽${document.title}`
+
+for(const el of 板一覧.querySelectorAll('a')){
+    const dir = el.href.split('/').slice(0, -1)
+    板一覧[el.href] = {}
+
+    板一覧[el.href].url  = el.href
+    板一覧[el.href].name = el.textContent
+    板一覧[el.href].el   = el
+    if(dir.length > 3){
+        板一覧[el.href].key  = dir.pop()
+        板一覧[el.href].home = dir.join('/') + '/'
+    }
+    else{
+        板一覧[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
+        板一覧[el.href].home = el.href
+    }
+}
+
+if(document.URL !== base.href){
+    if(document.URL in 板一覧){
+        ajax(`${document.URL}subject.txt`, subject_loadend)
+    }
+    else{
+        const {bbsurl, key} = parse_thread_url(document.URL)
+        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
+    }
+}
+
 
 
 
@@ -14,10 +49,10 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 
 
 
-ナビ_全板ボタン.onclick = function(){
+ナビ_全板ボタン.onclick = function(event){
     event.stopPropagation()
     
-    if(!コンテキスト_全板ボタン_template.textContent){
+    if(!コンテキスト_全板ボタン_template.innerHTML){
         ナビ_全板ボタン.タグ作成()
     }
     const {left, bottom} = this.getBoundingClientRect()
@@ -71,7 +106,7 @@ grid3.oncontextmenu = function (event){
     const tr = event.target.closest('tr')
     if(tr){
         change_selected(tr, サブジェクト一覧)
-        const {bbsurl, key} = thread_url(tr.querySelector('a').href)
+        const {bbsurl, key} = parse_thread_url(tr.querySelector('a').href)
         ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
 }
@@ -111,6 +146,7 @@ grid3.oncontextmenu = function (event){
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
+    投稿フォーム_form.setAttribute('data-bbsurl', bbs.url)
     set_value(投稿フォーム, {
         subject : '',
         FROM    : '',
@@ -141,6 +177,7 @@ grid3.oncontextmenu = function (event){
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
+    投稿フォーム_form.setAttribute('data-bbsurl', bbs.url)
     set_value(投稿フォーム, {
         subject : tab.innerHTML,
         FROM    : '',
@@ -188,7 +225,7 @@ grid3.oncontextmenu = function (event){
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this))
+    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this), this.dataset.bbsurl)
 }
 
 
@@ -246,10 +283,10 @@ grid3.oncontextmenu = function (event){
     const menu = document.getElementById(`${id}_template`).content.cloneNode(true)
     コンテキスト.replaceChild(menu, コンテキスト.firstElementChild)
 
-    コンテキスト.target        = target
-    コンテキスト.style.left    = `${x}px`
-    コンテキスト.style.top     = `${y}px`
-    コンテキスト.dataset.open  = id
+    コンテキスト.target       = target
+    コンテキスト.style.left   = `${x}px`
+    コンテキスト.style.top    = `${y}px`
+    コンテキスト.dataset.open = id
 }
 
 
@@ -281,28 +318,6 @@ document.body.addEventListener('click', function(event){
 
 
 
-function parse_dat(responseText, num){
-    const dat  = {html: ''}
-    const list = responseText.split("\n")
-    list.pop()
-
-    dat.num     = list.length
-    dat.subject = list[0].split('<>').pop()
-
-    for(const v of list){
-        const [from, mail, date, message, subject] = v.split('<>')
-        dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
-        num++
-    }
-    return dat
-}
-
-
-function render_subject(bbsurl){
-    
-}
-
-
 
 function render_thread(thread){
     const tab = タブ.querySelector(`[data-url="${thread.url}"]`) || タブ.querySelector('[data-selected]')
@@ -323,6 +338,24 @@ function render_thread(thread){
 
 
 
+function parse_dat(responseText, num){
+    const dat  = {html: ''}
+    const list = responseText.split("\n")
+    list.pop()
+
+    dat.num     = list.length
+    dat.subject = list[0].split('<>').pop()
+
+    for(const v of list){
+        const [from, mail, date, message, subject] = v.split('<>')
+        dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        num++
+    }
+    return dat
+}
+
+
+
 function dat_loadend(xhr){
     const thread  = Thread[xhr.bbsurl][xhr.key]
 
@@ -331,7 +364,7 @@ function dat_loadend(xhr){
 
         thread.key     = xhr.key
         thread.bbsurl  = xhr.bbsurl
-        thread.url     = thread_url(xhr.bbsurl, xhr.key)
+        thread.url     = build_thread_url(xhr.bbsurl, xhr.key)
         thread.scroll  = 0
         thread.subject = dat.subject
         thread.html    = dat.html
@@ -368,21 +401,26 @@ function dat_loadend(xhr){
 
 
 
-function thread_url(bbsurl, key){
-    if(key){
-        const dir = bbsurl.split('/').slice(0, -1)
-        const bbs = dir.pop()
-        return `${dir.join('/')}/test/read.cgi/${bbs}/${key}/`
+function parse_subject(responseText, bbsurl){
+    const list = responseText.split("\n")
+    list.pop()
+
+    let tr = ''
+    let no = 1
+    for(const v of list){
+        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key    = file.replace('.dat', '')
+        const url    = build_thread_url(bbsurl, key)
+        const thread = Thread[bbsurl][key] || {}
+
+        if(num == thread.既得){
+            thread.新着 = 0
+        }
+
+        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        no++
     }
-    else{
-        const threadurl = bbsurl
-        const dir = bbsurl.split('/').slice(0, -1)
-        const key = dir.pop()
-        const bbs = dir.pop()
-        dir.pop()
-        dir.pop()
-        return {bbsurl:`${dir.join('/')}/${bbs}/`, key}
-    }
+    return tr
 }
 
 
@@ -393,25 +431,10 @@ function subject_loadend(xhr){
         return
     }
 
-    const list   = xhr.responseText.split("\n")
-    const bbs    = 板一覧[xhr.bbsurl]
-
-    let html = ''
-    for(let i = 0; i < list.length-1; i++){
-        const [file, subject, num] = list[i].replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key = file.replace('.dat', '')
-        const url = `${bbs.home}test/read.cgi/${bbs.key}/${key}/`
-
-        const thread = Thread[xhr.bbsurl][key] || {}
-        if(num == thread.既得){
-            thread.新着 = 0
-        }
-        html += `<tr data-url="${url}"><td>${i+1}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
-    }
-
-    サブジェクト一覧.innerHTML = html
+    サブジェクト一覧.innerHTML      = parse_subject(xhr.responseText, xhr.bbsurl)
     サブジェクト一覧.dataset.bbsurl = xhr.bbsurl
 
+    const bbs      = 板一覧[xhr.bbsurl]
     document.title = `${base.title} [ ${bbs.name} ]`
     change_selected(bbs.el, 板一覧)
 
@@ -442,11 +465,11 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, fn, body){
+function ajax(url, fn, body, bbsurl){
     const xhr = new XMLHttpRequest()
     if(url.endsWith('cgi')){
         xhr.open('POST', url)
-        xhr.bbsurl = url.replace('test/bbs.cgi', body.get('bbs') + '/')
+        xhr.bbsurl = bbsurl
         xhr.key    = body.get('key')
     }
     else if(url.endsWith('txt')){
@@ -458,7 +481,7 @@ function ajax(url, fn, body){
         xhr.open('GET', `${url}?${Date.now()}`)
         xhr.bbsurl = url.replace(/\/(dat|kako)\/\d.*/, '/')
         xhr.key    = url.split('/').pop().replace(/\..*/, '')
-        history.replaceState(null, null, thread_url(xhr.bbsurl, xhr.key))
+        history.replaceState(null, null, build_thread_url(xhr.bbsurl, xhr.key))
         if(Thread[xhr.bbsurl] && Thread[xhr.bbsurl][xhr.key]){
             xhr.setRequestHeader('Range', `bytes=${Thread[xhr.bbsurl][xhr.key].byte || 0}-`)
             xhr.setRequestHeader('If-Modified-Since', Thread[xhr.bbsurl][xhr.key].mtime)
@@ -480,6 +503,30 @@ function ajax(url, fn, body){
     xhr.send(body)
 }
 
+
+
+function build_thread_url(bbsurl, key){
+    const dir = bbsurl.split('/').slice(0, -1)
+    if(dir.length > 3){
+        const bbs = dir.pop()
+        return `${dir.join('/')}/test/read.cgi/${bbs}/${key}/`
+    }
+    else{
+        const bbs = dir[2].slice(0, dir[2].indexOf('.'))
+        return `${bbsurl}test/read.cgi/${bbs}/${key}/`
+    }
+}
+
+
+
+function parse_thread_url(url){
+    const dir = url.split('/').slice(0, -1)
+    const key = dir.pop()
+    const bbs = dir.pop()
+    dir.pop()
+    dir.pop()
+    return {bbsurl:`${dir.join('/')}/${bbs}/`, key:key}
+}
 
 
 function change_selected(el, parent){
@@ -520,7 +567,7 @@ function go_bbs(bbsurl){
 
 
 function date(){
-    const d = new Date()
+    const d  = new Date()
 
     const 年 = d.getFullYear()
     const 月 = String(d.getMonth()+1).padStart(2, 0)
@@ -532,32 +579,3 @@ function date(){
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
 }
 
-
-
-
-const Thread = {}
-
-base.title = document.title
-ナビ_全板ボタン.textContent = `▽${document.title}`
-
-for(const el of 板一覧.querySelectorAll('a')){
-    const dir = el.href.split('/')
-    dir.pop()
-    板一覧[el.href] = {
-        url  : el.href,
-        name : el.textContent,
-        key  : dir.pop(),
-        home : dir.join('/') + '/',
-        el   : el,
-    }
-}
-
-if(document.URL !== base.href){
-    if(板一覧[document.URL]){
-        ajax(`${document.URL}subject.txt`, subject_loadend)
-    }
-    else{
-        const {bbsurl, key} = thread_url(document.URL)
-        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
-    }
-}
