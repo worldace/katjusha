@@ -5,7 +5,6 @@ bbs.php thread($bbs, $subject, $from, $mail, $body) res()
 bbs.php cookie name -> 元の
 
 書き込み後に 416エラー
-板URLがサブドメインでも対応
 */
 
 const Thread = {}
@@ -52,7 +51,7 @@ if(document.URL !== base.href){
 ナビ_全板ボタン.onclick = function(event){
     event.stopPropagation()
     
-    if(!コンテキスト_全板ボタン_template.innerHTML){
+    if(!コンテキスト_全板ボタン_template.textContent){
         ナビ_全板ボタン.タグ作成()
     }
     const {left, bottom} = this.getBoundingClientRect()
