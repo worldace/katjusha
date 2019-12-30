@@ -80,10 +80,10 @@ $message = html_escape($message, '<br>');
 if($is_thread){
     $subject = html_escape($subject);
     $key     = $_SERVER['REQUEST_TIME'];
-    thread($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッドを立てれませんでした');
+    thread($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッド書き込みエラー');
 }
 else{
-    res($bbs_path, $key, $from, $mail, $message) ? success($bbs, $key) : error('書き込みできませんでした');
+    res($bbs_path, $key, $from, $mail, $message) ? success($bbs, $key) : error('レス書き込みエラー');
 }
 
 
@@ -147,18 +147,8 @@ function success($bbs, $key){
     header('Cache-Control: no-cache');
     header('Content-type: text/html; charset=shift_jis');
 
-    $html = <<<END
-    <html><!-- 2ch_X:true -->
-    <head>
-      <title>書きこみました。</title>
-      <meta http-equiv="refresh" content="1;URL=read.cgi/$bbs/$key/">
-    </head>
-    <body>
-      書きこみが終わりました。<br><br>
-      <a href="read.cgi/$bbs/$key/">画面を切り替える</a>までしばらくお待ち下さい。
-    </body>
-    </html>
-    END;
+    $html  = "<html><!-- 2ch_X:true --><head><title>書きこみました。</title><meta http-equiv='refresh' content='1;URL=read.cgi/$bbs/$key/'></head>";
+    $html += "<body>書きこみが終わりました。<br><br><a href='read.cgi/$bbs/$key/'>画面を切り替える</a>までしばらくお待ち下さい。</body></html>";
 
     print mb_convert_encoding($html, 'sjis', 'utf-8');
 	exit;
@@ -170,17 +160,8 @@ function error($str){
 	header('Cache-Control: no-cache');
 	header('Content-Type: text/html; charset=shift_jis');
 
-    $html = <<<END
-    <html><!-- 2ch_X:error -->
-    <head>
-      <title>ＥＲＲＯＲ！</title>
-    </head>
-    <body>
-      <b>ＥＲＲＯＲ：$str</b><br>
-      <a href="javascript:history.back()">戻る</a>
-    </body>
-    </html>
-    END;
+    $html  = "<html><!-- 2ch_X:error --><head><title>ＥＲＲＯＲ！</title></head>";
+    $html += "<body><b>ＥＲＲＯＲ：$str</b><br><a href='javascript:history.back()'>戻る</a></body></html>";
 
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
@@ -195,7 +176,7 @@ function get_subject_path($bbs_path){
 
 
 function get_dat_path($bbs_path, $key){
-    return  "$bbs_path/dat/$key.dat";
+    return "$bbs_path/dat/$key.dat";
 }
 
 
