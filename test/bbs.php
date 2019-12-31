@@ -1,10 +1,10 @@
 <?php
 
+$password = '#default';
 /*
 
 トリップ
 管理者
-管理モード
 二重書き込み
 >>11
 */
@@ -29,6 +29,14 @@ $message = $_POST['MESSAGE'] ?? '';
 $is_thread = $key ? false : true;
 $bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
 
+
+if($mail === $password){
+    include './maintenance.php';
+
+    if(is_callable($from)){
+        error($from($bbs_path, $message, $key));
+    }
+}
 
 
 if(!$bbs){
@@ -73,7 +81,7 @@ if(strlen($message) > 800){
 
 
 $from    = $from !== '' ? html_escape($from) : '名無しさん';
-$mail    = html_escape($mail);
+$mail    = replace_mail($mail);
 $message = html_escape($message, '<br>');
 
 
@@ -190,6 +198,14 @@ function get_kako_path($bbs_path, $key){
 function create_date($time){
 	$week = ['日','月','火','水','木','金','土'][date('w', $time)];
 	return date("Y/m/d($week) H:i:s", $time);
+}
+
+
+
+function replace_mail($mail){
+    $mail = preg_replace('/#.*/', '', $mail);
+    $mail = html_escape($mail);
+    return $mail;
 }
 
 
