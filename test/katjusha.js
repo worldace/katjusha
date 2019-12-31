@@ -559,6 +559,13 @@ function copy_url_title(){
 }
 
 
+
+function copy_url(){
+    navigator.clipboard.writeText(コンテキスト.target.href)
+}
+
+
+
 function go_bbs(bbsurl){
     板一覧[bbsurl].el.click()
 }

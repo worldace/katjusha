@@ -23,16 +23,17 @@ function 削除($bbs_path, $message, $key = null){
 function 復帰($bbs_path){
     edit_file(get_subject_path($bbs_path), function($contents) use($bbs_path){
         foreach(glob("$bbs_path/dat/*.dat") as $v){
-            $list[$v] = filemtime("$bbs_path/dat/$v");
+            $list[$v] = filemtime($v);
         }
-        rsort($list);
+        arsort($list);
 
     	foreach(array_keys($list) as $v){
-    		$dat      = file("$bbs_path/dat/$v");
-    		$subject  = explode("<>", $dat[0])[5];
+    		$filename = basename($v);
+    		$dat      = file($v);
+    		$subject  = explode("<>", $dat[0])[4];
     		$subject  = rtrim($subject);
     		$count    = count($dat);
-    		$result[] = "$v<>$subject ($count)\n";
+    		$result[] = "$filename<>$subject ($count)\n";
     	}
 
         return $result;
@@ -82,6 +83,6 @@ function move_thread($bbs_path, $key){
 
 function delete_subject($bbs_path, $key){
 	edit_file(get_subject_path($bbs_path), function($contents) use($key){
-        return array_filter($contents, function($line) use($key){ !preg_match("/^$key\./", $line); });
+        return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
     });
 }
