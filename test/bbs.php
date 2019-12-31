@@ -156,7 +156,7 @@ function success($bbs, $key){
     header('Content-type: text/html; charset=shift_jis');
 
     $html  = "<html><!-- 2ch_X:true --><head><title>書きこみました。</title><meta http-equiv='refresh' content='1;URL=read.cgi/$bbs/$key/'></head>";
-    $html += "<body>書きこみが終わりました。<br><br><a href='read.cgi/$bbs/$key/'>画面を切り替える</a>までしばらくお待ち下さい。</body></html>";
+    $html .= "<body>書きこみが終わりました。<br><br><a href='read.cgi/$bbs/$key/'>画面を切り替える</a>までしばらくお待ち下さい。</body></html>";
 
     print mb_convert_encoding($html, 'sjis', 'utf-8');
 	exit;
@@ -169,7 +169,7 @@ function error($str){
 	header('Content-Type: text/html; charset=shift_jis');
 
     $html  = "<html><!-- 2ch_X:error --><head><title>ＥＲＲＯＲ！</title></head>";
-    $html += "<body><b>ＥＲＲＯＲ：$str</b><br><a href='javascript:history.back()'>戻る</a></body></html>";
+    $html .= "<body><b>ＥＲＲＯＲ：$str</b><br><a href='javascript:history.back()'>戻る</a></body></html>";
 
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
