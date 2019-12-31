@@ -56,7 +56,7 @@ function 倉庫($bbs_path, $message){
 
 function delete_res($bbs_path, $key, $num){
 	edit_file(get_dat_path($bbs_path, $key), function($contents) use($num){
-        $contents[$num-1] = "あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n";
+        $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
         return $contents;
     });
 }
