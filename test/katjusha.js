@@ -3,29 +3,6 @@
 */
 
 
-base.title = document.title
-ナビ_全板ボタン.textContent = `▽${document.title}`
-
-for(const el of 板.querySelectorAll('a')){
-    const dir = el.href.split('/').slice(0, -1)
-    板[el.href] = {}
-
-    板[el.href].url  = el.href
-    板[el.href].name = el.textContent
-    板[el.href].el   = el
-    if(dir.length > 3){
-        板[el.href].key  = dir.pop()
-        板[el.href].home = dir.join('/') + '/'
-    }
-    else{
-        板[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
-        板[el.href].home = el.href
-    }
-}
-
-if(document.URL !== base.href){
-    ajax(document.URL, (document.URL in 板) ? subject_loadend : dat_loadend)
-}
 
 
 
@@ -135,7 +112,6 @@ grid3.oncontextmenu = function (event){
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
-    投稿フォーム_form.setAttribute('data-bbsurl', bbs.url)
     set_value(投稿フォーム, {
         subject : '',
         FROM    : '',
@@ -166,7 +142,6 @@ grid3.oncontextmenu = function (event){
     const bbs = 板[tab.thread.bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
-    投稿フォーム_form.setAttribute('data-bbsurl', bbs.url)
     set_value(投稿フォーム, {
         subject : tab.innerHTML,
         FROM    : '',
@@ -344,7 +319,7 @@ grid3.oncontextmenu = function (event){
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this), this.dataset.bbsurl)
+    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this))
 }
 
 
@@ -445,7 +420,7 @@ function render_thread(thread){
         tab.el = スレッド.作成(thread.url)
     }
 
-    tab.el.innerHTML = thread.html
+    tab.el.innerHTML   = thread.html
     スレッド.scrollTop = thread.scroll
 
     スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
@@ -583,17 +558,18 @@ function cgi_loadend(xhr){
 
 
 
-function ajax(url, fn, body, bbsurl){
+function ajax(url, fn, body){
     const xhr = new XMLHttpRequest()
-    if(url.endsWith('cgi')){
+    if(url.endsWith('bbs.cgi')){
         xhr.open('POST', url)
+        let bbsurl = url.replace('test/bbs.cgi', '')
+        bbsurl  = (bbsurl in 板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
         xhr.url = body.get('key') ? build_thread_url(bbsurl, body.get('key')) : bbsurl
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = parse_thread_url(url)
         xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
         xhr.url = url
-        history.replaceState(null, null, url)
         if(url in スレッド){
             xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
             xhr.setRequestHeader('If-Modified-Since', スレッド[url].mtime)
@@ -601,6 +577,7 @@ function ajax(url, fn, body, bbsurl){
         else{
             スレッド[url] = {}
         }
+        history.replaceState(null, null, url)
     }
     else{
         xhr.open('GET', `${url}subject.txt?${Date.now()}`)
@@ -700,5 +677,42 @@ function date(){
     const 秒 = String(d.getSeconds()).padStart(2, 0)
 
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
+}
+
+
+
+
+
+
+
+
+base.title = document.title
+ナビ_全板ボタン.textContent = `▽${document.title}`
+
+for(const el of 板.querySelectorAll('a')){
+    const dir = el.href.split('/').slice(0, -1)
+    板[el.href] = {}
+
+    板[el.href].url  = el.href
+    板[el.href].name = el.textContent
+    板[el.href].el   = el
+    if(dir.length > 3){
+        板[el.href].key  = dir.pop()
+        板[el.href].home = dir.join('/') + '/'
+    }
+    else{
+        板[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
+        板[el.href].home = el.href
+    }
+}
+
+if(document.URL !== base.href){
+    if(document.URL in 板){
+        ajax(document.URL, subject_loadend)
+    }
+    else{
+        タブ.開く(document.URL)
+        ajax(document.URL, dat_loadend)
+    }
 }
 
