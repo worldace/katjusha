@@ -99,13 +99,13 @@ grid3.oncontextmenu = function (event){
 サブジェクト一覧.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
-    if(tr){
-        change_selected(サブジェクト一覧, tr)
-        const url = tr.querySelector('a').href
-        const {bbsurl, key} = parse_thread_url(url)
-        タブ.開く(url)
-        ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
+    if(!tr){
+        return
     }
+    change_selected(サブジェクト一覧, tr)
+    const {bbsurl, key} = parse_thread_url(tr.dataset.url)
+    タブ.開く(tr.dataset.url, tr.cells[1].textContent, tr.cells[2].textContent)
+    ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
 }
 
 
@@ -208,18 +208,17 @@ grid3.oncontextmenu = function (event){
 
 
 
-スレッドヘッダ.初期化 = function (){
-    スレッドヘッダ_タイトル.innerHTML = ''
-    スレッドヘッダ_板名.innerHTML     = ''
-    document.title = base.title
-}
-
-
-
-スレッドヘッダ.描画 = function (subject, num, bbsurl){
-    スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
-    スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板一覧[bbsurl].name}]</a>`
-    document.title = subject
+スレッドヘッダ.描画 = function (bbsurl, subject, num){
+    if(num){
+        スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
+        スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板一覧[bbsurl].name}]</a>`
+        document.title = subject
+    }
+    else{
+        スレッドヘッダ_タイトル.innerHTML = ''
+        スレッドヘッダ_板名.innerHTML     = ''
+        document.title = base.title
+    }
 }
 
 
@@ -246,7 +245,7 @@ grid3.oncontextmenu = function (event){
         delete tab.el
         delete tab.thread
 
-        スレッドヘッダ.初期化()
+        スレッドヘッダ.描画()
     }
     else{
         タブ.選択(tab.previousElementSibling || tab.nextElementSibling)
@@ -259,7 +258,7 @@ grid3.oncontextmenu = function (event){
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.thread.subject, tab.thread.num, tab.thread.bbsurl)
+    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
 }
 
 
@@ -281,7 +280,7 @@ grid3.oncontextmenu = function (event){
         tab.el.remove()
     }
 
-    tab.innerHTML = subject // subjectがない場合
+    tab.innerHTML = subject || ''
     tab.url       = url
     tab.el        = div
 
@@ -293,7 +292,7 @@ grid3.oncontextmenu = function (event){
         スレッド.scrollTop = Thread[bbsurl][key].scroll
     }
 
-    スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
+    スレッドヘッダ.描画(bbsurl, subject, num) // subject, numがない場合
 
     return tab
 }
@@ -313,7 +312,7 @@ grid3.oncontextmenu = function (event){
 
     const div     = スレッド.作成(url)
     const tab     = document.createElement('li')
-    tab.innerHTML = subject // subjectがない場合
+    tab.innerHTML = subject || ''
     tab.url       = url
     tab.el        = div
 
@@ -328,7 +327,7 @@ grid3.oncontextmenu = function (event){
         スレッド.scrollTop = Thread[bbsurl][key].scroll
     }
 
-    スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
+    スレッドヘッダ.描画(bbsurl, subject, num)
 
     return tab
 }
@@ -464,7 +463,7 @@ function render_thread(thread){
     tab.el.innerHTML = thread.html
     スレッド.scrollTop = thread.scroll
 
-    スレッドヘッダ.描画(thread.subject, thread.num, thread.bbsurl)
+    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
 }
 
 
