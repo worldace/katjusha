@@ -190,14 +190,47 @@ grid3.oncontextmenu = function (event){
 
 
 
-
-タブ.検索 = function (url){
-    for(const li of タブ.querySelectorAll('li')){
-        if(li.url === url){
-            return li
-        }
+タブ.初期化 = function (tab, thread){
+    if(!tab){
+        tab = document.createElement('li')
+        タブ.appendChild(tab)
     }
-    return タブ.querySelector('[data-selected]')
+    if(tab.el){
+        tab.el.remove()
+    }
+
+    const div     = document.createElement('div')
+    div.className = 'スレッド'
+    div.url       = thread.url
+
+    tab.innerHTML    = thread.subject || ''
+    tab.thread       = thread
+    tab.url          = thread.url
+    tab.el           = div
+    tab.el.innerHTML = thread.html || ''
+
+    スレッド.appendChild(div)
+    スレッド.scrollTop = thread.scroll || 0
+}
+
+
+
+タブ.開く = function (url, subject, num){
+    const tab = タブ.検索(url)
+    if(tab.url !== url){
+        タブ.初期化(tab, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
+    }
+    タブ.選択(tab)
+}
+
+
+
+タブ.新しく開く = function (url, subject, num){
+    const tab = タブ.検索(url)
+    if(tab.url !== url){
+        タブ.初期化(null, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
+    }
+    タブ.選択(tab)
 }
 
 
@@ -222,87 +255,23 @@ grid3.oncontextmenu = function (event){
 }
 
 
+
+タブ.検索 = function (url){
+    for(const li of タブ.querySelectorAll('li')){
+        if(li.url === url){
+            return li
+        }
+    }
+    return タブ.querySelector('[data-selected]')
+}
+
+
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
     スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
 }
 
-
-
-
-タブ.開く = function (url, subject, num){
-    for(const li of タブ.querySelectorAll('li')){
-        if(li.url === url){
-            タブ.選択(li)
-            return li
-        }
-    }
-
-    const div = スレッド.作成(url)
-    const tab = タブ.querySelector('[data-selected]')
-    if(tab.el){
-        tab.el.remove()
-    }
-
-    tab.innerHTML = subject || ''
-    tab.url       = url
-    tab.el        = div
-
-    スレッド.appendChild(div)
-    change_selected(スレッド, div)
-
-    if(url in スレッド){
-        div.innerHTML = スレッド[url].html
-        スレッド.scrollTop = スレッド[url].scroll
-    }
-
-    スレッドヘッダ.描画(parse_thread_url(url).bbsurl, subject, num) // subject, numがない場合
-
-    return tab
-}
-
-
-
-
-タブ.新しく開く = function (url, subject, num){
-    for(const li of タブ.querySelectorAll('li')){
-        if(li.url === url){
-            タブ.選択(li)
-            return li
-        }
-    }
-
-    const div     = スレッド.作成(url)
-    const tab     = document.createElement('li')
-    tab.innerHTML = subject || ''
-    tab.url       = url
-    tab.el        = div
-
-
-    スレッド.appendChild(div)
-    タブ.appendChild(tab)
-    change_selected(タブ, tab)
-    change_selected(スレッド, div)
-
-    if(url in スレッド){
-        div.innerHTML = スレッド[url].html
-        スレッド.scrollTop = スレッド[url].scroll
-    }
-
-    スレッドヘッダ.描画(parse_thread_url(url).bbsurl, subject, num)
-
-    return tab
-}
-
-
-スレッド.作成 = function (url){
-    const div     = document.createElement('div')
-    div.className = 'スレッド'
-    div.url       = url
-
-    return div
-}
 
 
 スレッド.addEventListener('scroll', function(event){ スレッド[document.URL].scroll = スレッド.scrollTop }, {passive:true});
