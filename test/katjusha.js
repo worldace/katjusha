@@ -1,9 +1,5 @@
 /*
 ajaxにタブも送る
-
-bbs.php thread($bbs, $subject, $from, $mail, $body) res()
-bbs.php cookie name -> 元の
-
 書き込み後に 416エラー
 */
 
@@ -78,7 +74,7 @@ if(document.URL !== base.href){
 板一覧.onclick = function(event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(event.target, 板一覧)
+        change_selected(板一覧, event.target)
         ajax(`${event.target.href}subject.txt`, subject_loadend)
     }
 }
@@ -88,7 +84,7 @@ if(document.URL !== base.href){
 板一覧.oncontextmenu = function (event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(event.target, 板一覧)
+        change_selected(板一覧, event.target)
         コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
     }
 }
@@ -104,7 +100,7 @@ grid3.oncontextmenu = function (event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(tr){
-        change_selected(tr, サブジェクト一覧)
+        change_selected(サブジェクト一覧, tr)
         const {bbsurl, key} = parse_thread_url(tr.querySelector('a').href)
         ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
@@ -115,7 +111,7 @@ grid3.oncontextmenu = function (event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(tr){
-        change_selected(tr, サブジェクト一覧)
+        change_selected(サブジェクト一覧, tr)
         コンテキスト.表示('コンテキスト_サブジェクト一覧', tr.querySelector('a'), event.pageX, event.pageY)
     }
 }
@@ -206,6 +202,126 @@ grid3.oncontextmenu = function (event){
     if(板一覧[bbsurl]){
         ajax(`${bbsurl}subject.txt`, subject_loadend)
     }
+}
+
+
+
+スレッドヘッダ.初期化 = function (){
+    スレッドヘッダ_タイトル.innerHTML = ''
+    スレッドヘッダ_板名.innerHTML     = ''
+    document.title = base.title
+}
+
+
+
+スレッドヘッダ.描画 = function (subject, num, bbsurl){
+    スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
+    スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板一覧[bbsurl].name}]</a>`
+    document.title = subject
+}
+
+
+タブ.閉じる = function (tab){
+    if(タブ.childElementCount === 1){
+        if(tab.el){
+            tab.el.remove()
+        }
+        tab.innerHTML = ''
+        delete tab.url
+        delete tab.el
+        delete tab.thread
+
+        スレッドヘッダ.初期化()
+    }
+    else{
+        タブ.選択(tab.previousElementSibling || tab.nextElementSibling)
+        tab.el.remove()
+        tab.remove()
+    }
+}
+
+
+タブ.選択 = function (tab){
+    change_selected(タブ, tab)
+    change_selected(スレッド, tab.el)
+    スレッドヘッダ.描画(tab.thread.subject, tab.thread.num, tab.thread.bbsurl)
+}
+
+
+
+
+タブ.開く = function (url, subject, num){
+    for(const li of タブ.querySelectorAll('li')){
+        if(li.url === url){
+            タブ.選択(li)
+            return li
+        }
+    }
+
+    const {bbsurl, key} = parse_thread_url(url)
+
+    const div     = document.createElement('div')
+    div.className = 'スレッド'
+    div.url       = url
+
+    const tab = タブ.querySelector('[data-selected]')
+    if(tab.el){
+        tab.el.remove()
+    }
+
+    tab.innerHTML = subject // subjectがない場合
+    tab.url       = url
+    tab.el        = div
+
+    if(Thread[bbsurl] && Thread[bbsurl][key]){
+        div.innerHTML = Thread[bbsurl][key].html
+        div.scrollTop = Thread[bbsurl][key].scroll
+    }
+
+    スレッド.appendChild(div)
+    change_selected(スレッド, div)
+
+    スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
+
+    return tab
+}
+
+
+
+
+タブ.新しく開く = function (url, subject, num){
+    for(const li of タブ.querySelectorAll('li')){
+        if(li.url === url){
+            タブ.選択(li)
+            return li
+        }
+    }
+
+    const {bbsurl, key} = parse_thread_url(url)
+
+    const div     = document.createElement('div')
+    div.className = 'スレッド'
+    div.url       = url
+
+    const tab     = document.createElement('li')
+    tab.innerHTML = subject // subjectがない場合
+    tab.url       = url
+    tab.el        = div
+
+    if(Thread[bbsurl] && Thread[bbsurl][key]){
+        div.innerHTML = Thread[bbsurl][key].html
+        div.scrollTop = Thread[bbsurl][key].scroll
+    }
+
+
+    スレッド.appendChild(div)
+    タブ.appendChild(tab)
+    change_selected(タブ, tab)
+    change_selected(スレッド, div)
+
+    スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
+
+    return tab
 }
 
 
@@ -325,10 +441,7 @@ function render_thread(thread){
     tab.dataset.key    = thread.key
     tab.dataset.url    = thread.url
 
-    スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
-    スレッドヘッダ_板名.innerHTML     = `<a href="${thread.bbsurl}">[${板一覧[thread.bbsurl].name}]</a>`
-
-    document.title = thread.subject
+    スレッドヘッダ.描画(thread.subject, thread.num, thread.bbsurl)
 
     スレッド.innerHTML = thread.html
     スレッド.thread    = thread
@@ -338,12 +451,14 @@ function render_thread(thread){
 
 
 function parse_dat(responseText, num){
-    const dat  = {html: ''}
     const list = responseText.split("\n")
     list.pop()
 
-    dat.num     = list.length
-    dat.subject = list[0].split('<>').pop()
+    const dat = {
+        html   : '',
+        num    : list.length,
+        subject: list[0].split('<>').pop(),
+    }
 
     for(const v of list){
         const [from, mail, date, message, subject] = v.split('<>')
@@ -435,7 +550,7 @@ function subject_loadend(xhr){
 
     const bbs      = 板一覧[xhr.bbsurl]
     document.title = `${base.title} [ ${bbs.name} ]`
-    change_selected(bbs.el, 板一覧)
+    change_selected(板一覧, bbs.el)
 
     grid3.scrollTop = 0
 }
@@ -524,11 +639,13 @@ function parse_thread_url(url){
     const bbs = dir.pop()
     dir.pop()
     dir.pop()
-    return {bbsurl:`${dir.join('/')}/${bbs}/`, key:key}
+    url = dir.join('/') + '/'
+    const bbsurl = (url in 板一覧) ? url : `${url}${bbs}/`
+    return {bbsurl, key}
 }
 
 
-function change_selected(el, parent){
+function change_selected(parent, el){
     const before = parent.querySelector('[data-selected]')
     if(before){
         delete before.dataset.selected

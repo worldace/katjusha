@@ -2,11 +2,9 @@
 
 $password = '#default';
 /*
-
 トリップ
 管理者
 二重書き込み
->>11
 */
 
 
@@ -30,12 +28,10 @@ $is_thread = $key ? false : true;
 $bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
 
 
-if($mail === $password){
-    include './maintenance.php';
 
-    if(is_callable($from)){
-        error($from($bbs_path, $message, $key));
-    }
+if($mail === $password and in_array($from, ['削除','倉庫','復帰'])){
+    include './maintenance.php';
+    error($from($bbs_path, $message, $key));
 }
 
 
@@ -59,6 +55,9 @@ if(!$is_thread and !file_exists(get_dat_path($bbs_path, $key))){
 if($is_thread and !$subject){
     error('タイトルを入力してください');
 }
+if($is_thread and !is_utf8($subject)){
+    error('文字コードが不正です');
+}
 if($is_thread and strlen($subject) > 96){
     error('タイトルが長すぎます');
 }
@@ -66,9 +65,15 @@ if($is_thread and strlen($subject) > 96){
 if(strlen($from) > 32){
     error('名前が長すぎます');
 }
+if(!is_utf8($from)){
+    error('文字コードが不正です');
+}
 
 if(strlen($mail) > 64){
     error('メールが長すぎます');
+}
+if(!is_utf8($mail)){
+    error('文字コードが不正です');
 }
 
 if(!$message){
@@ -262,4 +267,9 @@ function raw_post(){
         $post[$key]    = urldecode($value);
     }
     return $post;
+}
+
+
+function is_utf8($v){
+    return preg_match('//u', $v);
 }
