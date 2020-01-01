@@ -44,7 +44,7 @@
     event.preventDefault()
     if(event.target.tagName === 'A'){
         change_selected(板, event.target)
-        ajax(event.target.href, subject_loadend)
+        ajax(event.target.href)
     }
 }
 
@@ -74,7 +74,7 @@ grid3.oncontextmenu = function (event){
     change_selected(サブジェクト一覧, tr)
     const {bbsurl, key} = parse_thread_url(tr.dataset.url)
     タブ.開く(tr.dataset.url, tr.cells[1].textContent, tr.cells[2].textContent)
-    ajax(tr.dataset.url, dat_loadend)
+    ajax(tr.dataset.url)
 }
 
 
@@ -169,7 +169,7 @@ grid3.oncontextmenu = function (event){
     event.preventDefault()
     const bbsurl = this.querySelector('a').href
     if(bbsurl in 板){
-        ajax(bbsurl, subject_loadend)
+        ajax(bbsurl)
     }
 }
 
@@ -319,7 +319,7 @@ grid3.oncontextmenu = function (event){
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
-    ajax(this.getAttribute('action'), cgi_loadend, new FormData(this))
+    ajax(this.getAttribute('action'), new FormData(this))
 }
 
 
@@ -448,7 +448,96 @@ function parse_dat(responseText, num){
 
 
 
-function dat_loadend(xhr){
+
+
+
+function parse_subject(responseText, bbsurl){
+    const list = responseText.split("\n")
+    list.pop()
+
+    let tr = ''
+    let no = 1
+    for(const v of list){
+        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key    = file.replace('.dat', '')
+        const url    = build_thread_url(bbsurl, key)
+        const thread = スレッド[url] || {}
+
+        if(num == thread.既得){
+            thread.新着 = 0
+        }
+
+        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        no++
+    }
+    return tr
+}
+
+
+
+
+function ajax(url, body){
+    const xhr = new XMLHttpRequest()
+    let callback
+
+    if(url.endsWith('bbs.cgi')){
+        xhr.open('POST', url)
+        let bbsurl = url.replace('test/bbs.cgi', '')
+        bbsurl  = (bbsurl in 板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
+        xhr.url = body.get('key') ? build_thread_url(bbsurl, body.get('key')) : bbsurl
+        callback = 'cgi'
+    }
+    else if(url.includes('read.cgi')){
+        const {bbsurl, key} = parse_thread_url(url)
+        xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
+        xhr.url = url
+        if(url in スレッド){
+            xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
+            xhr.setRequestHeader('If-Modified-Since', スレッド[url].mtime)
+        }
+        else{
+            スレッド[url] = {}
+        }
+        callback = 'dat'
+        history.replaceState(null, null, url)
+    }
+    else{
+        xhr.open('GET', `${url}subject.txt?${Date.now()}`)
+        xhr.url  = url
+        callback = 'subject'
+        history.replaceState(null, null, url)
+    }
+    xhr.overrideMimeType('text/plain; charset=shift_jis')
+    xhr.timeout = 30 * 1000
+    xhr.onloadend = function(){
+        ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
+        ajax[callback](xhr)
+    }
+    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
+    xhr.send(body)
+}
+
+
+
+ajax.subject = function (xhr){
+    if(xhr.status !== 200){
+        サブジェクト一覧.innerHTML = ''
+        return
+    }
+
+    サブジェクト一覧.innerHTML      = parse_subject(xhr.responseText, xhr.url)
+    サブジェクト一覧.dataset.bbsurl = xhr.url
+
+    const bbs      = 板[xhr.url]
+    document.title = `${base.title} [ ${bbs.name} ]`
+    change_selected(板, bbs.el)
+
+    grid3.scrollTop = 0
+}
+
+
+
+ajax.dat = function (xhr){
     const thread        = スレッド[xhr.url]
     const {bbsurl, key} = parse_thread_url(xhr.url)
 
@@ -494,48 +583,7 @@ function dat_loadend(xhr){
 
 
 
-function parse_subject(responseText, bbsurl){
-    const list = responseText.split("\n")
-    list.pop()
-
-    let tr = ''
-    let no = 1
-    for(const v of list){
-        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key    = file.replace('.dat', '')
-        const url    = build_thread_url(bbsurl, key)
-        const thread = スレッド[url] || {}
-
-        if(num == thread.既得){
-            thread.新着 = 0
-        }
-
-        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
-        no++
-    }
-    return tr
-}
-
-
-
-function subject_loadend(xhr){
-    if(xhr.status !== 200){
-        サブジェクト一覧.innerHTML = ''
-        return
-    }
-
-    サブジェクト一覧.innerHTML      = parse_subject(xhr.responseText, xhr.url)
-    サブジェクト一覧.dataset.bbsurl = xhr.url
-
-    const bbs      = 板[xhr.url]
-    document.title = `${base.title} [ ${bbs.name} ]`
-    change_selected(板, bbs.el)
-
-    grid3.scrollTop = 0
-}
-
-
-function cgi_loadend(xhr){
+ajax.cgi = function (xhr){
     if(xhr.status !== 200){
         alert('投稿できませんでした')
         return
@@ -547,51 +595,10 @@ function cgi_loadend(xhr){
 
     if(xhr.url.includes('read.cgi')){
         スレッド[xhr.url].最終書き込み = date()
-        ajax(xhr.url, dat_loadend)
-    }
-    else{
-        ajax(xhr.url, subject_loadend)
     }
 
+    ajax(xhr.url)
     delete katjusha.dataset.dialog
-}
-
-
-
-function ajax(url, fn, body){
-    const xhr = new XMLHttpRequest()
-    if(url.endsWith('bbs.cgi')){
-        xhr.open('POST', url)
-        let bbsurl = url.replace('test/bbs.cgi', '')
-        bbsurl  = (bbsurl in 板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        xhr.url = body.get('key') ? build_thread_url(bbsurl, body.get('key')) : bbsurl
-    }
-    else if(url.includes('read.cgi')){
-        const {bbsurl, key} = parse_thread_url(url)
-        xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
-        xhr.url = url
-        if(url in スレッド){
-            xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
-            xhr.setRequestHeader('If-Modified-Since', スレッド[url].mtime)
-        }
-        else{
-            スレッド[url] = {}
-        }
-        history.replaceState(null, null, url)
-    }
-    else{
-        xhr.open('GET', `${url}subject.txt?${Date.now()}`)
-        xhr.url = url
-        history.replaceState(null, null, url)
-    }
-    xhr.overrideMimeType('text/plain; charset=shift_jis')
-    xhr.timeout = 30 * 1000
-    xhr.onloadend = function(){
-        ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
-        fn(xhr)
-    }
-    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
-    xhr.send(body)
 }
 
 
@@ -680,7 +687,21 @@ function date(){
 }
 
 
+function bbs(el){
+    this.el   = el
+    this.url  = el.href
+    this.name = el.textContent
 
+    const dir = el.href.split('/').slice(0, -1)
+    if(dir.length > 3){
+        this.key  = dir.pop()
+        this.home = dir.join('/') + '/'
+    }
+    else{
+        this.key  = dir[2].slice(0, dir[2].indexOf('.'))
+        this.home = el.href
+    }
+}
 
 
 
@@ -690,29 +711,15 @@ base.title = document.title
 ナビ_全板ボタン.textContent = `▽${document.title}`
 
 for(const el of 板.querySelectorAll('a')){
-    const dir = el.href.split('/').slice(0, -1)
-    板[el.href] = {}
-
-    板[el.href].url  = el.href
-    板[el.href].name = el.textContent
-    板[el.href].el   = el
-    if(dir.length > 3){
-        板[el.href].key  = dir.pop()
-        板[el.href].home = dir.join('/') + '/'
-    }
-    else{
-        板[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
-        板[el.href].home = el.href
+    if(!el.target){
+        板[el.href] = new bbs(el)
     }
 }
 
 if(document.URL !== base.href){
-    if(document.URL in 板){
-        ajax(document.URL, subject_loadend)
-    }
-    else{
+    if(!板[document.URL]){
         タブ.開く(document.URL)
-        ajax(document.URL, dat_loadend)
     }
+    ajax(document.URL)
 }
 
