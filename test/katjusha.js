@@ -101,7 +101,9 @@ grid3.oncontextmenu = function (event){
     const tr = event.target.closest('tr')
     if(tr){
         change_selected(サブジェクト一覧, tr)
-        const {bbsurl, key} = parse_thread_url(tr.querySelector('a').href)
+        const url = tr.querySelector('a').href
+        const {bbsurl, key} = parse_thread_url(url)
+        タブ.開く(url)
         ajax(`${bbsurl}dat/${key}.dat`, dat_loadend)
     }
 }
@@ -221,6 +223,19 @@ grid3.oncontextmenu = function (event){
 }
 
 
+
+
+タブ.検索 = function (url){
+    for(const li of タブ.querySelectorAll('li')){
+        if(li.url === url){
+            return li
+        }
+    }
+    return タブ.querySelector('[data-selected]')
+}
+
+
+
 タブ.閉じる = function (tab){
     if(タブ.childElementCount === 1){
         if(tab.el){
@@ -260,10 +275,7 @@ grid3.oncontextmenu = function (event){
 
     const {bbsurl, key} = parse_thread_url(url)
 
-    const div     = document.createElement('div')
-    div.className = 'スレッド'
-    div.url       = url
-
+    const div = スレッド.作成(url)
     const tab = タブ.querySelector('[data-selected]')
     if(tab.el){
         tab.el.remove()
@@ -273,13 +285,13 @@ grid3.oncontextmenu = function (event){
     tab.url       = url
     tab.el        = div
 
-    if(Thread[bbsurl] && Thread[bbsurl][key]){
-        div.innerHTML = Thread[bbsurl][key].html
-        div.scrollTop = Thread[bbsurl][key].scroll
-    }
-
     スレッド.appendChild(div)
     change_selected(スレッド, div)
+
+    if(Thread[bbsurl] && Thread[bbsurl][key]){
+        div.innerHTML = Thread[bbsurl][key].html
+        スレッド.scrollTop = Thread[bbsurl][key].scroll
+    }
 
     スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
 
@@ -299,19 +311,11 @@ grid3.oncontextmenu = function (event){
 
     const {bbsurl, key} = parse_thread_url(url)
 
-    const div     = document.createElement('div')
-    div.className = 'スレッド'
-    div.url       = url
-
+    const div     = スレッド.作成(url)
     const tab     = document.createElement('li')
     tab.innerHTML = subject // subjectがない場合
     tab.url       = url
     tab.el        = div
-
-    if(Thread[bbsurl] && Thread[bbsurl][key]){
-        div.innerHTML = Thread[bbsurl][key].html
-        div.scrollTop = Thread[bbsurl][key].scroll
-    }
 
 
     スレッド.appendChild(div)
@@ -319,14 +323,30 @@ grid3.oncontextmenu = function (event){
     change_selected(タブ, tab)
     change_selected(スレッド, div)
 
+    if(Thread[bbsurl] && Thread[bbsurl][key]){
+        div.innerHTML = Thread[bbsurl][key].html
+        スレッド.scrollTop = Thread[bbsurl][key].scroll
+    }
+
     スレッドヘッダ.描画(subject, num, bbsurl) // subject, numがない場合
 
     return tab
 }
 
 
+スレッド.作成 = function (url){
+    const div     = document.createElement('div')
+    div.className = 'スレッド'
+    div.url       = url
 
-スレッド.addEventListener('scroll', function(event){ スレッド.thread.scroll = スレッド.scrollTop}, {passive:true});
+    return div
+}
+
+
+スレッド.addEventListener('scroll', function(event){
+    const {bbsurl, key} = parse_thread_url(document.URL)
+    Thread[bbsurl][key].scroll = スレッド.scrollTop
+}, {passive:true});
 
 
 
@@ -431,21 +451,20 @@ document.body.addEventListener('click', function(event){
 })
 
 
-
-
-
 function render_thread(thread){
-    const tab = タブ.querySelector(`[data-url="${thread.url}"]`) || タブ.querySelector('[data-selected]')
-    tab.innerHTML      = thread.subject
-    tab.dataset.bbsurl = thread.bbsurl
-    tab.dataset.key    = thread.key
-    tab.dataset.url    = thread.url
+    const tab = タブ.検索(thread.url)
+    tab.thread    = thread
+    tab.url       = thread.url
+    tab.innerHTML = thread.subject
+
+    if(!tab.el){
+        tab.el = スレッド.作成(thread.url)
+    }
+
+    tab.el.innerHTML = thread.html
+    スレッド.scrollTop = thread.scroll
 
     スレッドヘッダ.描画(thread.subject, thread.num, thread.bbsurl)
-
-    スレッド.innerHTML = thread.html
-    スレッド.thread    = thread
-    スレッド.scrollTop = thread.scroll || 0
 }
 
 
