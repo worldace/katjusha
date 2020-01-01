@@ -58,127 +58,127 @@ body{
 
 
 
-#板一覧{
+#板{
     width: 150px;
     padding-top: 3px;
     border-right: solid 1px #a0a0a0;
     overflow-y: scroll;
     max-height: calc(100vh - 32px);
 }
-#板一覧 details{
+#板 details{
 }
-#板一覧 summary{
+#板 summary{
     outline: none;
     padding: 1px 1px;
 }
-#板一覧 a{
+#板 a{
     text-decoration: none;
     color: #000;
     padding: 1px 8px;
     margin: 1px 0;
     display: block;
 }
-#板一覧 [data-selected]{
+#板 [data-selected]{
     color: #fff;
     background-color: #0078d7;
 }
-#板一覧 details:nth-of-type(33n+1){
+#板 details:nth-of-type(33n+1){
     border-left: 4px solid #ffffff;
 }
-#板一覧 details:nth-of-type(33n+2){
+#板 details:nth-of-type(33n+2){
     border-left: 4px solid #985a62;
 }
-#板一覧 details:nth-of-type(33n+3){
+#板 details:nth-of-type(33n+3){
     border-left: 4px solid #ddffdd;
 }
-#板一覧 details:nth-of-type(33n+4){
+#板 details:nth-of-type(33n+4){
     border-left: 4px solid #ffd7ff;
 }
-#板一覧 details:nth-of-type(33n+5){
+#板 details:nth-of-type(33n+5){
     border-left: 4px solid #519db0;
 }
-#板一覧 details:nth-of-type(33n+6){
+#板 details:nth-of-type(33n+6){
     border-left: 4px solid #d7d7ff;
 }
-#板一覧 details:nth-of-type(33n+7){
+#板 details:nth-of-type(33n+7){
     border-left: 4px solid #008080;
 }
-#板一覧 details:nth-of-type(33n+8){
+#板 details:nth-of-type(33n+8){
     border-left: 4px solid #ff0000;
 }
-#板一覧 details:nth-of-type(33n+9){
+#板 details:nth-of-type(33n+9){
     border-left: 4px solid #baa047;
 }
-#板一覧 details:nth-of-type(33n+10){
+#板 details:nth-of-type(33n+10){
     border-left: 4px solid #ff8686;
 }
-#板一覧 details:nth-of-type(33n+11){
+#板 details:nth-of-type(33n+11){
     border-left: 4px solid #c2b1ba;
 }
-#板一覧 details:nth-of-type(33n+12){
+#板 details:nth-of-type(33n+12){
     border-left: 4px solid #8b3f78;
 }
-#板一覧 details:nth-of-type(33n+13){
+#板 details:nth-of-type(33n+13){
     border-left: 4px solid #a9ba32;
 }
-#板一覧 details:nth-of-type(33n+14){
+#板 details:nth-of-type(33n+14){
     border-left: 4px solid #a096de;
 }
-#板一覧 details:nth-of-type(33n+15){
+#板 details:nth-of-type(33n+15){
     border-left: 4px solid #d3c48d;
 }
-#板一覧 details:nth-of-type(33n+16){
+#板 details:nth-of-type(33n+16){
     border-left: 4px solid #ff00ff;
 }
-#板一覧 details:nth-of-type(33n+17){
+#板 details:nth-of-type(33n+17){
     border-left: 4px solid #ffff00;
 }
-#板一覧 details:nth-of-type(33n+18){
+#板 details:nth-of-type(33n+18){
     border-left: 4px solid #8f8c91;
 }
-#板一覧 details:nth-of-type(33n+19){
+#板 details:nth-of-type(33n+19){
     border-left: 4px solid #ffa2ff;
 }
-#板一覧 details:nth-of-type(33n+20){
+#板 details:nth-of-type(33n+20){
     border-left: 4px solid #0000ff;
 }
-#板一覧 details:nth-of-type(33n+21){
+#板 details:nth-of-type(33n+21){
     border-left: 4px solid #d022c4;
 }
-#板一覧 details:nth-of-type(33n+22){
+#板 details:nth-of-type(33n+22){
     border-left: 4px solid #b3ffb3;
 }
-#板一覧 details:nth-of-type(33n+23){
+#板 details:nth-of-type(33n+23){
     border-left: 4px solid #37e6d9;
 }
-#板一覧 details:nth-of-type(33n+24){
+#板 details:nth-of-type(33n+24){
     border-left: 4px solid #9595ff;
 }
-#板一覧 details:nth-of-type(33n+25){
+#板 details:nth-of-type(33n+25){
     border-left: 4px solid #5b30c2;
 }
-#板一覧 details:nth-of-type(33n+26){
+#板 details:nth-of-type(33n+26){
     border-left: 4px solid #c8f1ff;
 }
-#板一覧 details:nth-of-type(33n+27){
+#板 details:nth-of-type(33n+27){
     border-left: 4px solid #00ff00;
 }
-#板一覧 details:nth-of-type(33n+28){
+#板 details:nth-of-type(33n+28){
     border-left: 4px solid #28caff;
 }
-#板一覧 details:nth-of-type(33n+29){
+#板 details:nth-of-type(33n+29){
     border-left: 4px solid #ffffd2;
 }
-#板一覧 details:nth-of-type(33n+30){
+#板 details:nth-of-type(33n+30){
     border-left: 4px solid #ffd0d0;
 }
-#板一覧 details:nth-of-type(33n+31){
+#板 details:nth-of-type(33n+31){
     border-left: 4px solid #008cbb;
 }
-#板一覧 details:nth-of-type(33n+32){
+#板 details:nth-of-type(33n+32){
     border-left: 4px solid #ea8aac;
 }
-#板一覧 details:nth-of-type(33n+33){
+#板 details:nth-of-type(33n+33){
     border-left: 4px solid #000000;
 }
 

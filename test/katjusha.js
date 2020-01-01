@@ -1,5 +1,4 @@
 /*
-ajaxにタブも送る
 書き込み後に 416エラー
 */
 
@@ -8,25 +7,25 @@ const Thread = {}
 base.title = document.title
 ナビ_全板ボタン.textContent = `▽${document.title}`
 
-for(const el of 板一覧.querySelectorAll('a')){
+for(const el of 板.querySelectorAll('a')){
     const dir = el.href.split('/').slice(0, -1)
-    板一覧[el.href] = {}
+    板[el.href] = {}
 
-    板一覧[el.href].url  = el.href
-    板一覧[el.href].name = el.textContent
-    板一覧[el.href].el   = el
+    板[el.href].url  = el.href
+    板[el.href].name = el.textContent
+    板[el.href].el   = el
     if(dir.length > 3){
-        板一覧[el.href].key  = dir.pop()
-        板一覧[el.href].home = dir.join('/') + '/'
+        板[el.href].key  = dir.pop()
+        板[el.href].home = dir.join('/') + '/'
     }
     else{
-        板一覧[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
-        板一覧[el.href].home = el.href
+        板[el.href].key  = dir[2].slice(0, dir[2].indexOf('.'))
+        板[el.href].home = el.href
     }
 }
 
 if(document.URL !== base.href){
-    if(document.URL in 板一覧){
+    if(document.URL in 板){
         ajax(`${document.URL}subject.txt`, subject_loadend)
     }
     else{
@@ -58,7 +57,7 @@ if(document.URL !== base.href){
 
 ナビ_全板ボタン.タグ作成 = function (){
     let ul = ''
-    for(const el of 板一覧.querySelectorAll('*')){
+    for(const el of 板.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
@@ -71,21 +70,21 @@ if(document.URL !== base.href){
 
 
 
-板一覧.onclick = function(event){
+板.onclick = function(event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(板一覧, event.target)
+        change_selected(板, event.target)
         ajax(`${event.target.href}subject.txt`, subject_loadend)
     }
 }
 
 
 
-板一覧.oncontextmenu = function (event){
+板.oncontextmenu = function (event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(板一覧, event.target)
-        コンテキスト.表示('コンテキスト_板一覧', event.target, event.pageX, event.pageY)
+        change_selected(板, event.target)
+        コンテキスト.表示('コンテキスト_板', event.target, event.pageX, event.pageY)
     }
 }
 
@@ -137,7 +136,7 @@ grid3.oncontextmenu = function (event){
     if(katjusha.dataset.dialog){
         return
     }
-    const bbs = 板一覧[サブジェクト一覧.dataset.bbsurl]
+    const bbs = 板[サブジェクト一覧.dataset.bbsurl]
     if(!bbs){
         return
     }
@@ -167,7 +166,7 @@ grid3.oncontextmenu = function (event){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
-    const bbs = 板一覧[tab.dataset.bbsurl]
+    const bbs = 板[tab.dataset.bbsurl]
 
     if(!tab.dataset.key){
         return
@@ -201,7 +200,7 @@ grid3.oncontextmenu = function (event){
 スレッドヘッダ_板名.onclick = function (event){
     event.preventDefault()
     const bbsurl = this.querySelector('a').href
-    if(板一覧[bbsurl]){
+    if(板[bbsurl]){
         ajax(`${bbsurl}subject.txt`, subject_loadend)
     }
 }
@@ -211,7 +210,7 @@ grid3.oncontextmenu = function (event){
 スレッドヘッダ.描画 = function (bbsurl, subject, num){
     if(num){
         スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
-        スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板一覧[bbsurl].name}]</a>`
+        スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板[bbsurl].name}]</a>`
         document.title = subject
     }
     else{
@@ -566,9 +565,9 @@ function subject_loadend(xhr){
     サブジェクト一覧.innerHTML      = parse_subject(xhr.responseText, xhr.bbsurl)
     サブジェクト一覧.dataset.bbsurl = xhr.bbsurl
 
-    const bbs      = 板一覧[xhr.bbsurl]
+    const bbs      = 板[xhr.bbsurl]
     document.title = `${base.title} [ ${bbs.name} ]`
-    change_selected(板一覧, bbs.el)
+    change_selected(板, bbs.el)
 
     grid3.scrollTop = 0
 }
@@ -658,7 +657,7 @@ function parse_thread_url(url){
     dir.pop()
     dir.pop()
     url = dir.join('/') + '/'
-    const bbsurl = (url in 板一覧) ? url : `${url}${bbs}/`
+    const bbsurl = (url in 板) ? url : `${url}${bbs}/`
     return {bbsurl, key}
 }
 
@@ -702,7 +701,7 @@ function copy_url(){
 
 
 function go_bbs(bbsurl){
-    板一覧[bbsurl].el.click()
+    板[bbsurl].el.click()
 }
 
 
