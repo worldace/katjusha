@@ -13,11 +13,11 @@
 
 
 
-ナビ_全板ボタン.onclick = function(event){
+全板ボタン.onclick = function(event){
     event.stopPropagation()
     
     if(!コンテキスト_全板ボタン_template.textContent){
-        ナビ_全板ボタン.タグ作成()
+        全板ボタン.タグ作成()
     }
     const {left, bottom} = this.getBoundingClientRect()
     コンテキスト.表示('コンテキスト_全板ボタン', this, left, bottom)
@@ -25,7 +25,7 @@
 
 
 
-ナビ_全板ボタン.タグ作成 = function (){
+全板ボタン.タグ作成 = function (){
     let ul = ''
     for(const el of 板.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
@@ -195,7 +195,7 @@ grid3.oncontextmenu = function (event){
         tab = document.createElement('li')
         タブ.appendChild(tab)
     }
-    if(tab.el){
+    else if(tab.el){
         tab.el.remove()
     }
 
@@ -211,6 +211,8 @@ grid3.oncontextmenu = function (event){
 
     スレッド.appendChild(div)
     スレッド.scrollTop = thread.scroll || 0
+
+    return tab
 }
 
 
@@ -226,9 +228,9 @@ grid3.oncontextmenu = function (event){
 
 
 タブ.新しく開く = function (url, subject, num){
-    const tab = タブ.検索(url)
+    let tab = タブ.検索(url)
     if(tab.url !== url){
-        タブ.初期化(null, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
+        tab = タブ.初期化(null, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
     }
     タブ.選択(tab)
 }
@@ -256,6 +258,14 @@ grid3.oncontextmenu = function (event){
 
 
 
+タブ.選択 = function (tab){
+    change_selected(タブ, tab)
+    change_selected(スレッド, tab.el)
+    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
+}
+
+
+
 タブ.検索 = function (url){
     for(const li of タブ.querySelectorAll('li')){
         if(li.url === url){
@@ -263,13 +273,6 @@ grid3.oncontextmenu = function (event){
         }
     }
     return タブ.querySelector('[data-selected]')
-}
-
-
-タブ.選択 = function (tab){
-    change_selected(タブ, tab)
-    change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
 }
 
 
@@ -479,10 +482,10 @@ function ajax(url, body){
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
     xhr.onloadend = function(){
-        ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) - 1
+        アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
         ajax[callback](xhr)
     }
-    ナビ_アニメ.dataset.ajax = Number(ナビ_アニメ.dataset.ajax) + 1
+    アニメ.dataset.ajax = Number(アニメ.dataset.ajax) + 1
     xhr.send(body)
 }
 
@@ -677,7 +680,7 @@ function bbs(el){
 
 
 base.title = document.title
-ナビ_全板ボタン.textContent = `▽${document.title}`
+全板ボタン.textContent = `▽${document.title}`
 
 for(const el of 板.querySelectorAll('a')){
     if(!el.target){

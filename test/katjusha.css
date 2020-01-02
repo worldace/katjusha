@@ -35,15 +35,15 @@ body{
     display: flex;
     align-items: center;
 }
-#ナビ_板ボタン{
+#板ボタン{
     flex: 1;
     display: flex;
     align-items: center;
 }
-#ナビ_板ボタン span{
+#板ボタン span{
     padding: 2px 6px;
 }
-#ナビ_アニメ{
+#アニメ{
     width: 32px;
     height: 32px;
     background-image: url('katjusha.gif');
@@ -52,7 +52,7 @@ body{
     background-position: 50% 50%;
     z-index: 2;
 }
-#ナビ_アニメ[data-ajax="0"]{
+#アニメ[data-ajax="0"]{
     background-image: url('katjusha.png');
 }
 
