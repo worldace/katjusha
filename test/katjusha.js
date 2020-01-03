@@ -16,16 +16,13 @@
 全板ボタン.onclick = function(event){
     event.stopPropagation()
     
-    if(!コンテキスト_全板ボタン_template.textContent){
-        全板ボタン.タグ作成()
-    }
     const {left, bottom} = this.getBoundingClientRect()
-    コンテキスト.表示('コンテキスト_全板ボタン', this, left, bottom)
+    コンテキスト.表示(全板ボタン.コンテキスト(), this, left, bottom)
 }
 
 
 
-全板ボタン.タグ作成 = function (){
+全板ボタン.コンテキスト = function (){
     let ul = ''
     for(const el of 板.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
@@ -35,7 +32,7 @@
             ul += `<li><span onclick="掲示板に移動('${el.href}')">${el.textContent}</span></li>`
         }
     }
-    コンテキスト_全板ボタン_template.innerHTML = `<ul id="コンテキスト_全板ボタン" class="menu">${ul.slice(10)}</ul>`
+    return `<ul class="menu">${ul.slice(10)}</ul>`
 }
 
 
@@ -54,9 +51,20 @@
     event.preventDefault()
     if(event.target.tagName === 'A'){
         change_selected(板, event.target)
-        コンテキスト.表示('コンテキスト_板', event.target, event.pageX, event.pageY)
+        コンテキスト.表示(板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
 }
+
+
+板.コンテキスト = function (url, name){
+    return `
+    <ul class="menu">
+      <li><span onclick="copy('${url}')">URLをコピー</span></li>
+      <li><span onclick="copy('${name}\\n${url}\\n')">板名とURLをコピー</span></li>
+    </ul>
+    `
+}
+
 
 
 grid3.oncontextmenu = function (event){
@@ -82,11 +90,21 @@ grid3.oncontextmenu = function (event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(tr){
+        const a = tr.querySelector('a')
         change_selected(サブジェクト一覧, tr)
-        コンテキスト.表示('コンテキスト_サブジェクト一覧', tr.querySelector('a'), event.pageX, event.pageY)
+        コンテキスト.表示(サブジェクト一覧.コンテキスト(a.href, a.innerHTML), a, event.pageX, event.pageY)
     }
 }
 
+
+サブジェクト一覧.コンテキスト = function (url, name){
+    return `
+    <ul class="menu">
+      <li><span onclick="copy('${url}')">URLをコピー</span></li>
+      <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
+    </ul>
+    `
+}
 
 
 サブジェクト一覧.更新 = function (thread){
@@ -192,10 +210,20 @@ grid3.oncontextmenu = function (event){
 タブ.oncontextmenu = function (event){
     event.preventDefault()
     if(event.target.tagName === 'LI'){
-        コンテキスト.表示('コンテキスト_タブ', event.target, event.pageX, event.pageY)
+        コンテキスト.表示(タブ.コンテキスト(event.target.url, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
 }
 
+
+
+タブ.コンテキスト = function (url, name){
+    return `
+    <ul class="menu">
+      <li><span onclick="copy('${url}')">URLをコピー</span></li>
+      <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
+    </ul>
+    `
+}
 
 
 タブ.初期化 = function (tab, thread){
@@ -290,7 +318,7 @@ grid3.oncontextmenu = function (event){
 
 
 
-スレッド.追記 = function(thread, appendHTML){
+スレッド.追記 = function(thread, appendHTML = ''){
     const tab = タブ.検索(thread.url)
     tab.thread    = thread
     tab.innerHTML = thread.subject
@@ -367,14 +395,13 @@ grid3.oncontextmenu = function (event){
 }
 
 
-コンテキスト.表示 = function (id, target, x, y){
-    const menu = document.getElementById(`${id}_template`).content.cloneNode(true)
-    コンテキスト.replaceChild(menu, コンテキスト.firstElementChild)
 
+コンテキスト.表示 = function (html, target, x, y){
+    コンテキスト.innerHTML    = html
     コンテキスト.target       = target
     コンテキスト.style.left   = `${x}px`
     コンテキスト.style.top    = `${y}px`
-    コンテキスト.dataset.open = id
+    コンテキスト.dataset.open = true
 }
 
 
@@ -490,6 +517,7 @@ ajax.dat = function (xhr){
         thread.最終取得= date()
 
         スレッド.追記(thread, dat.html)
+        サブジェクト一覧.更新(thread)
     }
     else if(xhr.status === 206){
         const dat = parse_dat(xhr.responseText, thread.num+1)
@@ -504,15 +532,14 @@ ajax.dat = function (xhr){
         thread.最終取得= date()
 
         スレッド.追記(thread, dat.html)
+        サブジェクト一覧.更新(thread)
    }
     else if(xhr.status === 304){
-        thread.新着    = 0
+        thread.新着 = 0
     }
     else if(xhr.status === 404){
         // URLに/kako/が含まれていなければリトライ
     }
-
-    サブジェクト一覧.更新(thread)
 }
 
 
@@ -631,16 +658,9 @@ function set_value(form, value){
 }
 
 
-function 名前とURLをコピー(){
-    navigator.clipboard.writeText(`${コンテキスト.target.innerHTML}\n${コンテキスト.target.href || コンテキスト.target.url}\n`)
+function copy(str){
+    navigator.clipboard.writeText(str)
 }
-
-
-
-function URLをコピー(){
-    navigator.clipboard.writeText(コンテキスト.target.href || コンテキスト.target.url)
-}
-
 
 
 function 掲示板に移動(bbsurl){
