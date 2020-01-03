@@ -32,7 +32,7 @@
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
         else if(el.tagName === 'A'){
-            ul += `<li><span onclick="go_bbs('${el.href}')">${el.textContent}</span></li>`
+            ul += `<li><span onclick="掲示板に移動('${el.href}')">${el.textContent}</span></li>`
         }
     }
     コンテキスト_全板ボタン_template.innerHTML = `<ul id="コンテキスト_全板ボタン" class="menu">${ul.slice(10)}</ul>`
@@ -90,13 +90,13 @@ grid3.oncontextmenu = function (event){
 
 
 サブジェクト一覧.更新 = function (thread){
-    const td = サブジェクト一覧.querySelectorAll(`[data-url="${thread.url}"] > td`)
-    if(td.length){
-        td[2].textContent = thread.num || ''
-        td[3].textContent = thread.既得 || ''
-        td[4].textContent = thread.新着 || ''
-        td[5].textContent = thread.最終取得 || ''
-        td[6].textContent = thread.最終書き込み || ''
+    const tr = サブジェクト一覧.querySelector(`[data-url="${thread.url}"]`)
+    if(tr){
+        tr.cells[2].textContent = thread.num || ''
+        tr.cells[3].textContent = thread.既得 || ''
+        tr.cells[4].textContent = thread.新着 || ''
+        tr.cells[5].textContent = thread.最終取得 || ''
+        tr.cells[6].textContent = thread.最終書き込み || ''
     }
 }
 
@@ -106,7 +106,7 @@ grid3.oncontextmenu = function (event){
     if(katjusha.dataset.dialog){
         return
     }
-    const bbs = 板[サブジェクト一覧.dataset.bbsurl]
+    const bbs = 板[サブジェクト一覧.bbsurl]
     if(!bbs){
         return
     }
@@ -185,6 +185,14 @@ grid3.oncontextmenu = function (event){
         スレッドヘッダ_タイトル.innerHTML = ''
         スレッドヘッダ_板名.innerHTML     = ''
         document.title = base.title
+    }
+}
+
+
+タブ.oncontextmenu = function (event){
+    event.preventDefault()
+    if(event.target.tagName === 'LI'){
+        コンテキスト.表示('コンテキスト_タブ', event.target, event.pageX, event.pageY)
     }
 }
 
@@ -497,8 +505,8 @@ ajax.subject = function (xhr){
         return
     }
 
-    サブジェクト一覧.innerHTML      = parse_subject(xhr.responseText, xhr.url)
-    サブジェクト一覧.dataset.bbsurl = xhr.url
+    サブジェクト一覧.innerHTML = parse_subject(xhr.responseText, xhr.url)
+    サブジェクト一覧.bbsurl    = xhr.url
 
     const bbs      = 板[xhr.url]
     document.title = `${base.title} [ ${bbs.name} ]`
@@ -627,19 +635,19 @@ function set_value(form, value){
 }
 
 
-function copy_url_title(){
-    navigator.clipboard.writeText(`${コンテキスト.target.innerHTML}\n${コンテキスト.target.href}\n`)
+function 名前とURLをコピー(){
+    navigator.clipboard.writeText(`${コンテキスト.target.innerHTML}\n${コンテキスト.target.href || コンテキスト.target.url}\n`)
 }
 
 
 
-function copy_url(){
-    navigator.clipboard.writeText(コンテキスト.target.href)
+function URLをコピー(){
+    navigator.clipboard.writeText(コンテキスト.target.href || コンテキスト.target.url)
 }
 
 
 
-function go_bbs(bbsurl){
+function 掲示板に移動(bbsurl){
     板[bbsurl].el.click()
 }
 

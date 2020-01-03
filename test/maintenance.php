@@ -11,7 +11,7 @@ function 削除($bbs_path, $message, $key = null){
                 delete_res($bbs_path, $key, $i);
             }
         }
-        else if(preg_match("/\/(\d+)\/$/", $v, $m)){
+        else if(preg_match("|/(\d+)/$|", $v, $m)){
             delete_thread($bbs_path, $m[1]);
         }
     }
@@ -45,7 +45,7 @@ function 復帰($bbs_path){
 
 function 倉庫($bbs_path, $message){
 	foreach(explode("\n", $message) as $v){
-		if(preg_match("/\/(\d+)\/$/", $v, $m)){
+		if(preg_match("|/(\d+)/$|", $v, $m)){
 		    move_thread($bbs_path, $m[1]);
         }
     }
