@@ -231,7 +231,7 @@ grid3.oncontextmenu = function (event){
         tab = document.createElement('li')
         タブ.appendChild(tab)
     }
-    else if(tab.el){
+    if(tab.el){
         tab.el.remove()
     }
 
@@ -249,6 +249,25 @@ grid3.oncontextmenu = function (event){
     スレッド.scrollTop = thread.scroll || 0
 
     return tab
+}
+
+
+
+タブ.検索 = function (url){
+    for(const tab of タブ.children){
+        if(tab.url === url){
+            return tab
+        }
+    }
+    return タブ.querySelector('[data-selected]')
+}
+
+
+
+タブ.選択 = function (tab){
+    change_selected(タブ, tab)
+    change_selected(スレッド, tab.el)
+    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
 }
 
 
@@ -295,26 +314,9 @@ grid3.oncontextmenu = function (event){
 
 
 
-タブ.選択 = function (tab){
-    change_selected(タブ, tab)
-    change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
-}
-
-
-
-タブ.検索 = function (url){
-    for(const li of タブ.querySelectorAll('li')){
-        if(li.url === url){
-            return li
-        }
-    }
-    return タブ.querySelector('[data-selected]')
-}
-
-
-
-スレッド.addEventListener('scroll', function(event){ スレッド[document.URL].scroll = スレッド.scrollTop }, {passive:true});
+スレッド.addEventListener('scroll', function(event){
+    スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
+}, {passive:true});
 
 
 
@@ -637,7 +639,8 @@ function change_selected(parent, el){
     if(before){
         delete before.dataset.selected
     }
-    el.dataset.selected = 'selected'
+    el.dataset.selected    = 'selected'
+    parent.selectedElement = el
 }
 
 
