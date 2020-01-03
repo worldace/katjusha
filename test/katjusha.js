@@ -245,6 +245,7 @@ grid3.oncontextmenu = function (event){
 
 
 
+
 タブ.閉じる = function (tab){
     if(タブ.childElementCount === 1){
         if(tab.el){
@@ -286,6 +287,19 @@ grid3.oncontextmenu = function (event){
 
 
 スレッド.addEventListener('scroll', function(event){ スレッド[document.URL].scroll = スレッド.scrollTop }, {passive:true});
+
+
+
+スレッド.追記 = function(thread, appendHTML){
+    const tab = タブ.検索(thread.url)
+    tab.thread    = thread
+    tab.innerHTML = thread.subject
+
+    tab.el.innerHTML  += appendHTML
+    スレッド.scrollTop = thread.scroll
+
+    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
+}
 
 
 
@@ -390,71 +404,6 @@ document.body.addEventListener('click', function(event){
 })
 
 
-function render_thread(thread){
-    const tab = タブ.検索(thread.url)
-    tab.thread    = thread
-    tab.url       = thread.url
-    tab.innerHTML = thread.subject
-
-    if(!tab.el){
-        tab.el = スレッド.作成(thread.url)
-    }
-
-    tab.el.innerHTML   = thread.html
-    スレッド.scrollTop = thread.scroll
-
-    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
-}
-
-
-
-function parse_dat(responseText, num){
-    const list = responseText.split("\n")
-    list.pop()
-
-    const dat = {
-        html   : '',
-        num    : list.length,
-        subject: list[0].split('<>').pop(),
-    }
-
-    for(const v of list){
-        const [from, mail, date, message, subject] = v.split('<>')
-        dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
-        num++
-    }
-    return dat
-}
-
-
-
-
-
-
-function parse_subject(responseText, bbsurl){
-    const list = responseText.split("\n")
-    list.pop()
-
-    let tr = ''
-    let no = 1
-    for(const v of list){
-        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key    = file.replace('.dat', '')
-        const url    = build_thread_url(bbsurl, key)
-        const thread = スレッド[url] || {}
-
-        if(num == thread.既得){
-            thread.新着 = 0
-        }
-
-        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
-        no++
-    }
-    return tr
-}
-
-
-
 
 function ajax(url, body){
     const xhr = new XMLHttpRequest()
@@ -499,20 +448,22 @@ function ajax(url, body){
 
 
 
-ajax.subject = function (xhr){
+ajax.cgi = function (xhr){
     if(xhr.status !== 200){
-        サブジェクト一覧.innerHTML = ''
+        alert('投稿できませんでした')
+        return
+    }
+    if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
+        alert(xhr.responseText.match(/<b>(.+?)</i)[1])
         return
     }
 
-    サブジェクト一覧.innerHTML = parse_subject(xhr.responseText, xhr.url)
-    サブジェクト一覧.bbsurl    = xhr.url
+    if(xhr.url.includes('read.cgi')){
+        スレッド[xhr.url].最終書き込み = date()
+    }
 
-    const bbs      = 板[xhr.url]
-    document.title = `${base.title} [ ${bbs.name} ]`
-    change_selected(板, bbs.el)
-
-    grid3.scrollTop = 0
+    ajax(xhr.url)
+    delete katjusha.dataset.dialog
 }
 
 
@@ -537,6 +488,8 @@ ajax.dat = function (xhr){
         thread.既得    = dat.num
         thread.新着    = dat.num
         thread.最終取得= date()
+
+        スレッド.追記(thread, dat.html)
     }
     else if(xhr.status === 206){
         const dat = parse_dat(xhr.responseText, thread.num+1)
@@ -549,6 +502,8 @@ ajax.dat = function (xhr){
         thread.既得    = thread.num
         thread.新着    = dat.num
         thread.最終取得= date()
+
+        スレッド.追記(thread, dat.html)
    }
     else if(xhr.status === 304){
         thread.新着    = 0
@@ -558,27 +513,68 @@ ajax.dat = function (xhr){
     }
 
     サブジェクト一覧.更新(thread)
-    render_thread(thread)
 }
 
 
 
-ajax.cgi = function (xhr){
+ajax.subject = function (xhr){
     if(xhr.status !== 200){
-        alert('投稿できませんでした')
-        return
-    }
-    if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
-        alert(xhr.responseText.match(/<b>(.+?)</i)[1])
+        サブジェクト一覧.innerHTML = ''
         return
     }
 
-    if(xhr.url.includes('read.cgi')){
-        スレッド[xhr.url].最終書き込み = date()
+    サブジェクト一覧.innerHTML = parse_subject(xhr.responseText, xhr.url)
+    サブジェクト一覧.bbsurl    = xhr.url
+
+    const bbs      = 板[xhr.url]
+    document.title = `${base.title} [ ${bbs.name} ]`
+    change_selected(板, bbs.el)
+
+    grid3.scrollTop = 0
+}
+
+
+
+function parse_dat(responseText, num){
+    const list = responseText.split("\n")
+    list.pop()
+
+    const dat = {
+        html   : '',
+        num    : list.length,
+        subject: list[0].split('<>').pop(),
     }
 
-    ajax(xhr.url)
-    delete katjusha.dataset.dialog
+    for(const v of list){
+        const [from, mail, date, message, subject] = v.split('<>')
+        dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        num++
+    }
+    return dat
+}
+
+
+
+function parse_subject(responseText, bbsurl){
+    const list = responseText.split("\n")
+    list.pop()
+
+    let tr = ''
+    let no = 1
+    for(const v of list){
+        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key    = file.replace('.dat', '')
+        const url    = build_thread_url(bbsurl, key)
+        const thread = スレッド[url] || {}
+
+        if(num == thread.既得){
+            thread.新着 = 0
+        }
+
+        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        no++
+    }
+    return tr
 }
 
 
@@ -685,7 +681,7 @@ function bbs(el){
 
 
 
-
+//start up
 
 base.title = document.title
 全板ボタン.textContent = `▽${document.title}`
