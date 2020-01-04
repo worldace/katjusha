@@ -34,8 +34,6 @@ body{
 #ヘッダ{
     grid-area: ヘッダ;
     background-color: #f0f0f0;
-    width: 100%;
-    height: 24px;
     display: flex;
     border-bottom: solid 1px #a0a0a0;
 }
@@ -373,6 +371,7 @@ body{
     overflow-y: scroll;
     padding: 2px 12px 24px 6px;
     word-break: break-all;
+    line-height: 1.1;
 }
 
 #スレッド section{
@@ -403,8 +402,7 @@ body{
     background-color: #f0f0f0;
     line-height: 18px;
     font-family: Meiryo, sans-serif;
-    padding-left: 6px;
-    
+    padding-left: 4px;
 }
 
 
@@ -494,6 +492,7 @@ body{
 }
 #投稿フォーム_本文欄{
     width: 380px;
+    font-size: 12px;
     height: 120px;
     border-left: solid 1px #696969;
     border-top: solid 1px #696969;
