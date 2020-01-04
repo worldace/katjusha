@@ -7,7 +7,7 @@
 
 
 
-ナビ.oncontextmenu = function (event){
+ヘッダ.oncontextmenu = function (event){
     event.preventDefault()
 }
 
@@ -67,7 +67,7 @@
 
 
 
-grid3.oncontextmenu = function (event){
+サブジェクト.oncontextmenu = function (event){
     event.preventDefault()
 }
 
@@ -559,7 +559,7 @@ ajax.subject = function (xhr){
     document.title = `${base.title} [ ${bbs.name} ]`
     change_selected(掲示板, bbs.el)
 
-    grid3.scrollTop = 0
+    サブジェクト.scrollTop = 0
 }
 
 

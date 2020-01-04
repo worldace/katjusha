@@ -4,8 +4,6 @@
     box-sizing: border-box;
 }
 html{
-    width: 100%;
-    height: 100vh;
     font-size: 12px;
     font-family: 'MS PGothic', sans-serif;
 }
@@ -14,24 +12,34 @@ body{
     height: 100vh;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
     user-select: none;
     cursor: default;
     line-height: 1;
     position: relative;
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-rows: 24px 8px 0.4fr 24px 24px 1fr 32px;
+    grid-template-areas:
+        "ヘッダ ヘッダ"
+        "枠線 枠線"
+        "掲示板 サブジェクト"
+        "掲示板 スレッドヘッダ"
+        "掲示板 タブ"
+        "掲示板 スレッド"
+        "ステータス ステータス";
 }
 
 
-#ナビ{
+#ヘッダ{
+    grid-area: ヘッダ;
     background-color: #f0f0f0;
     width: 100%;
     height: 24px;
     display: flex;
     border-bottom: solid 1px #a0a0a0;
 }
-#ナビ_アイコン{
+#ナビアイコン{
     display: flex;
     align-items: center;
 }
@@ -58,12 +66,24 @@ body{
 
 
 
+#枠線{
+    grid-area: 枠線;
+    height: 7px;
+    margin-top: 1px;
+    background-color: #f0f0f0;
+    border-bottom: solid 1px #a0a0a0;
+    border-left: none;
+    border-top: none;
+}
+
+
+
+
 #掲示板{
-    width: 150px;
+    grid-area: 掲示板;
     padding-top: 3px;
     border-right: solid 1px #a0a0a0;
     overflow-y: scroll;
-    max-height: calc(100vh - 32px);
 }
 #掲示板 details{
 }
@@ -184,6 +204,10 @@ body{
 
 
 
+#サブジェクト{
+    grid-area: サブジェクト;
+    overflow-y: scroll;
+}
 #サブジェクト一覧表{
     border-collapse: collapse;
     width: 100%;
@@ -275,7 +299,7 @@ body{
 
 
 #スレッドヘッダ{
-    height: 24px;
+    grid-area: スレッドヘッダ;
     background-color: #f0f0f0;
     margin: 0;
     display: flex;
@@ -298,7 +322,7 @@ body{
 
 
 #タブ{
-    height: 24px;
+    grid-area: タブ;
     list-style: none;
     cursor: default;
     display: flex;
@@ -342,12 +366,11 @@ body{
 
 
 #スレッド{
+    grid-area: スレッド;
     font-size: 18px;
     user-select: text;
     cursor: auto;
-    flex: 1;
     overflow-y: scroll;
-    max-height: calc(100vh - 276px);
     padding: 2px 12px 24px 6px;
     word-break: break-all;
 }
@@ -371,6 +394,12 @@ body{
     margin-top: 3px;
     margin-left: 36px;
 }
+
+
+#ステータス{
+    grid-area: ステータス;
+}
+
 
 
 #投稿フォーム{
@@ -605,41 +634,6 @@ body{
 }
 .menu-sub:hover > ul{
     display: block;
-}
-
-
-
-
-
-
-
-#grid1{
-    flex: 1;
-    display: flex;
-}
-#grid2{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-#grid3{
-    height: 195px;
-    overflow-y: scroll;
-}
-#grid4{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-
-#hr1{
-    height: 7px;
-    margin-top: 1px;
-    background-color: #f0f0f0;
-    border-bottom: solid 1px #a0a0a0;
-    border-left: none;
-    border-top: none;
 }
 
 

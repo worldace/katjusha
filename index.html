@@ -11,8 +11,10 @@
 </head>
 <body>
 
-<nav id="ナビ">
-  <div id="ナビ_アイコン">
+
+
+<header id="ヘッダ">
+  <div id="ナビアイコン">
     <img src="test/online.png" width="16" height="16" class="icon">
     <img src="test/save.png" width="16" height="16" class="icon">
     <img src="test/separate.png" width="2" height="16" class="icon-separate">
@@ -33,65 +35,76 @@
     <span class="icon" id="全板ボタン">▽かちゅぼ～ど</span>
   </div>
   <div id="アニメ" data-ajax="0"></div>
+</header>
+
+
+
+<div id="枠線"></div>
+
+
+
+<nav id="掲示板">
+  <details open>
+    <summary>ニュース</summary>
+    <a href="headline/">ヘッドライン</a>
+    <a href="geinou/">芸能速報</a>
+  </details>
+  <details open>
+    <summary>ギャンブル</summary>
+    <a href="mahjong/">麻雀</a>
+    <a href="keiba/">競馬</a>
+  </details>
+  <details open>
+    <summary>案内</summary>
+    <a href="rounge/">ラウンジ</a>
+  </details>
 </nav>
 
-<div id="hr1"></div>
 
 
-<div id="grid1">
-  <nav id="掲示板">
-    <details open>
-      <summary>ニュース</summary>
-      <a href="headline/">ヘッドライン</a>
-      <a href="geinou/">芸能速報</a>
-    </details>
-    <details open>
-      <summary>ギャンブル</summary>
-      <a href="mahjong/">麻雀</a>
-      <a href="keiba/">競馬</a>
-    </details>
-    <details open>
-      <summary>案内</summary>
-      <a href="rounge/">ラウンジ</a>
-    </details>
-  </nav>
+<nav id="サブジェクト">
+  <table id="サブジェクト一覧表">
+    <thead>
+      <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
+    </thead>
+    <tbody id="サブジェクト一覧"></tbody>
+  </table>
+</nav>
 
 
-  <div id="grid2">
-    <nav id="grid3">
-      <table id="サブジェクト一覧表">
-        <thead><tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr></thead>
-        <tbody id="サブジェクト一覧"></tbody>
-      </table>
-    </nav><!-- /grid3 -->
 
-    <main id="grid4">
-      <header id="スレッドヘッダ">
-        <div>
-          <span id="スレッドヘッダ_掲示板名"></span>
-          <span id="スレッドヘッダ_タイトル"></span>
-        </div>
-        <div id="スレッドヘッダ_アイコン">
-          <img src="test/list.png" width="16" height="16" class="icon">
-          <img src="test/separate.png" width="2" height="16" class="icon-separate">
-          <img src="test/download.png" width="16" height="16" class="icon">
-          <img src="test/stop.png" width="16" height="16" class="icon">
-          <img src="test/separate.png" width="2" height="16" class="icon-separate">
-          <img src="test/res.png" width="16" height="16" class="icon" id="レス投稿ボタン" title="レス書き込み">
-          <img src="test/bookmark.png" width="16" height="16" class="icon">
-          <img src="test/separate.png" width="2" height="16" class="icon-separate">
-          <img src="test/trash.png" width="16" height="16" class="icon">
-          <img src="test/close.png" width="16" height="16" class="icon">
-        </div>
-      </header>
-      <ul id="タブ">
-        <li data-selected></li>
-      </ul>
-      <article id="スレッド"></article>
-    </main><!-- /grid4 -->
+<header id="スレッドヘッダ">
+  <div>
+    <span id="スレッドヘッダ_掲示板名"></span>
+    <span id="スレッドヘッダ_タイトル"></span>
+  </div>
+  <div id="スレッドヘッダ_アイコン">
+    <img src="test/list.png" width="16" height="16" class="icon">
+    <img src="test/separate.png" width="2" height="16" class="icon-separate">
+    <img src="test/download.png" width="16" height="16" class="icon">
+    <img src="test/stop.png" width="16" height="16" class="icon">
+    <img src="test/separate.png" width="2" height="16" class="icon-separate">
+    <img src="test/res.png" width="16" height="16" class="icon" id="レス投稿ボタン" title="レス書き込み">
+    <img src="test/bookmark.png" width="16" height="16" class="icon">
+    <img src="test/separate.png" width="2" height="16" class="icon-separate">
+    <img src="test/trash.png" width="16" height="16" class="icon">
+    <img src="test/close.png" width="16" height="16" class="icon">
+  </div>
+</header>
 
-  </div><!-- /grid2 -->
-</div><!-- /grid1 -->
+
+
+<ul id="タブ">
+  <li data-selected></li>
+</ul>
+
+
+
+<article id="スレッド"></article>
+
+
+
+<footer id="ステータス"></footer>
 
 
 <div id="投稿フォーム">
@@ -120,6 +133,7 @@
     </div>
   </form>
 </div>
+
 
 
 <nav id="コンテキスト"></nav>
