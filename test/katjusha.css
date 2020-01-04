@@ -371,7 +371,7 @@ body{
     overflow-y: scroll;
     padding: 2px 12px 24px 6px;
     word-break: break-all;
-    line-height: 1.1;
+    line-height: 1.15;
 }
 
 #スレッド section{
@@ -416,8 +416,7 @@ body{
     height: 272px;
     background-color: #f0f0f0;
 }
-[data-dialog="スレッド"] #投稿フォーム,
-[data-dialog="レス"] #投稿フォーム{
+#投稿フォーム[data-open]{
     display: block;
 }
 #投稿フォーム header{
@@ -578,10 +577,12 @@ body{
 #コンテキスト[data-open]{
     display: block;
 }
-#コンテキスト_サブジェクト一覧{
-    width: 220px;
+#コンテキスト span{
+    font-family: Meiryo, sans-serif;
 }
-
+#コンテキスト .context-subject{
+    width: 250px;
+}
 
 .menu,
 .menu ul{

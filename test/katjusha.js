@@ -28,7 +28,7 @@
         if(el.tagName === 'SUMMARY'){
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
-        else if(el.tagName === 'A'){
+        else if(el.tagName === 'A' && !el.target){
             ul += `<li><span onclick="掲示板に移動('${el.href}')">${el.textContent}</span></li>`
         }
     }
@@ -39,7 +39,7 @@
 
 掲示板.onclick = function(event){
     event.preventDefault()
-    if(event.target.tagName === 'A'){
+    if(event.target.tagName === 'A' && !event.target.target){
         change_selected(掲示板, event.target)
         ajax(event.target.href)
     }
@@ -49,7 +49,7 @@
 
 掲示板.oncontextmenu = function (event){
     event.preventDefault()
-    if(event.target.tagName === 'A'){
+    if(event.target.tagName === 'A' && !event.target.target){
         change_selected(掲示板, event.target)
         コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
@@ -99,7 +99,7 @@
 
 サブジェクト一覧.コンテキスト = function (url, name){
     return `
-    <ul class="menu">
+    <ul class="menu context-subject">
       <li><span onclick="copy('${url}')">URLをコピー</span></li>
       <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
     </ul>
@@ -121,7 +121,7 @@
 
 
 スレッド投稿ボタン.onclick = function (event){
-    if(katjusha.dataset.dialog){
+    if(投稿フォーム.dataset.open){
         return
     }
     const bbs = 掲示板[サブジェクト一覧.bbsurl]
@@ -141,7 +141,7 @@
 
     投稿フォーム_タイトル欄.disabled  = false
     投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
-    katjusha.dataset.dialog = 'スレッド'
+    投稿フォーム.dataset.open = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
@@ -149,7 +149,7 @@
 
 
 レス投稿ボタン.onclick = function (event){
-    if(katjusha.dataset.dialog){
+    if(投稿フォーム.dataset.open){
         return
     }
     const tab = タブ.querySelector('[data-selected]')
@@ -171,7 +171,7 @@
 
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
-    katjusha.dataset.dialog = 'レス'
+    投稿フォーム.dataset.open = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
@@ -349,12 +349,12 @@
 
 
 投稿フォーム_form.onreset = function (event){
-    delete katjusha.dataset.dialog
+    delete 投稿フォーム.dataset.open
 }
 
 
 投稿フォーム_閉じるボタン.onclick = function (event){
-    delete katjusha.dataset.dialog
+    delete 投稿フォーム.dataset.open
 }
 
 
@@ -492,7 +492,7 @@ ajax.cgi = function (xhr){
     }
 
     ajax(xhr.url)
-    delete katjusha.dataset.dialog
+    delete 投稿フォーム.dataset.open
 }
 
 
