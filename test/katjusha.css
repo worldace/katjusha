@@ -58,127 +58,127 @@ body{
 
 
 
-#板{
+#掲示板{
     width: 150px;
     padding-top: 3px;
     border-right: solid 1px #a0a0a0;
     overflow-y: scroll;
     max-height: calc(100vh - 32px);
 }
-#板 details{
+#掲示板 details{
 }
-#板 summary{
+#掲示板 summary{
     outline: none;
     padding: 1px 1px;
 }
-#板 a{
+#掲示板 a{
     text-decoration: none;
     color: #000;
     padding: 1px 8px;
     margin: 1px 0;
     display: block;
 }
-#板 [data-selected]{
+#掲示板 [data-selected]{
     color: #fff;
     background-color: #0078d7;
 }
-#板 details:nth-of-type(33n+1){
+#掲示板 details:nth-of-type(33n+1){
     border-left: 4px solid #ffffff;
 }
-#板 details:nth-of-type(33n+2){
+#掲示板 details:nth-of-type(33n+2){
     border-left: 4px solid #985a62;
 }
-#板 details:nth-of-type(33n+3){
+#掲示板 details:nth-of-type(33n+3){
     border-left: 4px solid #ddffdd;
 }
-#板 details:nth-of-type(33n+4){
+#掲示板 details:nth-of-type(33n+4){
     border-left: 4px solid #ffd7ff;
 }
-#板 details:nth-of-type(33n+5){
+#掲示板 details:nth-of-type(33n+5){
     border-left: 4px solid #519db0;
 }
-#板 details:nth-of-type(33n+6){
+#掲示板 details:nth-of-type(33n+6){
     border-left: 4px solid #d7d7ff;
 }
-#板 details:nth-of-type(33n+7){
+#掲示板 details:nth-of-type(33n+7){
     border-left: 4px solid #008080;
 }
-#板 details:nth-of-type(33n+8){
+#掲示板 details:nth-of-type(33n+8){
     border-left: 4px solid #ff0000;
 }
-#板 details:nth-of-type(33n+9){
+#掲示板 details:nth-of-type(33n+9){
     border-left: 4px solid #baa047;
 }
-#板 details:nth-of-type(33n+10){
+#掲示板 details:nth-of-type(33n+10){
     border-left: 4px solid #ff8686;
 }
-#板 details:nth-of-type(33n+11){
+#掲示板 details:nth-of-type(33n+11){
     border-left: 4px solid #c2b1ba;
 }
-#板 details:nth-of-type(33n+12){
+#掲示板 details:nth-of-type(33n+12){
     border-left: 4px solid #8b3f78;
 }
-#板 details:nth-of-type(33n+13){
+#掲示板 details:nth-of-type(33n+13){
     border-left: 4px solid #a9ba32;
 }
-#板 details:nth-of-type(33n+14){
+#掲示板 details:nth-of-type(33n+14){
     border-left: 4px solid #a096de;
 }
-#板 details:nth-of-type(33n+15){
+#掲示板 details:nth-of-type(33n+15){
     border-left: 4px solid #d3c48d;
 }
-#板 details:nth-of-type(33n+16){
+#掲示板 details:nth-of-type(33n+16){
     border-left: 4px solid #ff00ff;
 }
-#板 details:nth-of-type(33n+17){
+#掲示板 details:nth-of-type(33n+17){
     border-left: 4px solid #ffff00;
 }
-#板 details:nth-of-type(33n+18){
+#掲示板 details:nth-of-type(33n+18){
     border-left: 4px solid #8f8c91;
 }
-#板 details:nth-of-type(33n+19){
+#掲示板 details:nth-of-type(33n+19){
     border-left: 4px solid #ffa2ff;
 }
-#板 details:nth-of-type(33n+20){
+#掲示板 details:nth-of-type(33n+20){
     border-left: 4px solid #0000ff;
 }
-#板 details:nth-of-type(33n+21){
+#掲示板 details:nth-of-type(33n+21){
     border-left: 4px solid #d022c4;
 }
-#板 details:nth-of-type(33n+22){
+#掲示板 details:nth-of-type(33n+22){
     border-left: 4px solid #b3ffb3;
 }
-#板 details:nth-of-type(33n+23){
+#掲示板 details:nth-of-type(33n+23){
     border-left: 4px solid #37e6d9;
 }
-#板 details:nth-of-type(33n+24){
+#掲示板 details:nth-of-type(33n+24){
     border-left: 4px solid #9595ff;
 }
-#板 details:nth-of-type(33n+25){
+#掲示板 details:nth-of-type(33n+25){
     border-left: 4px solid #5b30c2;
 }
-#板 details:nth-of-type(33n+26){
+#掲示板 details:nth-of-type(33n+26){
     border-left: 4px solid #c8f1ff;
 }
-#板 details:nth-of-type(33n+27){
+#掲示板 details:nth-of-type(33n+27){
     border-left: 4px solid #00ff00;
 }
-#板 details:nth-of-type(33n+28){
+#掲示板 details:nth-of-type(33n+28){
     border-left: 4px solid #28caff;
 }
-#板 details:nth-of-type(33n+29){
+#掲示板 details:nth-of-type(33n+29){
     border-left: 4px solid #ffffd2;
 }
-#板 details:nth-of-type(33n+30){
+#掲示板 details:nth-of-type(33n+30){
     border-left: 4px solid #ffd0d0;
 }
-#板 details:nth-of-type(33n+31){
+#掲示板 details:nth-of-type(33n+31){
     border-left: 4px solid #008cbb;
 }
-#板 details:nth-of-type(33n+32){
+#掲示板 details:nth-of-type(33n+32){
     border-left: 4px solid #ea8aac;
 }
-#板 details:nth-of-type(33n+33){
+#掲示板 details:nth-of-type(33n+33){
     border-left: 4px solid #000000;
 }
 
@@ -284,10 +284,10 @@ body{
     border-top: 1px solid #c0c0c0;
     box-shadow: 0 1px 0 0 #fff inset;
 }
-#スレッドヘッダ_板名{
+#スレッドヘッダ_掲示板名{
     margin-left: 14px;
 }
-#スレッドヘッダ_板名 a{
+#スレッドヘッダ_掲示板名 a{
     color: #000;
     text-decoration: none;
 }

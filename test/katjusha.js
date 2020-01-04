@@ -24,7 +24,7 @@
 
 全板ボタン.コンテキスト = function (){
     let ul = ''
-    for(const el of 板.querySelectorAll('*')){
+    for(const el of 掲示板.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
@@ -37,30 +37,30 @@
 
 
 
-板.onclick = function(event){
+掲示板.onclick = function(event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(板, event.target)
+        change_selected(掲示板, event.target)
         ajax(event.target.href)
     }
 }
 
 
 
-板.oncontextmenu = function (event){
+掲示板.oncontextmenu = function (event){
     event.preventDefault()
     if(event.target.tagName === 'A'){
-        change_selected(板, event.target)
-        コンテキスト.表示(板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
+        change_selected(掲示板, event.target)
+        コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
 }
 
 
-板.コンテキスト = function (url, name){
+掲示板.コンテキスト = function (url, name){
     return `
     <ul class="menu">
       <li><span onclick="copy('${url}')">URLをコピー</span></li>
-      <li><span onclick="copy('${name}\\n${url}\\n')">板名とURLをコピー</span></li>
+      <li><span onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</span></li>
     </ul>
     `
 }
@@ -124,7 +124,7 @@ grid3.oncontextmenu = function (event){
     if(katjusha.dataset.dialog){
         return
     }
-    const bbs = 板[サブジェクト一覧.bbsurl]
+    const bbs = 掲示板[サブジェクト一覧.bbsurl]
     if(!bbs){
         return
     }
@@ -157,7 +157,7 @@ grid3.oncontextmenu = function (event){
         return
     }
 
-    const bbs = 板[tab.thread.bbsurl]
+    const bbs = 掲示板[tab.thread.bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
@@ -183,10 +183,10 @@ grid3.oncontextmenu = function (event){
 }
 
 
-スレッドヘッダ_板名.onclick = function (event){
+スレッドヘッダ_掲示板名.onclick = function (event){
     event.preventDefault()
     const bbsurl = this.querySelector('a').href
-    if(bbsurl in 板){
+    if(bbsurl in 掲示板){
         ajax(bbsurl)
     }
 }
@@ -196,12 +196,12 @@ grid3.oncontextmenu = function (event){
 スレッドヘッダ.描画 = function (bbsurl, subject, num){
     if(num){
         スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
-        スレッドヘッダ_板名.innerHTML     = `<a href="${bbsurl}">[${板[bbsurl].name}]</a>`
+        スレッドヘッダ_掲示板名.innerHTML = `<a href="${bbsurl}">[${掲示板[bbsurl].name}]</a>`
         document.title = subject
     }
     else{
         スレッドヘッダ_タイトル.innerHTML = ''
-        スレッドヘッダ_板名.innerHTML     = ''
+        スレッドヘッダ_掲示板名.innerHTML = ''
         document.title = base.title
     }
 }
@@ -441,7 +441,7 @@ function ajax(url, body){
     if(url.endsWith('bbs.cgi')){
         xhr.open('POST', url)
         let bbsurl = url.replace('test/bbs.cgi', '')
-        bbsurl  = (bbsurl in 板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
+        bbsurl  = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
         xhr.url = body.get('key') ? build_thread_url(bbsurl, body.get('key')) : bbsurl
         callback = 'cgi'
     }
@@ -555,9 +555,9 @@ ajax.subject = function (xhr){
     サブジェクト一覧.innerHTML = parse_subject(xhr.responseText, xhr.url)
     サブジェクト一覧.bbsurl    = xhr.url
 
-    const bbs      = 板[xhr.url]
+    const bbs      = 掲示板[xhr.url]
     document.title = `${base.title} [ ${bbs.name} ]`
-    change_selected(板, bbs.el)
+    change_selected(掲示板, bbs.el)
 
     grid3.scrollTop = 0
 }
@@ -629,7 +629,7 @@ function parse_thread_url(url){
     dir.pop()
     dir.pop()
     url = dir.join('/') + '/'
-    const bbsurl = (url in 板) ? url : `${url}${bbs}/`
+    const bbsurl = (url in 掲示板) ? url : `${url}${bbs}/`
     return {bbsurl, key}
 }
 
@@ -667,7 +667,7 @@ function copy(str){
 
 
 function 掲示板に移動(bbsurl){
-    板[bbsurl].el.click()
+    掲示板[bbsurl].el.click()
 }
 
 
@@ -709,14 +709,14 @@ function bbs(el){
 base.title = document.title
 全板ボタン.textContent = `▽${document.title}`
 
-for(const el of 板.querySelectorAll('a')){
+for(const el of 掲示板.querySelectorAll('a')){
     if(!el.target){
-        板[el.href] = new bbs(el)
+        掲示板[el.href] = new bbs(el)
     }
 }
 
 if(document.URL !== base.href){
-    if(!板[document.URL]){
+    if(!掲示板[document.URL]){
         タブ.開く(document.URL)
     }
     ajax(document.URL)
