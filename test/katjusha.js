@@ -139,8 +139,10 @@
         key     : '',
     })
 
-    投稿フォーム_タイトル欄.disabled  = false
-    投稿フォーム_タイトル.textContent = `『${bbs.name}』に新規スレッド`
+    投稿フォーム_sage.checked        = false
+    投稿フォーム_メール欄.disabled   = false
+    投稿フォーム_タイトル欄.disabled = false
+    投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
     投稿フォーム.dataset.open = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
@@ -169,6 +171,8 @@
         key     : tab.thread.key
     })
 
+    投稿フォーム_sage.checked        = false
+    投稿フォーム_メール欄.disabled   = false
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
     投稿フォーム.dataset.open = 'レス'

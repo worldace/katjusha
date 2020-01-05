@@ -5,6 +5,9 @@ $password = '#default';
 トリップ
 管理者
 二重書き込み
+ab -c 10 -n 300 -p post.txt -T "application/x-www-form-urlencoded" http://127.0.0.1/katjusha/test/bbs.cgi
+bbs=headline&key=1576954969&FROM=&mail=&MESSAGE=1&submit=%E6%9B%B8%E3%81%8D%E8%BE%BC%E3%82%80
+70r/s
 */
 
 
