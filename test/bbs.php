@@ -52,7 +52,7 @@ if(!$is_thread and preg_match('/[^\d]/', $key)){
     error('keyが不正です');
 }
 if(!$is_thread and !file_exists(get_dat_path($bbs_path, $key))){
-    error('スレが存在しないかDAT落ちです');
+    get_kako_path($bbs_path, $key) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 
 if($is_thread and !$subject){
@@ -197,8 +197,9 @@ function get_dat_path($bbs_path, $key){
 
 
 
-function get_kako_path($bbs_path, $key){ //仕様未決定
-    return sprintf('%s/kako/%s/%s/', $bbs_path, substr($key,0,4), substr($key,0,5));
+function get_kako_path($bbs_path, $key){
+    //return sprintf('%s/kako/%s/%s/', $bbs_path, substr($key,0,4), substr($key,0,5));
+    return sprintf('%s/kako/%s/', $bbs_path, substr($key,0,3));
 }
 
 
