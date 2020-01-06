@@ -550,6 +550,7 @@ ajax.dat = function (xhr){
    }
     else if(xhr.status === 304){
         thread.新着 = 0
+        サブジェクト一覧.更新(thread)
     }
     else if(xhr.status === 404){
         // URLに/kako/が含まれていなければリトライ
@@ -726,6 +727,8 @@ for(const el of 掲示板.querySelectorAll('a')){
         掲示板[el.href] = new bbs(el)
     }
 }
+
+タブ.選択(タブ.初期化())
 
 if(document.URL !== base.href){
     if(!掲示板[document.URL]){
