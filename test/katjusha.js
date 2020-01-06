@@ -80,9 +80,14 @@
         return
     }
     change_selected(サブジェクト一覧, tr)
-    const {bbsurl, key} = parse_thread_url(tr.dataset.url)
-    タブ.開く(tr.dataset.url, tr.cells[1].textContent, tr.cells[2].textContent)
-    ajax(tr.dataset.url)
+
+    const url      = tr.dataset.url
+    const {bbsurl} = parse_thread_url(url)
+
+    const tab = タブ.開く(url)
+    タブ.描画(tab, スレッド[url] || {subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl})
+
+    ajax(url)
 }
 
 
@@ -230,29 +235,74 @@
 }
 
 
-タブ.初期化 = function (tab, thread){
+
+タブ.初期化 = function (tab, url){
     if(!tab){
         tab = document.createElement('li')
         タブ.appendChild(tab)
     }
     if(tab.el){
         tab.el.remove()
+        delete tab.thread
     }
-
-    const div     = document.createElement('div')
-    div.className = 'スレッド'
-    div.url       = thread.url
-
-    tab.innerHTML    = thread.subject || ''
-    tab.thread       = thread
-    tab.url          = thread.url
-    tab.el           = div
-    tab.el.innerHTML = thread.html || ''
-
-    スレッド.appendChild(div)
-    スレッド.scrollTop = thread.scroll || 0
+    tab.url          = url
+    tab.innerHTML    = ''
+    tab.el           = document.createElement('div')
+    tab.el.url       = url
+    tab.el.className = 'スレッド'
+    スレッド.appendChild(tab.el)
 
     return tab
+}
+
+
+
+タブ.描画 = function (tab, thread){
+    tab.thread         = thread
+    tab.innerHTML      = thread.subject || ''
+    tab.el.innerHTML   = thread.html || ''
+
+    スレッド.scrollTop = thread.scroll || 0
+
+    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
+
+    return tab
+}
+
+
+タブ.開く = function (url){
+    const tab = タブ.検索(url)
+    if(tab.url !== url){
+        タブ.初期化(tab, url)
+    }
+    タブ.選択(tab)
+    return tab
+}
+
+
+
+タブ.新しく開く = function (url){
+    let tab = タブ.検索(url)
+    if(tab.url !== url){
+        tab = タブ.初期化(null, url)
+    }
+    タブ.選択(tab)
+    return tab
+}
+
+
+
+
+タブ.閉じる = function (tab){
+    if(タブ.childElementCount === 1){
+        タブ.初期化(tab)
+        スレッドヘッダ.描画()
+    }
+    else{
+        タブ.選択(tab.previousElementSibling || tab.nextElementSibling)
+        tab.el.remove()
+        tab.remove()
+    }
 }
 
 
@@ -271,49 +321,7 @@
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
-}
-
-
-
-タブ.開く = function (url, subject, num){
-    const tab = タブ.検索(url)
-    if(tab.url !== url){
-        タブ.初期化(tab, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
-    }
-    タブ.選択(tab)
-}
-
-
-
-タブ.新しく開く = function (url, subject, num){
-    let tab = タブ.検索(url)
-    if(tab.url !== url){
-        tab = タブ.初期化(null, スレッド[url] || {url, subject, num, bbsurl:parse_thread_url(url).bbsurl})
-    }
-    タブ.選択(tab)
-}
-
-
-
-
-タブ.閉じる = function (tab){
-    if(タブ.childElementCount === 1){
-        if(tab.el){
-            tab.el.remove()
-        }
-        tab.innerHTML = ''
-        delete tab.url
-        delete tab.el
-        delete tab.thread
-
-        スレッドヘッダ.描画()
-    }
-    else{
-        タブ.選択(tab.previousElementSibling || tab.nextElementSibling)
-        tab.el.remove()
-        tab.remove()
-    }
+    return tab
 }
 
 
