@@ -28,7 +28,7 @@
         if(el.tagName === 'SUMMARY'){
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
-        else if(el.tagName === 'A' && !el.target){
+        else if(el.tagName === 'A'){
             ul += `<li><span onclick="掲示板に移動('${el.href}')">${el.textContent}</span></li>`
         }
     }
@@ -39,7 +39,7 @@
 
 掲示板.onclick = function(event){
     event.preventDefault()
-    if(event.target.tagName === 'A' && !event.target.target){
+    if(event.target.tagName === 'A'){
         change_selected(掲示板, event.target)
         ajax(event.target.href)
     }
@@ -49,7 +49,7 @@
 
 掲示板.oncontextmenu = function (event){
     event.preventDefault()
-    if(event.target.tagName === 'A' && !event.target.target){
+    if(event.target.tagName === 'A'){
         change_selected(掲示板, event.target)
         コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
@@ -243,10 +243,8 @@
     }
     if(tab.el){
         tab.el.remove()
-        delete tab.thread
     }
     tab.url          = url
-    tab.innerHTML    = ''
     tab.el           = document.createElement('div')
     tab.el.url       = url
     tab.el.className = 'スレッド'
@@ -294,15 +292,9 @@
 
 
 タブ.閉じる = function (tab){
-    if(タブ.childElementCount === 1){
-        タブ.初期化(tab)
-        スレッドヘッダ.描画()
-    }
-    else{
-        タブ.選択(tab.previousElementSibling || tab.nextElementSibling)
-        tab.el.remove()
-        tab.remove()
-    }
+    tab.el.remove()
+    tab.remove()
+    タブ.選択(tab.previousElementSibling || tab.nextElementSibling || タブ.初期化())
 }
 
 
