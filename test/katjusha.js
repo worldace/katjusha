@@ -30,10 +30,16 @@
             ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
         }
         else if(el.tagName === 'A'){
-            ul += `<li><span onclick="掲示板に移動('${el.href}')">${el.textContent}</span></li>`
+            ul += `<li><span onclick="全板ボタン.コンテキスト.掲示板に移動('${el.href}')">${el.textContent}</span></li>`
         }
     }
     return `<ul class="menu">${ul.slice(10)}</ul>`
+}
+
+
+
+全板ボタン.コンテキスト.掲示板に移動 = function(bbsurl){
+    掲示板[bbsurl].el.click()
 }
 
 
@@ -368,15 +374,20 @@
     change_selected(スレッド, tab.el)
     if(tab.thread){
         スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
+        スレッド.scrollTop = tab.thread.scroll || 0
+    }
+    else{
+        スレッドヘッダ.描画()
     }
     return tab
 }
 
 
 
-スレッド.addEventListener('scroll', function(event){
+スレッド.onscroll = function(event){
     スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
-}, {passive:true});
+}
+
 
 
 
@@ -700,8 +711,8 @@ function change_selected(parent, el){
     if(before){
         delete before.dataset.selected
     }
-    el.dataset.selected    = 'selected'
     parent.selectedElement = el
+    el.dataset.selected    = 'selected'
 }
 
 
@@ -728,10 +739,6 @@ function copy(str){
     navigator.clipboard.writeText(str)
 }
 
-
-function 掲示板に移動(bbsurl){
-    掲示板[bbsurl].el.click()
-}
 
 
 
