@@ -394,6 +394,12 @@ body{
     margin-left: 36px;
 }
 
+.スレッド{
+    display: none;
+}
+.スレッド[data-selected]{
+    display: block;
+}
 
 #ステータス{
     grid-area: ステータス;
@@ -420,9 +426,8 @@ body{
     display: block;
 }
 #投稿フォーム header{
-    border: solid 1px #2982cc;
     background-color: #2982cc;
-    padding: 5px 8px;
+    padding: 5px 0 5px 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -439,12 +444,17 @@ body{
     margin-left: 20px;
 }
 #投稿フォーム_閉じるボタン{
-    width: 16px;
-    height: 16px;
+    width: 28px;
+    height: 28px;
     background-repeat: no-repeat;
     background-image: url('close.svg');
     background-size: 16px;
+    background-position: center center;
     cursor: pointer;
+}
+#投稿フォーム_閉じるボタン:hover{
+    background-color: #e81123;
+    
 }
 #投稿フォーム [type="text"]{
     border-left: solid 1px #696969;
@@ -608,7 +618,7 @@ body{
 
 .menu span{
     display: block;
-    padding: 1px 20px;
+    padding: 1px 20px 1px 32px;
     line-height: 18px;
     color: #333;
     white-space: nowrap;

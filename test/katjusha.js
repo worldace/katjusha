@@ -105,11 +105,23 @@
 サブジェクト一覧.コンテキスト = function (url, name){
     return `
     <ul class="menu context-subject">
+      <li><span onclick="サブジェクト一覧.コンテキスト.新しいタブで開く('${url}')">新しいタブで開く</span></li>
       <li><span onclick="copy('${url}')">URLをコピー</span></li>
       <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
     </ul>
     `
 }
+
+
+サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
+    const tab = タブ.新しく開く(url)
+    if(スレッド[url]){
+        タブ.描画(tab, スレッド[url])
+    }
+    ajax(url)
+}
+
+
 
 
 サブジェクト一覧.更新 = function (thread){
@@ -228,10 +240,25 @@
 タブ.コンテキスト = function (url, name){
     return `
     <ul class="menu">
+      <li><span onclick="タブ.コンテキスト.閉じる()">閉じる</span></li>
+      <li><span onclick="タブ.コンテキスト.このタブ以外全て閉じる()">このタブ以外全て閉じる</span></li>
       <li><span onclick="copy('${url}')">URLをコピー</span></li>
       <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
     </ul>
     `
+}
+
+
+タブ.コンテキスト.閉じる = function(){
+    タブ.閉じる(コンテキスト.target)
+}
+
+タブ.コンテキスト.このタブ以外全て閉じる = function (){
+    for(const tab of タブ.querySelectorAll('li')){
+        if(tab !== コンテキスト.target){
+            タブ.閉じる(tab)
+        }
+    }
 }
 
 
@@ -292,9 +319,9 @@
 
 
 タブ.閉じる = function (tab){
+    タブ.選択(tab.previousElementSibling || tab.nextElementSibling || タブ.初期化())
     tab.el.remove()
     tab.remove()
-    タブ.選択(tab.previousElementSibling || tab.nextElementSibling || タブ.初期化())
 }
 
 
@@ -654,6 +681,8 @@ function centering(el){
     el.style.left = `${innerWidth/2 - width/2}px`
     el.style.top  = `${innerHeight/2 - height/2}px`
 }
+
+
 
 
 
