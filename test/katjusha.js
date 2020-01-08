@@ -367,7 +367,7 @@
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
     if(tab.thread){
-        スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
+        スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
     }
     return tab
 }
