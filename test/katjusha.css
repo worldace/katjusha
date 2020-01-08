@@ -593,6 +593,9 @@ body{
 #コンテキスト .context-subject{
     width: 250px;
 }
+#コンテキスト .context-tab{
+    width: 220px;
+}
 
 .menu,
 .menu ul{

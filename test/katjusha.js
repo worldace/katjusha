@@ -1,5 +1,6 @@
 /*
 書き込み後に 416エラー
+タブ選択で、スレッドヘッダとタイトル描画
 */
 
 
@@ -199,6 +200,17 @@
 
 
 
+レス取得ボタン.onclick = function (event){
+    const tab = タブ.selectedElement
+    if(!tab || !tab.url){
+        return
+    }
+    タブ.選択(tab)
+    ajax(tab.url)
+}
+
+
+
 スレッドヘッダ.oncontextmenu = function (event){
     event.preventDefault()
 }
@@ -228,6 +240,20 @@
 }
 
 
+タブ.onclick = function (event){
+    if(event.target.tagName !== 'LI' || event.target.dataset.selected){
+        return
+    }
+    タブ.選択(event.target)
+}
+
+
+タブ.ondblclick = function (event){
+    レス取得ボタン.click()
+}
+
+
+
 タブ.oncontextmenu = function (event){
     event.preventDefault()
     if(event.target.tagName === 'LI'){
@@ -239,7 +265,7 @@
 
 タブ.コンテキスト = function (url, name){
     return `
-    <ul class="menu">
+    <ul class="menu context-tab">
       <li><span onclick="タブ.コンテキスト.閉じる()">閉じる</span></li>
       <li><span onclick="タブ.コンテキスト.このタブ以外全て閉じる()">このタブ以外全て閉じる</span></li>
       <li><span onclick="copy('${url}')">URLをコピー</span></li>
@@ -340,6 +366,9 @@
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
+    if(tab.thread){
+        スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
+    }
     return tab
 }
 
