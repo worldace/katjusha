@@ -92,7 +92,7 @@
     const {bbsurl} = parse_thread_url(url)
     const thread   = スレッド[url] || {subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl}
 
-    タブ.開く(url, thread)
+    タブ.開く(url, 'self', thread)
     ajax(url)
 }
 
@@ -120,7 +120,7 @@
 
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
-    タブ.新しく開く(url, スレッド[url])
+    タブ.開く(url, 'blank', スレッド[url])
     ajax(url)
 }
 
@@ -310,27 +310,11 @@
 
 
 
-タブ.開く = function (url, thread){
-    const tab = タブ.検索(url)
-    if(tab.url !== url){
-        タブ.初期化(tab, url)
-    }
-    タブ.選択(tab)
-    if(thread){
-        tab.thread         = thread
-        tab.innerHTML      = thread.subject || ''
-        tab.el.innerHTML   = thread.html || ''
-        スレッド.scrollTop = thread.scroll || 0
-    }
-    return tab
-}
 
-
-
-タブ.新しく開く = function (url, thread){
+タブ.開く = function (url, target = 'self', thread){
     let tab = タブ.検索(url)
     if(tab.url !== url){
-        tab = タブ.初期化(null, url)
+        tab = タブ.初期化((target === 'self') ? tab : null, url)
     }
     タブ.選択(tab)
     if(thread){
