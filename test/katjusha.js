@@ -90,10 +90,9 @@
 
     const url      = tr.dataset.url
     const {bbsurl} = parse_thread_url(url)
+    const thread   = スレッド[url] || {subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl}
 
-    const tab = タブ.開く(url)
-    タブ.描画(tab, スレッド[url] || {subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl})
-
+    タブ.開く(url, thread)
     ajax(url)
 }
 
@@ -121,10 +120,7 @@
 
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
-    const tab = タブ.新しく開く(url)
-    if(スレッド[url]){
-        タブ.描画(tab, スレッド[url])
-    }
+    タブ.新しく開く(url, スレッド[url])
     ajax(url)
 }
 
@@ -314,39 +310,37 @@
 
 
 
-タブ.描画 = function (tab, thread){
-    tab.thread         = thread
-    tab.innerHTML      = thread.subject || ''
-    tab.el.innerHTML   = thread.html || ''
-
-    スレッド.scrollTop = thread.scroll || 0
-
-    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
-
-    return tab
-}
-
-
-タブ.開く = function (url){
+タブ.開く = function (url, thread){
     const tab = タブ.検索(url)
     if(tab.url !== url){
         タブ.初期化(tab, url)
     }
     タブ.選択(tab)
+    if(thread){
+        tab.thread         = thread
+        tab.innerHTML      = thread.subject || ''
+        tab.el.innerHTML   = thread.html || ''
+        スレッド.scrollTop = thread.scroll || 0
+    }
     return tab
 }
 
 
 
-タブ.新しく開く = function (url){
+タブ.新しく開く = function (url, thread){
     let tab = タブ.検索(url)
     if(tab.url !== url){
         tab = タブ.初期化(null, url)
     }
     タブ.選択(tab)
+    if(thread){
+        tab.thread         = thread
+        tab.innerHTML      = thread.subject || ''
+        tab.el.innerHTML   = thread.html || ''
+        スレッド.scrollTop = thread.scroll || 0
+    }
     return tab
 }
-
 
 
 
