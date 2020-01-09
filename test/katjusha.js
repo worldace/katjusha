@@ -316,13 +316,12 @@
     if(tab.url !== url){
         tab = タブ.初期化((target === 'self') ? tab : null, url)
     }
-    タブ.選択(tab)
     if(thread){
         tab.thread         = thread
         tab.innerHTML      = thread.subject || ''
         tab.el.innerHTML   = thread.html || ''
-        スレッド.scrollTop = thread.scroll || 0
     }
+    タブ.選択(tab)
     return tab
 }
 
