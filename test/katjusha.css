@@ -380,6 +380,10 @@ body{
 #スレッド i{
     color: blue;
     font-style: normal;
+    cursor: pointer;
+}
+#スレッド i:hover{
+    text-decoration: underline;
 }
 #スレッド b{
     color: forestgreen;
@@ -392,6 +396,12 @@ body{
 #スレッド p{
     margin-top: 3px;
     margin-left: 36px;
+}
+#スレッド a{
+    text-decoration: none;
+}
+#スレッド a:hover{
+    text-decoration: underline;
 }
 
 .スレッド{

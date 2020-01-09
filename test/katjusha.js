@@ -383,6 +383,35 @@
 }
 
 
+スレッド.onclick = function (event){
+    if(event.target.tagName === 'I'){
+        event.stopPropagation()
+        コンテキスト.表示(スレッド.コンテキスト(), event.target, event.pageX, event.pageY)
+    }
+    else if(event.target.target === '_self'){
+        event.preventDefault()
+        掲示板[event.target.href] ? 全板ボタン.コンテキスト.掲示板に移動(event.target.href) : サブジェクト一覧.コンテキスト.新しいタブで開く(event.target.href)
+    }
+}
+
+
+
+スレッド.コンテキスト = function (){
+    return `
+    <ul class="menu">
+      <li><span onclick="スレッド.コンテキスト.これにレス()">これにレス</span></li>
+    </ul>
+    `
+}
+
+
+
+スレッド.コンテキスト.これにレス = function (){
+    const n = コンテキスト.target.textContent
+    レス投稿ボタン.click()
+    insert_text(投稿フォーム_本文欄, `>>${n}\n`)
+}
+
 
 スレッド.onscroll = function(event){
     スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
@@ -649,7 +678,7 @@ function parse_dat(responseText, num){
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
         message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="popup">&gt;&gt;$1</span>`)
-        message = message.replace(/https?:\/\/[^\s<]+/g, url => is_thread_url(url) ? `<a href="${url}">${url}</a>` : `<a href="${url}" target="_blank">${url}</a>`)
+        message = message.replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="${target_url(url)}">${url}</a>`)
         dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
@@ -708,9 +737,8 @@ function parse_thread_url(url){
 }
 
 
-function is_thread_url(url){
-    url = new URL(url)
-    return 掲示板.ホスト一覧.has(url.hostname) && /\/test\/read\.cgi\/[^\/]+\/\d+\//.test(url.pathname)
+function target_url(url){
+    return 掲示板.ホスト一覧.has((new URL(url)).hostname) ? '_self' : '_blank'
 }
 
 
@@ -749,6 +777,13 @@ function copy(str){
 }
 
 
+function insert_text(textarea, text){
+    const cursor = textarea.selectionStart;
+    const before = textarea.value.substr(0, cursor);
+    const after  = textarea.value.substr(cursor, textarea.value.length);
+
+    textarea.value = before + text + after;
+}
 
 
 function date(){
