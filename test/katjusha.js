@@ -647,7 +647,9 @@ function parse_dat(responseText, num){
     }
 
     for(const v of list){
-        const [from, mail, date, message, subject] = v.split('<>')
+        let [from, mail, date, message, subject] = v.split('<>')
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="popup">&gt;&gt;$1</span>`)
+        message = message.replace(/https?:\/\/[^\s<]+/g, url => is_thread_url(url) ? `<a href="${url}">${url}</a>` : `<a href="${url}" target="_blank">${url}</a>`)
         dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
@@ -706,6 +708,13 @@ function parse_thread_url(url){
 }
 
 
+function is_thread_url(url){
+    url = new URL(url)
+    return 掲示板.ホスト一覧.has(url.hostname) && /\/test\/read\.cgi\/[^\/]+\/\d+\//.test(url.pathname)
+}
+
+
+
 function change_selected(parent, el){
     const before = parent.querySelector('[data-selected]')
     if(before){
@@ -762,6 +771,7 @@ function bbs(el){
     this.name = el.textContent
 
     const dir = el.href.split('/').slice(0, -1)
+    this.host = dir[2]
     if(dir.length > 3){
         this.key  = dir.pop()
         this.home = dir.join('/') + '/'
@@ -779,10 +789,11 @@ function bbs(el){
 base.title = document.title
 全板ボタン.textContent = `▽${document.title}`
 
+掲示板.ホスト一覧 = new Set
+
 for(const el of 掲示板.querySelectorAll('a')){
-    if(!el.target){
-        掲示板[el.href] = new bbs(el)
-    }
+    掲示板[el.href] = new bbs(el)
+    掲示板.ホスト一覧.add(掲示板[el.href].host)
 }
 
 タブ.選択(タブ.初期化())
