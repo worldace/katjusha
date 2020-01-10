@@ -7,6 +7,24 @@
 
 
 
+katjusha.addEventListener('click', function(event){
+    const url = event.target.href
+    if(!url || !is_internal_url(url)){
+        return
+    }
+    event.preventDefault()
+    if(掲示板[url]){
+        change_selected(掲示板, 掲示板[url].el)
+        ajax(url)
+    }
+    else if(url.includes('/test/read.cgi/')){
+        const thread = スレッド[url] || {}
+        タブ.開く(url, event.target.target, thread.subject, thread.html)
+        ajax(url)
+    }
+})
+
+
 
 ヘッダ.oncontextmenu = function (event){
     event.preventDefault()
@@ -45,10 +63,8 @@
 
 
 掲示板.onclick = function(event){
-    event.preventDefault()
-    if(event.target.tagName === 'A'){
-        change_selected(掲示板, event.target)
-        ajax(event.target.href)
+    if(event.target.tagName !== 'A'){
+        event.preventDefault()
     }
 }
 
@@ -87,14 +103,9 @@
         return
     }
     change_selected(サブジェクト一覧, tr)
-
-    const url      = tr.dataset.url
-    const {bbsurl} = parse_thread_url(url)
-    const thread   = スレッド[url] || {} //{subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl}
-
-    タブ.開く(url, 'self', thread.subject, thread.html)
-    ajax(url)
+    tr.querySelector('a').click()
 }
+
 
 
 サブジェクト一覧.oncontextmenu = function (event){
@@ -121,7 +132,7 @@
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
     const thread = スレッド[url] || {} //new thread
-    タブ.開く(url, 'blank', thread.subject, thread.html)
+    タブ.開く(url, '_blank', thread.subject, thread.html)
     ajax(url)
 }
 
@@ -220,15 +231,6 @@
 }
 
 
-スレッドヘッダ_掲示板名.onclick = function (event){
-    event.preventDefault()
-    const bbsurl = this.querySelector('a').href
-    if(bbsurl in 掲示板){
-        ajax(bbsurl)
-    }
-}
-
-
 
 スレッドヘッダ.描画 = function (url){
     const thread = スレッド[url]
@@ -323,10 +325,10 @@
 
 
 
-タブ.開く = function (url, target = 'self', title = '', html = ''){
+タブ.開く = function (url, target, title = '', html = ''){
     let tab = タブ.検索(url)
     if(tab.url !== url){ // urlのタブが存在しない時
-        tab = (target === 'blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
+        tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
         tab.innerHTML    = title
         tab.el.innerHTML = html
     }
@@ -503,7 +505,7 @@
 
 
 
-document.body.addEventListener('click', function(event){
+katjusha.addEventListener('click', function(event){
     if(コンテキスト.dataset.open){
         delete コンテキスト.dataset.open
         delete コンテキスト.target
@@ -656,7 +658,7 @@ function parse_dat(responseText, num){
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
         message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="popup">&gt;&gt;$1</span>`)
-        message = message.replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="${target_url(url)}">${url}</a>`)
+        message = message.replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="_blank">${url}</a>`)
         dat.html += `<section><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
@@ -715,8 +717,8 @@ function parse_thread_url(url){
 }
 
 
-function target_url(url){
-    return 掲示板.ホスト一覧.has((new URL(url)).hostname) ? '_self' : '_blank'
+function is_internal_url(url){
+    return 掲示板.ホスト一覧.has((new URL(url)).hostname)
 }
 
 
