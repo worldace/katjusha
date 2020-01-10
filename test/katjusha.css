@@ -600,9 +600,6 @@ body{
 #コンテキスト[data-open]{
     display: block;
 }
-#コンテキスト span{
-    font-family: Meiryo, sans-serif;
-}
 #コンテキスト .context-subject{
     width: 250px;
 }
@@ -622,7 +619,7 @@ body{
     box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);
 }
 .menu li{
-    font-family: 'MS PGothic', sans-serif;
+    font-family: Meiryo, sans-serif;
     font-size: 12px;
 }
 .menu li:empty{
@@ -632,7 +629,7 @@ body{
     box-shadow: 0 1px 0 #fff;
 }
 
-.menu span{
+.menu a{
     display: block;
     padding: 1px 20px 1px 24px;
     line-height: 18px;
@@ -640,15 +637,15 @@ body{
     white-space: nowrap;
     text-decoration: none;
 }
-.menu span:hover,
-.menu-sub:hover > span{
+.menu a:hover,
+.menu-sub:hover > a{
     background-color: #91c9f7;
 }
 
 .menu-sub{
     position: relative;
 }
-.menu-sub > span::after{
+.menu-sub > a::after{
     position: absolute;
     right: 5px;
     width: 0;

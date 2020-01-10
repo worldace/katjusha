@@ -45,19 +45,13 @@ katjusha.addEventListener('click', function(event){
     let ul = ''
     for(const el of 掲示板.querySelectorAll('*')){
         if(el.tagName === 'SUMMARY'){
-            ul += `</ul></li><li class="menu-sub"><span>${el.textContent}</span><ul>`
+            ul += `</ul></li><li class="menu-sub"><a>${el.textContent}</a><ul>`
         }
         else if(el.tagName === 'A'){
-            ul += `<li><span onclick="全板ボタン.コンテキスト.掲示板に移動('${el.href}')">${el.textContent}</span></li>`
+            ul += `<li><a href="${el.href}">${el.textContent}</a></li>`
         }
     }
     return `<ul class="menu">${ul.slice(10)}</ul>`
-}
-
-
-
-全板ボタン.コンテキスト.掲示板に移動 = function(bbsurl){
-    掲示板[bbsurl].el.click()
 }
 
 
@@ -82,8 +76,8 @@ katjusha.addEventListener('click', function(event){
 掲示板.コンテキスト = function (url, name){
     return `
     <ul class="menu">
-      <li><span onclick="copy('${url}')">URLをコピー</span></li>
-      <li><span onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</span></li>
+      <li><a onclick="copy('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</a></li>
     </ul>
     `
 }
@@ -123,9 +117,9 @@ katjusha.addEventListener('click', function(event){
 サブジェクト一覧.コンテキスト = function (url, name){
     return `
     <ul class="menu context-subject">
-      <li><span onclick="サブジェクト一覧.コンテキスト.新しいタブで開く('${url}')">新しいタブで開く</span></li>
-      <li><span onclick="copy('${url}')">URLをコピー</span></li>
-      <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
+      <li><a onclick="サブジェクト一覧.コンテキスト.新しいタブで開く('${url}')">新しいタブで開く</a></li>
+      <li><a onclick="copy('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
     </ul>
     `
 }
@@ -282,10 +276,10 @@ katjusha.addEventListener('click', function(event){
 タブ.コンテキスト = function (url, name){
     return `
     <ul class="menu context-tab">
-      <li><span onclick="タブ.コンテキスト.閉じる()">閉じる</span></li>
-      <li><span onclick="タブ.コンテキスト.このタブ以外全て閉じる()">このタブ以外全て閉じる</span></li>
-      <li><span onclick="copy('${url}')">URLをコピー</span></li>
-      <li><span onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</span></li>
+      <li><a onclick="タブ.コンテキスト.閉じる()">閉じる</a></li>
+      <li><a onclick="タブ.コンテキスト.このタブ以外全て閉じる()">このタブ以外全て閉じる</a></li>
+      <li><a onclick="copy('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
     </ul>
     `
 }
@@ -385,7 +379,7 @@ katjusha.addEventListener('click', function(event){
 スレッド.コンテキスト = function (){
     return `
     <ul class="menu">
-      <li><span onclick="スレッド.コンテキスト.これにレス()">これにレス</span></li>
+      <li><a onclick="スレッド.コンテキスト.これにレス()">これにレス</a></li>
     </ul>
     `
 }
@@ -494,10 +488,12 @@ katjusha.addEventListener('click', function(event){
 
 
 コンテキスト.onclick = function (event){
-    event.stopPropagation()
-    if(event.target.onclick){
+    if(event.target.onclick || event.target.href){
         delete コンテキスト.dataset.open
         delete コンテキスト.target
+    }
+    else{
+        event.stopPropagation()
     }
 }
 
