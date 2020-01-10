@@ -432,7 +432,10 @@ body{
     height: 272px;
     background-color: #f0f0f0;
 }
-#投稿フォーム[data-open]{
+[data-open="スレッド"] #投稿フォーム{
+    display: block;
+}
+[data-open="レス"] #投稿フォーム{
     display: block;
 }
 #投稿フォーム header{

@@ -142,7 +142,7 @@
 
 
 スレッド投稿ボタン.onclick = function (event){
-    if(投稿フォーム.dataset.open){
+    if(katjusha.dataset.open){
         return
     }
     const bbs = 掲示板[サブジェクト一覧.bbsurl]
@@ -164,7 +164,7 @@
     投稿フォーム_メール欄.disabled   = false
     投稿フォーム_タイトル欄.disabled = false
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
-    投稿フォーム.dataset.open = 'スレッド'
+    katjusha.dataset.open = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
@@ -172,7 +172,7 @@
 
 
 レス投稿ボタン.onclick = function (event){
-    if(投稿フォーム.dataset.open){
+    if(katjusha.dataset.open){
         return
     }
     const tab = タブ.selectedElement
@@ -197,7 +197,7 @@
     投稿フォーム_メール欄.disabled   = false
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
-    投稿フォーム.dataset.open = 'レス'
+    katjusha.dataset.open = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
@@ -427,12 +427,12 @@
 
 
 投稿フォーム_form.onreset = function (event){
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.open
 }
 
 
 投稿フォーム_閉じるボタン.onclick = function (event){
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.open
 }
 
 
@@ -570,7 +570,7 @@ ajax.cgi = function (xhr){
     }
 
     ajax(xhr.url)
-    delete 投稿フォーム.dataset.open
+    delete katjusha.dataset.open
 }
 
 
