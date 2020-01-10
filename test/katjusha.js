@@ -119,6 +119,7 @@ katjusha.addEventListener('click', function(event){
 }
 
 
+
 サブジェクト一覧.コンテキスト = function (url, name){
     return `
     <ul class="menu context-subject">
@@ -135,7 +136,6 @@ katjusha.addEventListener('click', function(event){
     タブ.開く(url, '_blank', thread.subject, thread.html)
     ajax(url)
 }
-
 
 
 
@@ -254,12 +254,14 @@ katjusha.addEventListener('click', function(event){
 }
 
 
+
 タブ.onclick = function (event){
     if(event.target.tagName !== 'LI' || event.target.dataset.selected){
         return
     }
     タブ.選択(event.target)
 }
+
 
 
 タブ.ondblclick = function (event){
@@ -287,6 +289,7 @@ katjusha.addEventListener('click', function(event){
     </ul>
     `
 }
+
 
 
 タブ.コンテキスト.閉じる = function(){
@@ -321,7 +324,6 @@ katjusha.addEventListener('click', function(event){
 
     return tab
 }
-
 
 
 
@@ -366,6 +368,7 @@ katjusha.addEventListener('click', function(event){
 }
 
 
+
 スレッド.onclick = function (event){
     if(event.target.tagName === 'I'){
         event.stopPropagation()
@@ -402,7 +405,6 @@ katjusha.addEventListener('click', function(event){
 
 
 
-
 スレッド.追記 = function(url, title, html){
     const tab         = タブ.検索(url)
     tab.innerHTML     = title
@@ -433,9 +435,11 @@ katjusha.addEventListener('click', function(event){
 }
 
 
+
 投稿フォーム_閉じるボタン.onclick = function (event){
     delete katjusha.dataset.open
 }
+
 
 
 投稿フォーム_sage.onchange = function (event){
@@ -448,6 +452,7 @@ katjusha.addEventListener('click', function(event){
         投稿フォーム_メール欄.value    = ''
     }
 }
+
 
 
 投稿フォーム_ヘッダ.onmousedown = function (event){
@@ -717,9 +722,12 @@ function parse_thread_url(url){
 }
 
 
+
 function is_internal_url(url){
-    return 掲示板.ホスト一覧.has((new URL(url)).hostname)
+    url = new URL(url)
+    return 掲示板.ホスト一覧.has(url.hostname)
 }
+
 
 
 
