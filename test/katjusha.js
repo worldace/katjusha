@@ -1,7 +1,6 @@
 /*
 書き込み後に 416エラー
-tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
-
+サブジェクト一覧.onclick と 新しいタブで開くに thread がない問題
 */
 
 
@@ -91,9 +90,9 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 
     const url      = tr.dataset.url
     const {bbsurl} = parse_thread_url(url)
-    const thread   = スレッド[url] || {subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl}
+    const thread   = スレッド[url] || {} //{subject:tr.cells[1].textContent, num:tr.cells[2].textContent, bbsurl}
 
-    タブ.開く(url, 'self', thread)
+    タブ.開く(url, 'self', thread.subject, thread.html)
     ajax(url)
 }
 
@@ -121,7 +120,8 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
-    タブ.開く(url, 'blank', スレッド[url])
+    const thread = スレッド[url] || {} //new thread
+    タブ.開く(url, 'blank', thread.subject, thread.html)
     ajax(url)
 }
 
@@ -230,17 +230,25 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 
 
 
-スレッドヘッダ.描画 = function (bbsurl, subject, num){
-    if(num){
-        スレッドヘッダ_タイトル.innerHTML = `${subject} (${num})`
-        スレッドヘッダ_掲示板名.innerHTML = `<a href="${bbsurl}">[${掲示板[bbsurl].name}]</a>`
-        document.title = subject
+スレッドヘッダ.描画 = function (url){
+    const thread = スレッド[url]
+    if(thread){
+        スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
+        スレッドヘッダ_掲示板名.innerHTML = `<a href="${thread.bbsurl}">[${掲示板[thread.bbsurl].name}]</a>`
+        document.title = thread.subject
+        スレッド.scrollTop = thread.scroll
     }
     else{
         スレッドヘッダ_タイトル.innerHTML = ''
         スレッドヘッダ_掲示板名.innerHTML = ''
         document.title = base.title
     }
+}
+
+
+
+タブ閉じるボタン.onclick = function (event){
+    タブ.閉じる(タブ.selectedElement)
 }
 
 
@@ -283,6 +291,8 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
     タブ.閉じる(コンテキスト.target)
 }
 
+
+
 タブ.コンテキスト.このタブ以外全て閉じる = function (){
     for(const tab of タブ.querySelectorAll('li')){
         if(tab !== コンテキスト.target){
@@ -313,15 +323,12 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 
 
 
-タブ.開く = function (url, target = 'self', thread){
+タブ.開く = function (url, target = 'self', title = '', html = ''){
     let tab = タブ.検索(url)
-    if(tab.url !== url){
-        tab = タブ.初期化((target === 'self') ? tab : null, url)
-    }
-    if(thread){
-        tab.thread         = thread
-        tab.innerHTML      = thread.subject || ''
-        tab.el.innerHTML   = thread.html || ''
+    if(tab.url !== url){ // urlのタブが存在しない時
+        tab = (target === 'blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
+        tab.innerHTML    = title
+        tab.el.innerHTML = html
     }
     タブ.選択(tab)
     return tab
@@ -351,13 +358,8 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
-    if(tab.thread){
-        スレッドヘッダ.描画(tab.thread.bbsurl, tab.thread.subject, tab.thread.num)
-        スレッド.scrollTop = tab.thread.scroll || 0
-    }
-    else{
-        スレッドヘッダ.描画()
-    }
+    スレッドヘッダ.描画(tab.url)
+
     return tab
 }
 
@@ -399,14 +401,12 @@ tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
 
 
 
-スレッド.追記 = function(thread, appendHTML = ''){
-    const tab = タブ.検索(thread.url)
-    tab.thread    = thread
-    tab.innerHTML = thread.subject
+スレッド.追記 = function(url, title, html){
+    const tab         = タブ.検索(url)
+    tab.innerHTML     = title
+    tab.el.innerHTML += html
 
-    tab.el.innerHTML  += appendHTML
-
-    スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
+    スレッドヘッダ.描画(url)
 }
 
 
@@ -596,7 +596,7 @@ ajax.dat = function (xhr){
         thread.新着    = dat.num
         thread.最終取得= date()
 
-        スレッド.追記(thread, dat.html)
+        スレッド.追記(thread.url, thread.subject, thread.html)
         サブジェクト一覧.更新(thread)
     }
     else if(xhr.status === 206){
@@ -611,7 +611,7 @@ ajax.dat = function (xhr){
         thread.新着    = dat.num
         thread.最終取得= date()
 
-        スレッド.追記(thread, dat.html)
+        スレッド.追記(thread.url, thread.subject, dat.html)
         サブジェクト一覧.更新(thread)
    }
     else if(xhr.status === 304){
