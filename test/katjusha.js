@@ -1,6 +1,7 @@
 /*
 書き込み後に 416エラー
-タブ選択で、スレッドヘッダとタイトル描画
+tab.thread 不要かも＋ スレッドヘッダ.描画()をどうするか
+
 */
 
 
@@ -174,12 +175,13 @@
     if(投稿フォーム.dataset.open){
         return
     }
-    const tab = タブ.querySelector('[data-selected]')
-    if(!tab.thread){
+    const tab = タブ.selectedElement
+    if(!tab || !tab.url){
         return
     }
 
-    const bbs = 掲示板[tab.thread.bbsurl]
+    const {bbsurl, key} = parse_thread_url(tab.url)
+    const bbs = 掲示板[bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
@@ -188,7 +190,7 @@
         mail    : '',
         MESSAGE : '',
         bbs     : bbs.key,
-        key     : tab.thread.key
+        key     : key
     })
 
     投稿フォーム_sage.checked        = false
@@ -403,7 +405,6 @@
     tab.innerHTML = thread.subject
 
     tab.el.innerHTML  += appendHTML
-    スレッド.scrollTop = thread.scroll
 
     スレッドヘッダ.描画(thread.bbsurl, thread.subject, thread.num)
 }
