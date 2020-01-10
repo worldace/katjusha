@@ -1,6 +1,6 @@
 /*
 書き込み後に 416エラー
-サブジェクト一覧.onclick と 新しいタブで開くに thread がない問題
+タブ.開くに thread がない問題
 */
 
 
@@ -357,6 +357,7 @@ katjusha.addEventListener('click', function(event){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
     スレッドヘッダ.描画(tab.url)
+    history.replaceState(null, null, tab.url || サブジェクト一覧.bbsurl || base.href)
 
     return tab
 }
