@@ -322,7 +322,7 @@ katjusha.addEventListener('click', function(event){
 
 
 タブ.開く = function (url, target, title = '', html = ''){
-    let tab = タブ.検索(url) || タブ.初期化(null, url)
+    let tab = タブ.検索(url) || タブ.初期化()
     if(tab.url !== url){ // urlのタブが存在しない時
         tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
         tab.innerHTML    = title
