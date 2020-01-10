@@ -322,7 +322,7 @@ katjusha.addEventListener('click', function(event){
 
 
 タブ.開く = function (url, target, title = '', html = ''){
-    let tab = タブ.検索(url)
+    let tab = タブ.検索(url) || タブ.初期化(null, url)
     if(tab.url !== url){ // urlのタブが存在しない時
         tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
         tab.innerHTML    = title
@@ -816,7 +816,7 @@ for(const el of 掲示板.querySelectorAll('a')){
     掲示板.ホスト一覧.add(掲示板[el.href].host)
 }
 
-タブ.選択(タブ.初期化())
+
 
 if(document.URL !== base.href){
     if(!掲示板[document.URL]){
@@ -824,4 +824,3 @@ if(document.URL !== base.href){
     }
     ajax(document.URL)
 }
-
