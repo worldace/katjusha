@@ -17,7 +17,7 @@ katjusha.addEventListener('click', function(event){
         change_selected(掲示板, 掲示板[url].el)
         ajax(url)
     }
-    else if(url.includes('/test/read.cgi/')){
+    else if(url.includes('read.cgi')){
         const thread = スレッド[url] || {}
         タブ.開く(url, event.target.target, thread.subject, thread.html)
         ajax(url)
@@ -819,7 +819,7 @@ for(const el of 掲示板.querySelectorAll('a')){
 
 
 if(document.URL !== base.href){
-    if(!掲示板[document.URL]){
+    if(document.URL.includes('read.cgi')){
         タブ.開く(document.URL)
     }
     ajax(document.URL)
