@@ -549,10 +549,12 @@ function ajax(url, body){
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
     xhr.onloadend = function(){
-        アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
+        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
+        ステータス.textContent = ``
         ajax[callback](xhr)
     }
-    アニメ.dataset.ajax = Number(アニメ.dataset.ajax) + 1
+    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
+    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
     xhr.send(body)
 }
 
@@ -601,6 +603,7 @@ ajax.dat = function (xhr){
 
         スレッド.追記(thread.url, thread.subject, thread.html)
         サブジェクト一覧.更新(thread)
+        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
     else if(xhr.status === 206){
         const dat = parse_dat(xhr.responseText, thread.num+1)
@@ -616,10 +619,12 @@ ajax.dat = function (xhr){
 
         スレッド.追記(thread.url, thread.subject, dat.html)
         サブジェクト一覧.更新(thread)
+        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
    }
     else if(xhr.status === 304){
         thread.新着 = 0
         サブジェクト一覧.更新(thread)
+        ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
     }
     else if(xhr.status === 404){
         // URLに/kako/が含まれていなければリトライ
@@ -634,7 +639,8 @@ ajax.subject = function (xhr){
         return
     }
 
-    サブジェクト一覧.innerHTML = parse_subject(xhr.responseText, xhr.url)
+    const {html, num} = parse_subject(xhr.responseText, xhr.url)
+    サブジェクト一覧.innerHTML = html
     サブジェクト一覧.bbsurl    = xhr.url
 
     const bbs      = 掲示板[xhr.url]
@@ -642,6 +648,7 @@ ajax.subject = function (xhr){
     change_selected(掲示板, bbs.el)
 
     サブジェクト.scrollTop = 0
+    ステータス.textContent = `${num}件のスレッドを受信 (${date()})`
 }
 
 
@@ -687,7 +694,7 @@ function parse_subject(responseText, bbsurl){
         tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
         no++
     }
-    return tr
+    return {html:tr, num:list.length}
 }
 
 
@@ -770,6 +777,7 @@ function insert_text(textarea, text){
 }
 
 
+
 function date(){
     const d  = new Date()
 
@@ -782,6 +790,13 @@ function date(){
 
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
 }
+
+
+
+function format_KB(byte){
+    return Math.ceil(byte/1024) + 'KB'
+}
+
 
 
 function bbs(el){
