@@ -533,7 +533,7 @@ function ajax(url, body){
         xhr.url = url
         if(url in スレッド){
             xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
-            xhr.setRequestHeader('If-Modified-Since', スレッド[url].mtime)
+            xhr.setRequestHeader('If-None-Match', スレッド[url].etag)
         }
         else{
             スレッド[url] = {}
@@ -594,7 +594,7 @@ ajax.dat = function (xhr){
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
-        thread.mtime   = xhr.getResponseHeader('Last-Modified')
+        thread.etag    = xhr.getResponseHeader('ETag').replace('W/','')
 
         thread.既得    = dat.num
         thread.新着    = dat.num
@@ -609,7 +609,7 @@ ajax.dat = function (xhr){
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
-        thread.mtime   = xhr.getResponseHeader('Last-Modified')
+        thread.etag    = xhr.getResponseHeader('ETag').replace('W/','')
 
         thread.既得    = thread.num
         thread.新着    = dat.num
