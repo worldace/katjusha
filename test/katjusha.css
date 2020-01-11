@@ -381,6 +381,7 @@ body{
     color: blue;
     font-style: normal;
     cursor: pointer;
+    margin-right: 3px;
 }
 #スレッド i:hover{
     text-decoration: underline;
@@ -532,6 +533,8 @@ body{
     background-color: transparent;
     width: 80px;
     font-size: 12px;
+    font-family: 'MS PGothic', sans-serif;
+    padding: 3px;
     border-left: solid 1px #e3e3e3;
     border-top: solid 1px #e3e3e3;
     border-right: solid 1px #a0a0a0;
@@ -636,6 +639,7 @@ body{
     color: #333;
     white-space: nowrap;
     text-decoration: none;
+    cursor: default;
 }
 .menu a:hover,
 .menu-sub:hover > a{

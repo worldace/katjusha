@@ -1,4 +1,5 @@
 <?php
+//詰まらない削除
 
 function 削除($bbs_path, $message, $key = null){
 	foreach(explode("\n", $message) as $v){
@@ -55,7 +56,8 @@ function 倉庫($bbs_path, $message){
 
 
 function delete_res($bbs_path, $key, $num){
-	edit_file(get_dat_path($bbs_path, $key), function($contents) use($num){
+    $dat_path = is_live($bbs_path, $key) ? get_dat_path($bbs_path, $key) : get_kako_path($bbs_path, $key);
+    edit_file($dat_path, function($contents) use($num){
         $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
         return $contents;
     });
@@ -64,8 +66,13 @@ function delete_res($bbs_path, $key, $num){
 
 
 function delete_thread($bbs_path, $key){
-    unlink(get_dat_path($bbs_path, $key));
-    delete_subject($bbs_path, $key);
+    if(is_live($bbs_path, $key)){
+        unlink(get_dat_path($bbs_path, $key));
+        delete_subject($bbs_path, $key);
+    }
+    else{
+        unlink(get_kako_path($bbs_path, $key));
+    }
 }
 
 
@@ -82,7 +89,12 @@ function move_thread($bbs_path, $key){
 
 
 function delete_subject($bbs_path, $key){
-	edit_file(get_subject_path($bbs_path), function($contents) use($key){
+    edit_file(get_subject_path($bbs_path), function($contents) use($key){
         return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
     });
+}
+
+
+function is_live($bbs_path, $key){
+    return file_exists(get_dat_path($bbs_path, $key));
 }

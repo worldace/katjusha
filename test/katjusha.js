@@ -1,6 +1,5 @@
 /*
-書き込み後に 416エラー
-タブ.開くに thread がない問題
+「タブ.開く」時に thread がない問題
 */
 
 
@@ -594,7 +593,7 @@ ajax.dat = function (xhr){
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
-        thread.etag    = xhr.getResponseHeader('ETag').replace('W/','')
+        thread.etag    = String(xhr.getResponseHeader('ETag')).replace('W/', '')
 
         thread.既得    = dat.num
         thread.新着    = dat.num
@@ -609,7 +608,7 @@ ajax.dat = function (xhr){
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
-        thread.etag    = xhr.getResponseHeader('ETag').replace('W/','')
+        thread.etag    = String(xhr.getResponseHeader('ETag')).replace('W/', '')
 
         thread.既得    = thread.num
         thread.新着    = dat.num
