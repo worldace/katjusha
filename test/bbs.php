@@ -8,7 +8,6 @@ $password = '#default';
 */
 
 
-
 if(!$_POST){
     $_POST = raw_post();
 }
