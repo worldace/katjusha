@@ -670,9 +670,9 @@ function parse_dat(responseText, num){
 
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="anker" onclick="goto_anker($1)" onmouseenter="show_popup($1)" onmouseleave="hide_popup()">&gt;&gt;$1</span>`)
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="anker" onclick="goto_anker($1)" onmouseenter="show_anker($1)" onmouseleave="hide_anker()">&gt;&gt;$1</span>`)
         message = message.replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="_blank">${url}</a>`)
-        dat.html += `<section id="no${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        dat.html += `<section data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
     return dat
@@ -737,21 +737,21 @@ function is_internal_url(url){
 }
 
 
-function show_popup(n){
-    const el = スレッド.querySelector(`#no${n}`)
+function show_anker(n){
+    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
     if(el){
         event.target.insertAdjacentHTML('beforeend', `<div class="popup">${el.innerHTML}</div>`)
     }
 }
 
-function hide_popup(){
+function hide_anker(){
     while(event.target.firstElementChild){
         event.target.firstElementChild.remove()
     }
 }
 
 function goto_anker(n){
-    const el = スレッド.querySelector(`#no${n}`)
+    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
     if(el){
         el.scrollIntoView()
     }

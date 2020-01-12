@@ -427,7 +427,9 @@ body{
     white-space: nowrap;
     cursor: default;
 }
-
+#スレッド .popup p{
+    margin: 3px 0 0 12px;
+}
 
 .スレッド{
     display: none;
