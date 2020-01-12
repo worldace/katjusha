@@ -627,7 +627,12 @@ ajax.dat = function (xhr){
         ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
     }
     else if(xhr.status === 404){
-        // URLに/kako/が含まれていなければリトライ
+        ステータス.textContent = `スレッドが見つかりません (${date()})`
+        // /kako/ を含まなければリトライ？
+    }
+    else if(xhr.status === 416){
+        delete スレッド[xhr.url]
+        ajax(xhr.url)
     }
 }
 
@@ -793,7 +798,7 @@ function date(){
 
 
 
-function format_KB(byte){
+function format_KB(byte = 0){
     return Math.ceil(byte/1024) + 'KB'
 }
 
