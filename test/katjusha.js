@@ -409,6 +409,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
+
 投稿フォーム.oncontextmenu = function (event){
     if(event.target.tagName !== 'TEXTAREA'){
         event.preventDefault()
@@ -631,6 +632,7 @@ ajax.dat = function (xhr){
         // /kako/ を含まなければリトライ？
     }
     else if(xhr.status === 416){
+        タブ.検索(xhr.url).el.innerHTML = ''
         delete スレッド[xhr.url]
         ajax(xhr.url)
     }
