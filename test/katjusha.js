@@ -672,7 +672,7 @@ function parse_dat(responseText, num){
         let [from, mail, date, message, subject] = v.split('<>')
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="goto_anker($1)" onmouseenter="show_anker($1)" onmouseleave="hide_anker()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-        dat.html += `<section data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        dat.html += `<section class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
     return dat

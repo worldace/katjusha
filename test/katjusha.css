@@ -373,44 +373,50 @@ body{
     word-break: break-all;
     line-height: 1.15;
 }
+.スレッド{
+    display: none;
+}
+.スレッド[data-selected]{
+    display: block;
+}
 
-#スレッド section{
+.レス{
     margin: 20px 8px;
 }
-#スレッド i{
+.レス i{
     color: blue;
     font-style: normal;
     cursor: pointer;
     margin-right: 3px;
 }
-#スレッド i:hover{
+.レス i:hover{
     text-decoration: underline;
 }
-#スレッド b{
+.レス b{
     color: forestgreen;
     font-weight: bold;
     margin-left: 4px;
 }
-#スレッド date{
+.レス date{
     margin-left: 4px;
 }
-#スレッド p{
+.レス p{
     margin-top: 3px;
     margin-left: 36px;
 }
-#スレッド a{
+.レス a{
     text-decoration: none;
 }
-#スレッド a:hover{
+.レス a:hover{
     text-decoration: underline;
 }
 
-#スレッド .anker{
+.レス .anker{
     position: relative;
     cursor: pointer;
     color: blue;
 }
-#スレッド .popup{
+.レス .popup{
     font-size: 14px;
     color: #000;
     background-color: #ffffe1;
@@ -427,16 +433,11 @@ body{
     white-space: nowrap;
     cursor: default;
 }
-#スレッド .popup p{
+.レス .popup p{
     margin: 3px 0 0 12px;
 }
 
-.スレッド{
-    display: none;
-}
-.スレッド[data-selected]{
-    display: block;
-}
+
 
 #ステータス{
     grid-area: ステータス;
