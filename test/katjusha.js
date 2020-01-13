@@ -363,6 +363,23 @@ katjusha.addEventListener('click', function(event){
 
 
 
+タブ.ロード開始 = function (url){
+    for(const tab of タブ.children){
+        if(tab.url === url){
+            tab.dataset.loading = true
+            return tab
+        }
+    }
+}
+
+タブ.ロード終了 = function (tab){
+    if(tab){
+        delete tab.dataset.loading
+    }
+}
+
+
+
 スレッド.onclick = function (event){
     if(event.target.tagName === 'I'){
         event.stopPropagation()
@@ -373,6 +390,16 @@ katjusha.addEventListener('click', function(event){
         掲示板[event.target.href] ? 全板ボタン.コンテキスト.掲示板に移動(event.target.href) : サブジェクト一覧.コンテキスト.新しいタブで開く(event.target.href)
     }
 }
+
+
+スレッド.クリア = function (url){
+    for(const el of スレッド.children){
+        if(el.url === url){
+            el.innerHTML = ''
+        }
+    }
+}
+
 
 
 
@@ -549,13 +576,15 @@ function ajax(url, body){
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
+    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
+    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
+    const tab = タブ.ロード開始(url)
     xhr.onloadend = function(){
+        タブ.ロード終了(tab)
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
         ステータス.textContent = ``
         ajax[callback](xhr)
     }
-    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
-    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
     xhr.send(body)
 }
 
@@ -632,7 +661,7 @@ ajax.dat = function (xhr){
         // /kako/ を含まなければリトライ？
     }
     else if(xhr.status === 416){
-        タブ.検索(xhr.url).el.innerHTML = ''
+        スレッド.クリア(xhr.url)
         delete スレッド[xhr.url]
         ajax(xhr.url)
     }

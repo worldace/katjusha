@@ -361,7 +361,12 @@ body{
 #タブ [data-selected]::after{
     box-shadow: -2px 2px 0 #fff;
 }
-
+#タブ [data-loading]{
+    background-image: url('loading.svg');
+    background-repeat: no-repeat;
+    background-size: 12px;
+    background-position: 4px center;
+}
 
 #スレッド{
     grid-area: スレッド;
