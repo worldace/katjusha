@@ -519,7 +519,7 @@ function ajax(url, body){
     const xhr = new XMLHttpRequest()
     let callback
 
-    if(url.endsWith('bbs.cgi')){
+    if(url.includes('bbs.cgi')){
         xhr.open('POST', url)
         let bbsurl = url.replace('test/bbs.cgi', '')
         bbsurl  = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
@@ -670,8 +670,8 @@ function parse_dat(responseText, num){
 
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, `<span class="anker" onclick="goto_anker($1)" onmouseenter="show_anker($1)" onmouseleave="hide_anker()">&gt;&gt;$1</span>`)
-        message = message.replace(/https?:\/\/[^\s<]+/g, url => `<a href="${url}" target="_blank">${url}</a>`)
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="goto_anker($1)" onmouseenter="show_anker($1)" onmouseleave="hide_anker()">&gt;&gt;$1</span>')
+        message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         dat.html += `<section data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }
