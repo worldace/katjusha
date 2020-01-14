@@ -1,5 +1,5 @@
 /*
-「タブ.開く」時に thread がない問題
+「タブ.開く」時に thread がない問題。スレッド.オブジェクト
 ポップアップのスタック文脈問題
 */
 
@@ -137,6 +137,29 @@ katjusha.addEventListener('click', function(event){
 
 
 
+サブジェクトヘッダ.ondblclick = function (event){
+    if(event.target.tagName !== 'TH'){
+        return
+    }
+    const index    = Array.from(this.rows[0].cells).indexOf(event.target)
+    const order    = Number(event.target.dataset.order || -1)
+    const tbody    = this.parentElement.tBodies[0]
+    const collator = new Intl.Collator(undefined, {numeric: true})
+    const list     = []
+
+    for(const tr of tbody.rows){
+        list.push({tr, content:tr.cells[index].textContent})
+    }
+    list.sort((a, b) => collator.compare(a.content, b.content) * order)
+
+    for(const v of list){
+        tbody.append(v.tr)
+    }
+    event.target.dataset.order = -order
+}
+
+
+
 サブジェクト一覧.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
@@ -189,29 +212,6 @@ katjusha.addEventListener('click', function(event){
         tr.cells[5].textContent = thread.最終取得 || ''
         tr.cells[6].textContent = thread.最終書き込み || ''
     }
-}
-
-
-
-サブジェクト一覧_thead.ondblclick = function (event){
-    if(event.target.tagName !== 'TH'){
-        return
-    }
-    const index    = Array.from(this.rows[0].cells).indexOf(event.target)
-    const order    = Number(event.target.dataset.order || -1)
-    const tbody    = this.parentElement.tBodies[0]
-    const collator = new Intl.Collator(undefined, {numeric: true})
-    const list     = []
-
-    for(const tr of tbody.rows){
-        list.push({tr, content:tr.cells[index].textContent})
-    }
-    list.sort((a, b) => collator.compare(a.content, b.content) * order)
-
-    for(const v of list){
-        tbody.append(v.tr)
-    }
-    event.target.dataset.order = -order
 }
 
 

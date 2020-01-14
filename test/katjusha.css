@@ -206,12 +206,12 @@ body{
     grid-area: サブジェクト;
     overflow-y: scroll;
 }
-#サブジェクト一覧表{
+#サブジェクト表{
     border-collapse: collapse;
     width: 100%;
     margin: 1px 0 3px 0;
 }
-#サブジェクト一覧表 th{
+#サブジェクト表 th{
     background-color: #f0f0f0;
     border-top: solid 1px #e3e3e3;
     border-left: solid 1px #e3e3e3;
@@ -221,33 +221,33 @@ body{
     font-weight: normal;
     padding: 1px 4px 2px 4px;
 }
-#サブジェクト一覧表 th:nth-of-type(1){
+#サブジェクト表 th:nth-of-type(1){
     text-align: right;
     width: 40px;
 }
-#サブジェクト一覧表 th:nth-of-type(2){
+#サブジェクト表 th:nth-of-type(2){
     text-align: left;
     padding-left: 8px;
     width: 450px;
     overflow: hidden;
 }
-#サブジェクト一覧表 th:nth-of-type(3){
+#サブジェクト表 th:nth-of-type(3){
     text-align: right;
     width: 40px;
 }
-#サブジェクト一覧表 th:nth-of-type(4){
+#サブジェクト表 th:nth-of-type(4){
     text-align: right;
     width: 40px;
 }
-#サブジェクト一覧表 th:nth-of-type(5){
+#サブジェクト表 th:nth-of-type(5){
     text-align: right;
     width: 40px;
 }
-#サブジェクト一覧表 th:nth-of-type(6){
+#サブジェクト表 th:nth-of-type(6){
     text-align: left;
     width: 140px;
 }
-#サブジェクト一覧表 th:nth-of-type(7){
+#サブジェクト表 th:nth-of-type(7){
     text-align: left;
     width: 140px;
 }
@@ -406,7 +406,7 @@ body{
     margin-left: 4px;
 }
 .レス p{
-    margin-top: 3px;
+    margin-top: 2px;
     margin-left: 36px;
 }
 .レス a{
