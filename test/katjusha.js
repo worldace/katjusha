@@ -1,14 +1,42 @@
 /*
 「タブ.開く」時に thread がない問題
+ポップアップのスタック文脈問題
 */
 
 
 
 
+katjusha.start = function (){
+    base.title = document.title
+    全板ボタン.textContent = `▽${document.title}`
+
+    掲示板.ホスト一覧 = new Set
+
+    for(const el of 掲示板.querySelectorAll('a')){
+        掲示板[el.href] = new 掲示板.オブジェクト(el)
+        掲示板.ホスト一覧.add(掲示板[el.href].host)
+    }
+
+    if(document.URL !== base.href){
+        if(document.URL.includes('read.cgi')){
+            タブ.開く(document.URL)
+        }
+        ajax(document.URL)
+    }
+}
+
+
+
+katjusha.is_internal_url = function(url){
+    url = new URL(url)
+    return 掲示板.ホスト一覧.has(url.hostname)
+}
+
+
 
 katjusha.addEventListener('click', function(event){
     const url = event.target.href
-    if(!url || !is_internal_url(url)){
+    if(!url || !katjusha.is_internal_url(url)){
         return
     }
     event.preventDefault()
@@ -70,6 +98,26 @@ katjusha.addEventListener('click', function(event){
         コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
 }
+
+
+
+掲示板.オブジェクト = function(el){
+    this.el   = el
+    this.url  = el.href
+    this.name = el.textContent
+
+    const dir = el.href.split('/').slice(0, -1)
+    this.host = dir[2]
+    if(dir.length > 3){
+        this.key  = dir.pop()
+        this.home = dir.join('/') + '/'
+    }
+    else{
+        this.key  = dir[2].slice(0, dir[2].indexOf('.'))
+        this.home = el.href
+    }
+}
+
 
 
 掲示板.コンテキスト = function (url, name){
@@ -184,7 +232,7 @@ katjusha.addEventListener('click', function(event){
         return
     }
 
-    const {bbsurl, key} = parse_thread_url(tab.url)
+    const {bbsurl, key} = スレッド.parse_url(tab.url)
     const bbs = 掲示板[bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
@@ -392,6 +440,23 @@ katjusha.addEventListener('click', function(event){
 }
 
 
+
+スレッド.onscroll = function(event){
+    スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
+}
+
+
+
+スレッド.追記 = function(url, title, html){
+    const tab         = タブ.検索(url)
+    tab.innerHTML     = title
+    tab.el.innerHTML += html
+
+    スレッドヘッダ.描画(url)
+}
+
+
+
 スレッド.クリア = function (url){
     for(const el of スレッド.children){
         if(el.url === url){
@@ -400,6 +465,58 @@ katjusha.addEventListener('click', function(event){
     }
 }
 
+
+
+スレッド.アンカー移動 = function(n){
+    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
+    if(el){
+        el.scrollIntoView()
+    }
+}
+
+
+
+スレッド.ポップアップ表示 = function(n){
+    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
+    if(el){
+        event.target.insertAdjacentHTML('beforeend', `<div class="popup">${el.innerHTML}</div>`)
+    }
+}
+
+
+
+スレッド.ポップアップ閉じる = function(){
+    while(event.target.firstElementChild){
+        event.target.firstElementChild.remove()
+    }
+}
+
+
+
+スレッド.create_url = function(bbsurl, key){
+    const dir = bbsurl.split('/').slice(0, -1)
+    if(dir.length > 3){
+        const bbs = dir.pop()
+        return `${dir.join('/')}/test/read.cgi/${bbs}/${key}/`
+    }
+    else{
+        const bbs = dir[2].slice(0, dir[2].indexOf('.'))
+        return `${bbsurl}test/read.cgi/${bbs}/${key}/`
+    }
+}
+
+
+
+スレッド.parse_url = function(url){
+    const dir = url.split('/').slice(0, -1)
+    const key = dir.pop()
+    const bbs = dir.pop()
+    dir.pop()
+    dir.pop()
+    url = dir.join('/') + '/'
+    const bbsurl = (url in 掲示板) ? url : `${url}${bbs}/`
+    return {bbsurl, key}
+}
 
 
 
@@ -418,22 +535,6 @@ katjusha.addEventListener('click', function(event){
     レス投稿ボタン.click()
     insert_text(投稿フォーム_本文欄, `>>${n}\n`)
 }
-
-
-スレッド.onscroll = function(event){
-    スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
-}
-
-
-
-スレッド.追記 = function(url, title, html){
-    const tab         = タブ.検索(url)
-    tab.innerHTML     = title
-    tab.el.innerHTML += html
-
-    スレッドヘッダ.描画(url)
-}
-
 
 
 
@@ -551,11 +652,11 @@ function ajax(url, body){
         xhr.open('POST', url)
         let bbsurl = url.replace('test/bbs.cgi', '')
         bbsurl  = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        xhr.url = body.get('key') ? build_thread_url(bbsurl, body.get('key')) : bbsurl
+        xhr.url = body.get('key') ? スレッド.create_url(bbsurl, body.get('key')) : bbsurl
         callback = 'cgi'
     }
     else if(url.includes('read.cgi')){
-        const {bbsurl, key} = parse_thread_url(url)
+        const {bbsurl, key} = スレッド.parse_url(url)
         xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
         xhr.url = url
         if(url in スレッド){
@@ -612,10 +713,10 @@ ajax.cgi = function (xhr){
 
 ajax.dat = function (xhr){
     const thread        = スレッド[xhr.url]
-    const {bbsurl, key} = parse_thread_url(xhr.url)
+    const {bbsurl, key} = スレッド.parse_url(xhr.url)
 
     if(xhr.status === 200){
-        const dat = parse_dat(xhr.responseText, 1)
+        const dat = ajax.dat.parse(xhr.responseText, 1)
 
         thread.key     = key
         thread.bbsurl  = bbsurl
@@ -636,7 +737,7 @@ ajax.dat = function (xhr){
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
     else if(xhr.status === 206){
-        const dat = parse_dat(xhr.responseText, thread.num+1)
+        const dat = ajax.dat.parse(xhr.responseText, thread.num+1)
 
         thread.html   += dat.html
         thread.num    += dat.num
@@ -669,13 +770,35 @@ ajax.dat = function (xhr){
 
 
 
+ajax.dat.parse = function(responseText, num){
+    const list = responseText.split("\n")
+    list.pop()
+
+    const dat = {
+        html   : '',
+        num    : list.length,
+        subject: list[0].split('<>').pop(),
+    }
+
+    for(const v of list){
+        let [from, mail, date, message, subject] = v.split('<>')
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="スレッド.ポップアップ表示($1)" onmouseleave="スレッド.ポップアップ閉じる()">&gt;&gt;$1</span>')
+        message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+        dat.html += `<section class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        num++
+    }
+    return dat
+}
+
+
+
 ajax.subject = function (xhr){
     if(xhr.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
     }
 
-    const {html, num} = parse_subject(xhr.responseText, xhr.url)
+    const {html, num} = ajax.subject.parse(xhr.responseText, xhr.url)
     サブジェクト一覧.innerHTML = html
     サブジェクト一覧.bbsurl    = xhr.url
 
@@ -689,29 +812,7 @@ ajax.subject = function (xhr){
 
 
 
-function parse_dat(responseText, num){
-    const list = responseText.split("\n")
-    list.pop()
-
-    const dat = {
-        html   : '',
-        num    : list.length,
-        subject: list[0].split('<>').pop(),
-    }
-
-    for(const v of list){
-        let [from, mail, date, message, subject] = v.split('<>')
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="goto_anker($1)" onmouseenter="show_anker($1)" onmouseleave="hide_anker()">&gt;&gt;$1</span>')
-        message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-        dat.html += `<section class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
-        num++
-    }
-    return dat
-}
-
-
-
-function parse_subject(responseText, bbsurl){
+ajax.subject.parse = function(responseText, bbsurl){
     const list = responseText.split("\n")
     list.pop()
 
@@ -720,7 +821,7 @@ function parse_subject(responseText, bbsurl){
     for(const v of list){
         const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key    = file.replace('.dat', '')
-        const url    = build_thread_url(bbsurl, key)
+        const url    = スレッド.create_url(bbsurl, key)
         const thread = スレッド[url] || {}
 
         if(num == thread.既得){
@@ -735,60 +836,6 @@ function parse_subject(responseText, bbsurl){
 
 
 
-function build_thread_url(bbsurl, key){
-    const dir = bbsurl.split('/').slice(0, -1)
-    if(dir.length > 3){
-        const bbs = dir.pop()
-        return `${dir.join('/')}/test/read.cgi/${bbs}/${key}/`
-    }
-    else{
-        const bbs = dir[2].slice(0, dir[2].indexOf('.'))
-        return `${bbsurl}test/read.cgi/${bbs}/${key}/`
-    }
-}
-
-
-
-function parse_thread_url(url){
-    const dir = url.split('/').slice(0, -1)
-    const key = dir.pop()
-    const bbs = dir.pop()
-    dir.pop()
-    dir.pop()
-    url = dir.join('/') + '/'
-    const bbsurl = (url in 掲示板) ? url : `${url}${bbs}/`
-    return {bbsurl, key}
-}
-
-
-
-function is_internal_url(url){
-    url = new URL(url)
-    return 掲示板.ホスト一覧.has(url.hostname)
-}
-
-
-function show_anker(n){
-    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
-    if(el){
-        event.target.insertAdjacentHTML('beforeend', `<div class="popup">${el.innerHTML}</div>`)
-    }
-}
-
-function hide_anker(){
-    while(event.target.firstElementChild){
-        event.target.firstElementChild.remove()
-    }
-}
-
-function goto_anker(n){
-    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
-    if(el){
-        el.scrollIntoView()
-    }
-}
-
-
 function change_selected(parent, el){
     const before = parent.querySelector('[data-selected]')
     if(before){
@@ -799,13 +846,12 @@ function change_selected(parent, el){
 }
 
 
+
 function centering(el){
     const {width, height} = el.getBoundingClientRect()
     el.style.left = `${innerWidth/2 - width/2}px`
     el.style.top  = `${innerHeight/2 - height/2}px`
 }
-
-
 
 
 
@@ -818,9 +864,11 @@ function set_value(form, value){
 }
 
 
+
 function copy(str){
     navigator.clipboard.writeText(str)
 }
+
 
 
 function insert_text(textarea, text){
@@ -854,42 +902,4 @@ function format_KB(byte = 0){
 
 
 
-function bbs(el){
-    this.el   = el
-    this.url  = el.href
-    this.name = el.textContent
-
-    const dir = el.href.split('/').slice(0, -1)
-    this.host = dir[2]
-    if(dir.length > 3){
-        this.key  = dir.pop()
-        this.home = dir.join('/') + '/'
-    }
-    else{
-        this.key  = dir[2].slice(0, dir[2].indexOf('.'))
-        this.home = el.href
-    }
-}
-
-
-
-//start up
-
-base.title = document.title
-全板ボタン.textContent = `▽${document.title}`
-
-掲示板.ホスト一覧 = new Set
-
-for(const el of 掲示板.querySelectorAll('a')){
-    掲示板[el.href] = new bbs(el)
-    掲示板.ホスト一覧.add(掲示板[el.href].host)
-}
-
-
-
-if(document.URL !== base.href){
-    if(document.URL.includes('read.cgi')){
-        タブ.開く(document.URL)
-    }
-    ajax(document.URL)
-}
+document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', katjusha.start) : katjusha.start()
