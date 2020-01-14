@@ -420,9 +420,11 @@ katjusha.addEventListener('click', function(event){
     }
 }
 
-タブ.ロード終了 = function (tab){
-    if(tab){
-        delete tab.dataset.loading
+タブ.ロード終了 = function (url){
+    for(const tab of タブ.children){
+        if(tab.url === url){
+            delete tab.dataset.loading
+        }
     }
 }
 
@@ -493,7 +495,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-スレッド.create_url = function(bbsurl, key){
+スレッド.URL作成 = function(bbsurl, key){
     const dir = bbsurl.split('/').slice(0, -1)
     if(dir.length > 3){
         const bbs = dir.pop()
@@ -507,7 +509,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-スレッド.parse_url = function(url){
+スレッド.URL分解 = function(url){
     const dir = url.split('/').slice(0, -1)
     const key = dir.pop()
     const bbs = dir.pop()
@@ -652,11 +654,11 @@ function ajax(url, body){
         xhr.open('POST', url)
         let bbsurl = url.replace('test/bbs.cgi', '')
         bbsurl  = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        xhr.url = body.get('key') ? スレッド.create_url(bbsurl, body.get('key')) : bbsurl
+        xhr.url = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
         callback = 'cgi'
     }
     else if(url.includes('read.cgi')){
-        const {bbsurl, key} = スレッド.parse_url(url)
+        const {bbsurl, key} = スレッド.URL分解(url)
         xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
         xhr.url = url
         if(url in スレッド){
@@ -677,16 +679,16 @@ function ajax(url, body){
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.timeout = 30 * 1000
-    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
-    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
-    const tab = タブ.ロード開始(url)
     xhr.onloadend = function(){
-        タブ.ロード終了(tab)
-        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
         ステータス.textContent = ``
+        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
+        タブ.ロード終了(url)
         ajax[callback](xhr)
     }
     xhr.send(body)
+    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
+    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
+    タブ.ロード開始(url)
 }
 
 
@@ -713,7 +715,7 @@ ajax.cgi = function (xhr){
 
 ajax.dat = function (xhr){
     const thread        = スレッド[xhr.url]
-    const {bbsurl, key} = スレッド.parse_url(xhr.url)
+    const {bbsurl, key} = スレッド.URL分解(xhr.url)
 
     if(xhr.status === 200){
         const dat = ajax.dat.parse(xhr.responseText, 1)
@@ -821,7 +823,7 @@ ajax.subject.parse = function(responseText, bbsurl){
     for(const v of list){
         const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key    = file.replace('.dat', '')
-        const url    = スレッド.create_url(bbsurl, key)
+        const url    = スレッド.URL作成(bbsurl, key)
         const thread = スレッド[url] || {}
 
         if(num == thread.既得){
