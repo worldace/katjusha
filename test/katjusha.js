@@ -193,6 +193,29 @@ katjusha.addEventListener('click', function(event){
 
 
 
+サブジェクト一覧_thead.ondblclick = function (event){
+    if(event.target.tagName !== 'TH'){
+        return
+    }
+    const index = Array.from(this.rows[0].cells).indexOf(event.target)
+    const order = Number(event.target.dataset.order || -1)
+    const tbody = this.parentElement.tBodies[0]
+    const array = []
+    for(const tr of tbody.rows){
+        array.push({tr, value:tr.cells[index].textContent})
+    }
+
+    const collator = new Intl.Collator(undefined, {numeric: true})
+    array.sort((a, b) => collator.compare(a.value, b.value) * order)
+
+    for(const v of array){
+        tbody.append(v.tr)
+    }
+    event.target.dataset.order = -order
+}
+
+
+
 スレッド投稿ボタン.onclick = function (event){
     if(katjusha.dataset.open){
         return
