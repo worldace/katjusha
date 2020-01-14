@@ -232,7 +232,7 @@ katjusha.addEventListener('click', function(event){
         return
     }
 
-    const {bbsurl, key} = スレッド.parse_url(tab.url)
+    const {bbsurl, key} = スレッド.URL分解(tab.url)
     const bbs = 掲示板[bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
@@ -370,7 +370,7 @@ katjusha.addEventListener('click', function(event){
 
 タブ.開く = function (url, target, title = '', html = ''){
     let tab = タブ.検索(url) || タブ.初期化()
-    if(tab.url !== url){ // urlのタブが存在しない時
+    if(tab.url !== url){
         tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
         tab.innerHTML    = title
         tab.el.innerHTML = html
@@ -403,7 +403,7 @@ katjusha.addEventListener('click', function(event){
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.url)
+    スレッドヘッダ.描画(tab.url) //密結合
     history.replaceState(null, null, tab.url || サブジェクト一覧.bbsurl || base.href)
 
     return tab
