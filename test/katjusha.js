@@ -197,15 +197,15 @@ katjusha.addEventListener('click', function(event){
     if(event.target.tagName !== 'TH'){
         return
     }
-    const index = Array.from(this.rows[0].cells).indexOf(event.target)
-    const order = Number(event.target.dataset.order || -1)
-    const tbody = this.parentElement.tBodies[0]
-    const list  = []
+    const index    = Array.from(this.rows[0].cells).indexOf(event.target)
+    const order    = Number(event.target.dataset.order || -1)
+    const tbody    = this.parentElement.tBodies[0]
+    const collator = new Intl.Collator(undefined, {numeric: true})
+    const list     = []
+
     for(const tr of tbody.rows){
         list.push({tr, content:tr.cells[index].textContent})
     }
-
-    const collator = new Intl.Collator(undefined, {numeric: true})
     list.sort((a, b) => collator.compare(a.content, b.content) * order)
 
     for(const v of list){
