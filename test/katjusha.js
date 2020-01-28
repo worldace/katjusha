@@ -163,7 +163,7 @@ katjusha.addEventListener('click', function(event){
 サブジェクト一覧.onclick = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
-    if(!tr){
+    if(!tr || event.target.cellIndex === 7){
         return
     }
     change_selected(サブジェクト一覧, tr)
@@ -677,8 +677,8 @@ function ajax(url, body){
     if(url.includes('bbs.cgi')){
         xhr.open('POST', url)
         let bbsurl = url.replace('test/bbs.cgi', '')
-        bbsurl  = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        xhr.url = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
+        bbsurl   = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
+        xhr.url  = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
         callback = 'cgi'
     }
     else if(url.includes('read.cgi')){
