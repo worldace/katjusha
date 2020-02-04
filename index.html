@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width">
   <title>かちゅぼ～ど</title>
   <base href="http://127.0.0.1/katjusha/" id="base">
+  <script src="test/katjusha.js" async></script>
   <link rel="icon" href="test/favicon.png" type="image/png">
   <link rel="stylesheet" href="test/katjusha.css">
-  <script src="test/katjusha.js" async></script>
 </head>
 <body>
 
@@ -15,24 +15,24 @@
 
 <header id="ヘッダ">
   <div id="ナビアイコン">
-    <img src="test/online.png" width="16" height="16" class="icon">
-    <img src="test/save.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/search.png" width="16" height="16" class="icon">
-    <img src="test/update.png" width="16" height="16" class="icon">
-    <img src="test/post.png" width="16" height="16" class="icon" id="スレッド投稿ボタン" title="新規スレッド書き込み">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/column.png" width="16" height="16" class="icon">
-    <img src="test/grid1.png" width="16" height="16" class="icon">
-    <img src="test/grid2.png" width="16" height="16" class="icon">
-    <img src="test/grid3.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/setting.png" width="16" height="16" class="icon">
-    <img src="test/help.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
+    <span id="オンラインアイコン" class="icon"></span>
+    <span id="セーブアイコン" class="icon"></span>
+    <span class="icon-separate"></span>
+    <span id="検索アイコン" class="icon"></span>
+    <span id="巡回アイコン" class="icon"></span>
+    <span id="スレッド投稿アイコン" class="icon" title="新規スレッド書き込み"></span>
+    <span class="icon-separate"></span>
+    <span id="コラムアイコン" class="icon"></span>
+    <span id="グリッド1アイコン" class="icon"></span>
+    <span id="グリッド2アイコン" class="icon"></span>
+    <span id="グリッド3アイコン" class="icon"></span>
+    <span class="icon-separate"></span>
+    <span id="設定アイコン" class="icon"></span>
+    <span id="ヘルプアイコン" class="icon"></span>
+    <span class="icon-separate"></span>
   </div>
   <div id="板ボタン">
-    <span class="icon" id="全板ボタン">▽かちゅぼ～ど</span>
+    <span class="icon-text" id="全板ボタン">▽かちゅぼ～ど</span>
   </div>
   <div id="アニメ" data-ajax="0"></div>
 </header>
@@ -79,16 +79,16 @@
     <span id="スレッドヘッダ_タイトル"></span>
   </div>
   <div id="スレッドヘッダ_アイコン">
-    <img src="test/list.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/download.png" width="16" height="16" class="icon" id="レス取得ボタン" title="レスを取得">
-    <img src="test/stop.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/res.png" width="16" height="16" class="icon" id="レス投稿ボタン" title="レス書き込み">
-    <img src="test/bookmark.png" width="16" height="16" class="icon">
-    <img src="test/separate.png" width="2" height="16" class="icon-separate">
-    <img src="test/trash.png" width="16" height="16" class="icon">
-    <img src="test/close.png" width="16" height="16" class="icon" id="タブ閉じるボタン" title="タブを閉じる">
+    <span id="リストアイコン" class="icon"></span>
+    <span class="icon-separate"></span>
+    <span id="レス更新アイコン" class="icon" title="レスを取得"></span>
+    <span id="中止アイコン" class="icon"></span>
+    <span class="icon-separate"></span>
+    <span id="レス投稿アイコン" class="icon" title="レス書き込み"></span>
+    <span id="お気に入りアイコン" class="icon"></span>
+    <span class="icon-separate"></span>
+    <span id="ごみ箱アイコン" class="icon"></span>
+    <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
   </div>
 </header>
 

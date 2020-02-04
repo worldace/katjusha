@@ -216,7 +216,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-スレッド投稿ボタン.onclick = function (event){
+スレッド投稿アイコン.onclick = function (event){
     if(katjusha.dataset.open){
         return
     }
@@ -246,7 +246,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-レス投稿ボタン.onclick = function (event){
+レス投稿アイコン.onclick = function (event){
     if(katjusha.dataset.open){
         return
     }
@@ -279,7 +279,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-レス取得ボタン.onclick = function (event){
+レス更新アイコン.onclick = function (event){
     const tab = タブ.selectedElement
     if(!tab || !tab.url){
         return
@@ -313,7 +313,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-タブ閉じるボタン.onclick = function (event){
+タブ閉じるアイコン.onclick = function (event){
     タブ.閉じる(タブ.selectedElement)
 }
 
@@ -329,7 +329,7 @@ katjusha.addEventListener('click', function(event){
 
 
 タブ.ondblclick = function (event){
-    レス取得ボタン.click()
+    レス更新アイコン.click()
 }
 
 
@@ -558,7 +558,7 @@ katjusha.addEventListener('click', function(event){
 
 スレッド.コンテキスト.これにレス = function (){
     const n = コンテキスト.target.textContent
-    レス投稿ボタン.click()
+    レス投稿アイコン.click()
     insert_text(投稿フォーム_本文欄, `>>${n}\n`)
 }
 
@@ -683,7 +683,7 @@ function ajax(url, body){
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = スレッド.URL分解(url)
-        xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
+        xhr.open('GET', `${bbsurl}dat/${key}.dat`)
         xhr.url = url
         if(url in スレッド){
             xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
@@ -696,12 +696,13 @@ function ajax(url, body){
         history.replaceState(null, null, url)
     }
     else{
-        xhr.open('GET', `${url}subject.txt?${Date.now()}`)
+        xhr.open('GET', `${url}subject.txt`)
         xhr.url  = url
         callback = 'subject'
         history.replaceState(null, null, url)
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
+    xhr.setRequestHeader('Cache-Controll', 'no-store')
     xhr.timeout = 30 * 1000
     xhr.onloadend = function(){
         ステータス.textContent = ``
