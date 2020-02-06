@@ -254,6 +254,7 @@ body{
     box-shadow: 0 -1px 0 0 #a0a0a0 inset;
     font-weight: normal;
     padding: 1px 4px 2px 4px;
+    /* stickey https://teratail.com/questions/202382 */
 }
 #サブジェクト表 th:nth-of-type(1){
     text-align: right;
