@@ -245,7 +245,7 @@ body{
     width: 100%;
     margin: 1px 0 3px 0;
 }
-#サブジェクト表 th{
+#サブジェクトヘッダ th{
     background-color: #f0f0f0;
     border-top: solid 1px #e3e3e3;
     border-left: solid 1px #e3e3e3;
@@ -255,33 +255,33 @@ body{
     padding: 1px 4px;
     /* stickey https://teratail.com/questions/202382 */
 }
-#サブジェクト表 th:nth-of-type(1){
+#サブジェクトヘッダ th:nth-of-type(1){
     text-align: right;
     width: 40px;
 }
-#サブジェクト表 th:nth-of-type(2){
+#サブジェクトヘッダ th:nth-of-type(2){
     text-align: left;
     padding-left: 8px;
     width: 450px;
     overflow: hidden;
 }
-#サブジェクト表 th:nth-of-type(3){
+#サブジェクトヘッダ th:nth-of-type(3){
     text-align: right;
     width: 40px;
 }
-#サブジェクト表 th:nth-of-type(4){
+#サブジェクトヘッダ th:nth-of-type(4){
     text-align: right;
     width: 40px;
 }
-#サブジェクト表 th:nth-of-type(5){
+#サブジェクトヘッダ th:nth-of-type(5){
     text-align: right;
     width: 40px;
 }
-#サブジェクト表 th:nth-of-type(6){
+#サブジェクトヘッダ th:nth-of-type(6){
     text-align: left;
     width: 140px;
 }
-#サブジェクト表 th:nth-of-type(7){
+#サブジェクトヘッダ th:nth-of-type(7){
     text-align: left;
     width: 140px;
 }
@@ -398,7 +398,7 @@ body{
     border-right: 1px solid #e3e3e3;
     background-color: #f0f0f0;
     color: #909090;
-    background: linear-gradient(top, #ececec 50%, #e9e9e9 100%);
+    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     width: 100px;
@@ -511,7 +511,7 @@ body{
     box-shadow: 0 1px 0 0 #fff inset;
     background-color: #f0f0f0;
     line-height: 18px;
-    font-family: Meiryo, sans-serif;
+    font-family: 'Meiryo', sans-serif;
     padding-left: 4px;
 }
 
@@ -662,7 +662,7 @@ body{
     border-right: 1px solid #e3e3e3;
     background-color: #f0f0f0;
     color: #909090;
-    background: linear-gradient(top, #ececec 50%, #e9e9e9 100%);
+    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     margin: 0 -5px;
@@ -715,7 +715,7 @@ body{
     box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);
 }
 .menu li{
-    font-family: Meiryo, sans-serif;
+    font-family: 'Meiryo', sans-serif;
     font-size: 12px;
 }
 .menu li:empty{
