@@ -656,7 +656,11 @@ katjusha.addEventListener('click', function(event){
 
 コンテキスト.oncontextmenu = function (event){
     event.preventDefault()
-    //event.target.click() //firefoxですぐコンテキストが消えてしまう
+    /* firefoxだと、うまく動かない
+    if(event.target.tagName === 'A'){
+        event.target.click()
+    }
+    */
 }
 
 
