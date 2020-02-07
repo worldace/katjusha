@@ -195,7 +195,6 @@ function get_dat_path($bbs_path, $key){
 
 function get_kako_path($bbs_path, $key){
     return sprintf('%s/kako/%s/', $bbs_path, substr($key,0,3));
-    //return sprintf('%s/kako/%s/%s/', $bbs_path, substr($key,0,4), substr($key,0,5));
 }
 
 

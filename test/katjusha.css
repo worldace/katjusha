@@ -250,10 +250,9 @@ body{
     border-top: solid 1px #e3e3e3;
     border-left: solid 1px #e3e3e3;
     border-right: solid 1px #a0a0a0;
-    border-bottom: solid 3px #fff;
-    box-shadow: 0 -1px 0 0 #a0a0a0 inset;
+    border-bottom: solid 1px #a0a0a0;
     font-weight: normal;
-    padding: 1px 4px 2px 4px;
+    padding: 1px 4px;
     /* stickey https://teratail.com/questions/202382 */
 }
 #サブジェクト表 th:nth-of-type(1){
@@ -287,6 +286,12 @@ body{
     width: 140px;
 }
 
+
+#サブジェクト一覧::before{
+    content: '';
+    display: block;
+    height: 3px;
+}
 #サブジェクト一覧 td{
     padding: 2px 4px;
 }
