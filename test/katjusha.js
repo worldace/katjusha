@@ -505,19 +505,21 @@ katjusha.addEventListener('click', function(event){
 
 
 
-スレッド.ポップアップ表示 = function(n){
-    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
-    if(el){
-        event.target.insertAdjacentHTML('beforeend', `<div class="popup">${el.innerHTML}</div>`)
+レスポップアップ.表示 = function(n){
+    const res = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
+    if(res){
+        const {top, left, width} = event.target.getBoundingClientRect()
+        レスポップアップ.style.left   = `${left + width / 2}px`
+        レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
+        レスポップアップ.innerHTML    = res.outerHTML
+        レスポップアップ.dataset.open = true
     }
 }
 
 
 
-スレッド.ポップアップ閉じる = function(){
-    while(event.target.firstElementChild){
-        event.target.firstElementChild.remove()
-    }
+レスポップアップ.閉じる = function(){
+    delete レスポップアップ.dataset.open
 }
 
 
@@ -811,7 +813,7 @@ ajax.dat.parse = function(responseText, num){
 
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="スレッド.ポップアップ表示($1)" onmouseleave="スレッド.ポップアップ閉じる()">&gt;&gt;$1</span>')
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
         dat.html += `<article class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
