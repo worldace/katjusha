@@ -238,8 +238,8 @@ katjusha.addEventListener('click', function(event){
     })
 
     投稿フォーム_sage.checked        = false
+    投稿フォーム_メール欄.readOnly   = false
     投稿フォーム_タイトル欄.disabled = false
-    投稿フォーム_メール欄.removeAttribute('readonly')
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
     katjusha.dataset.open = 'スレッド'
     centering(投稿フォーム)
@@ -271,8 +271,8 @@ katjusha.addEventListener('click', function(event){
     })
 
     投稿フォーム_sage.checked        = false
+    投稿フォーム_メール欄.readOnly   = false
     投稿フォーム_タイトル欄.disabled = true
-    投稿フォーム_メール欄.removeAttribute('readonly')
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
     katjusha.dataset.open = 'レス'
     centering(投稿フォーム)
@@ -596,11 +596,11 @@ katjusha.addEventListener('click', function(event){
 
 投稿フォーム_sage.onchange = function (event){
     if(event.target.checked){
-        投稿フォーム_メール欄.setAttribute('readonly', 'readonly')
+        投稿フォーム_メール欄.readOnly = true
         投稿フォーム_メール欄.value    = 'sage'
     }
     else{
-        投稿フォーム_メール欄.removeAttribute('readonly')
+        投稿フォーム_メール欄.readOnly = false
         投稿フォーム_メール欄.value    = ''
     }
 }
