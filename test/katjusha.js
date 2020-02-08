@@ -93,6 +93,7 @@ katjusha.addEventListener('click', function(event){
 
 掲示板.oncontextmenu = function (event){
     event.preventDefault()
+    event.stopPropagation()
     if(event.target.tagName === 'A'){
         change_selected(掲示板, event.target)
         コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
@@ -174,6 +175,7 @@ katjusha.addEventListener('click', function(event){
 
 サブジェクト一覧.oncontextmenu = function (event){
     event.preventDefault()
+    event.stopPropagation()
     const tr = event.target.closest('tr')
     if(tr){
         const a = tr.querySelector('a')
@@ -336,6 +338,7 @@ katjusha.addEventListener('click', function(event){
 
 タブ.oncontextmenu = function (event){
     event.preventDefault()
+    event.stopPropagation()
     if(event.target.tagName === 'LI'){
         コンテキスト.表示(タブ.コンテキスト(event.target.url, event.target.innerHTML), event.target, event.pageX, event.pageY)
     }
@@ -656,11 +659,6 @@ katjusha.addEventListener('click', function(event){
 
 コンテキスト.oncontextmenu = function (event){
     event.preventDefault()
-    /* firefoxだと、うまく動かない
-    if(event.target.tagName === 'A'){
-        event.target.click()
-    }
-    */
 }
 
 
@@ -815,6 +813,7 @@ ajax.dat.parse = function(responseText, num){
         let [from, mail, date, message, subject] = v.split('<>')
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="スレッド.ポップアップ表示($1)" onmouseleave="スレッド.ポップアップ閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+        message = message.replace(/^ /, '')
         dat.html += `<section class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
         num++
     }

@@ -464,6 +464,7 @@ body{
 .レス p{
     margin-top: 2px;
     margin-left: 36px;
+    white-space: pre-wrap;
 }
 .レス a{
     text-decoration: none;

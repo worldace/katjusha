@@ -78,7 +78,7 @@ if(!is_utf8($mail)){
 if(!$message){
     error('本文を入力してください');
 }
-if(strlen($message) > 800){
+if(strlen($message) > 4096){
     error('本文が長すぎます');
 }
 
@@ -86,7 +86,7 @@ if(strlen($message) > 800){
 
 $from    = $from !== '' ? html_escape($from) : '名無しさん';
 $mail    = replace_mail($mail);
-$message = html_escape($message, '<br>');
+$message = replace_message($message);
 
 
 if($is_thread){
@@ -210,6 +210,14 @@ function replace_mail($mail){
     $mail = preg_replace('/#.*/', '', $mail);
     $mail = html_escape($mail);
     return $mail;
+}
+
+
+
+function replace_message($message){
+    $message = rtrim($message);
+    $message = html_escape($message, '<br>');
+    return $message;
 }
 
 
