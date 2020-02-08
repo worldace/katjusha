@@ -1,6 +1,6 @@
 /*
 「タブ.開く」時に thread がない問題。スレッド.オブジェクト
-ポップアップのスタック文脈問題
+全板ボタン 増えたとき
 */
 
 
@@ -145,17 +145,12 @@ katjusha.addEventListener('click', function(event){
     const index = Array.from(this.rows[0].cells).indexOf(event.target)
     const order = Number(event.target.dataset.order || -1)
     const tbody = this.parentElement.tBodies[0]
+    const rows  = Array.from(tbody.rows)
     const intl  = new Intl.Collator(undefined, {numeric: true})
-    const list  = []
 
-    for(const tr of tbody.rows){
-        list.push({tr:tr, content:tr.cells[index].textContent})
-    }
-    list.sort((a, b) => intl.compare(a.content, b.content) * order)
+    rows.sort((a, b) => intl.compare(a.cells[index].textContent, b.cells[index].textContent) * order)
+    rows.forEach(tr => tbody.append(tr))
 
-    for(const v of list){
-        tbody.append(v.tr)
-    }
     event.target.dataset.order = -order
 }
 
@@ -497,29 +492,10 @@ katjusha.addEventListener('click', function(event){
 
 
 スレッド.アンカー移動 = function(n){
-    const el = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
+    const el = スレッド.querySelector(`[data-selected] [data-no="${n}"]`)
     if(el){
         el.scrollIntoView()
     }
-}
-
-
-
-レスポップアップ.表示 = function(n){
-    const res = event.target.closest('.スレッド').querySelector(`[data-no="${n}"]`)
-    if(res){
-        const {top, left, width} = event.target.getBoundingClientRect()
-        レスポップアップ.style.left   = `${left + width / 2}px`
-        レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
-        レスポップアップ.innerHTML    = res.outerHTML
-        レスポップアップ.dataset.open = true
-    }
-}
-
-
-
-レスポップアップ.閉じる = function(){
-    delete レスポップアップ.dataset.open
 }
 
 
@@ -565,6 +541,25 @@ katjusha.addEventListener('click', function(event){
     const n = コンテキスト.target.textContent
     レス投稿アイコン.click()
     insert_text(投稿フォーム_本文欄, `>>${n}\n`)
+}
+
+
+
+レスポップアップ.表示 = function(n){
+    const res = スレッド.querySelector(`[data-selected] [data-no="${n}"]`)
+    if(res){
+        const {top, left, width}      = event.target.getBoundingClientRect()
+        レスポップアップ.style.left   = `${left + width / 2}px`
+        レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
+        レスポップアップ.innerHTML    = res.outerHTML
+        レスポップアップ.dataset.open = true
+    }
+}
+
+
+
+レスポップアップ.閉じる = function(){
+    delete レスポップアップ.dataset.open
 }
 
 
