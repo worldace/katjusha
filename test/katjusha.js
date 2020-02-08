@@ -83,7 +83,7 @@ katjusha.addEventListener('click', function(event){
 
 
 
-掲示板.onclick = function(event){
+掲示板.onmousedown = function(event){
     if(event.target.tagName !== 'A'){
         event.preventDefault()
     }
@@ -146,17 +146,17 @@ katjusha.addEventListener('click', function(event){
     const order = Number(event.target.dataset.order || -1)
     const tbody = this.parentElement.tBodies[0]
     const rows  = Array.from(tbody.rows)
-    const intl  = new Intl.Collator(undefined, {numeric: true})
+    const compare = new Intl.Collator(undefined, {numeric: true}).compare
 
-    rows.sort((a, b) => intl.compare(a.cells[index].textContent, b.cells[index].textContent) * order)
-    rows.forEach(tr => tbody.append(tr))
+    rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
+    rows.forEach(tr  => tbody.append(tr))
 
     event.target.dataset.order = -order
 }
 
 
 
-サブジェクト一覧.onclick = function(event){
+サブジェクト一覧.onmousedown = function(event){
     event.preventDefault()
     const tr = event.target.closest('tr')
     if(!tr || event.target.cellIndex === 7){
