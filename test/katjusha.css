@@ -458,8 +458,14 @@ body{
     font-weight: bold;
     margin-left: 4px;
 }
-.レス date{
+.レス time{
     margin-left: 4px;
+}
+.レス address{
+    display: inline;
+    font-style: normal;
+    color: red;
+    margin-left: 8px;
 }
 .レス p{
     margin-top: 2px;
@@ -584,7 +590,10 @@ body{
 #投稿フォーム_タイトル欄{
     width: 330px;
 }
-
+#投稿フォーム_タイトル欄:disabled{
+    color: #6d6d6d;
+    background-color: #fff;
+}
 #投稿フォーム_名前欄{
     width: 115px;
     margin-right: 6px;
@@ -593,11 +602,12 @@ body{
     width: 115px;
     margin-right: 6px;
 }
-#投稿フォーム_メール欄:disabled{
-    background-color: #fff;
+#投稿フォーム_メール欄:read-only{
+    color: #6d6d6d;
 }
 #投稿フォーム label{
     margin-right: 8px;
+    padding: 2px 0;
 }
 #投稿フォーム_sage{
 

@@ -238,8 +238,8 @@ katjusha.addEventListener('click', function(event){
     })
 
     投稿フォーム_sage.checked        = false
-    投稿フォーム_メール欄.disabled   = false
     投稿フォーム_タイトル欄.disabled = false
+    投稿フォーム_メール欄.removeAttribute('readonly')
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
     katjusha.dataset.open = 'スレッド'
     centering(投稿フォーム)
@@ -271,8 +271,8 @@ katjusha.addEventListener('click', function(event){
     })
 
     投稿フォーム_sage.checked        = false
-    投稿フォーム_メール欄.disabled   = false
     投稿フォーム_タイトル欄.disabled = true
+    投稿フォーム_メール欄.removeAttribute('readonly')
     投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
     katjusha.dataset.open = 'レス'
     centering(投稿フォーム)
@@ -596,11 +596,11 @@ katjusha.addEventListener('click', function(event){
 
 投稿フォーム_sage.onchange = function (event){
     if(event.target.checked){
-        投稿フォーム_メール欄.disabled = true
+        投稿フォーム_メール欄.setAttribute('readonly', 'readonly')
         投稿フォーム_メール欄.value    = 'sage'
     }
     else{
-        投稿フォーム_メール欄.disabled = false
+        投稿フォーム_メール欄.removeAttribute('readonly')
         投稿フォーム_メール欄.value    = ''
     }
 }
@@ -814,7 +814,7 @@ ajax.dat.parse = function(responseText, num){
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="スレッド.ポップアップ表示($1)" onmouseleave="スレッド.ポップアップ閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
-        dat.html += `<section class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<date>${date}</date></header><p>${message}</p></section>`
+        dat.html += `<article class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
         num++
     }
     return dat
