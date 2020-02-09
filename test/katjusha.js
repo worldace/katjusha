@@ -34,7 +34,7 @@ katjusha.is_internal_url = function(url){
 
 
 
-katjusha.addEventListener('click', function(event){
+katjusha.onclick = function(event){
     const url = event.target.href
     if(!url || !katjusha.is_internal_url(url)){
         return
@@ -49,7 +49,7 @@ katjusha.addEventListener('click', function(event){
         タブ.開く(url, event.target.target, thread.subject, thread.html)
         ajax(url)
     }
-})
+}
 
 
 
@@ -102,6 +102,17 @@ katjusha.addEventListener('click', function(event){
 
 
 
+掲示板.コンテキスト = function (url, name){
+    return `
+    <ul class="menu">
+      <li><a onclick="copy('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</a></li>
+    </ul>
+    `
+}
+
+
+
 掲示板.オブジェクト = function(el){
     this.el   = el
     this.url  = el.href
@@ -121,17 +132,6 @@ katjusha.addEventListener('click', function(event){
 
 
 
-掲示板.コンテキスト = function (url, name){
-    return `
-    <ul class="menu">
-      <li><a onclick="copy('${url}')">URLをコピー</a></li>
-      <li><a onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</a></li>
-    </ul>
-    `
-}
-
-
-
 サブジェクト.oncontextmenu = function (event){
     event.preventDefault()
 }
@@ -142,7 +142,7 @@ katjusha.addEventListener('click', function(event){
     if(event.target.tagName !== 'TH'){
         return
     }
-    const index = Array.from(this.rows[0].cells).indexOf(event.target)
+    const index = event.target.cellIndex
     const order = Number(event.target.dataset.order || -1)
     const tbody = this.parentElement.tBodies[0]
     const rows  = Array.from(tbody.rows)
@@ -287,6 +287,12 @@ katjusha.addEventListener('click', function(event){
 
 
 
+タブ閉じるアイコン.onclick = function (event){
+    タブ.閉じる(タブ.selectedElement)
+}
+
+
+
 スレッドヘッダ.oncontextmenu = function (event){
     event.preventDefault()
 }
@@ -306,12 +312,6 @@ katjusha.addEventListener('click', function(event){
         スレッドヘッダ_掲示板名.innerHTML = ''
         document.title = base.title
     }
-}
-
-
-
-タブ閉じるアイコン.onclick = function (event){
-    タブ.閉じる(タブ.selectedElement)
 }
 
 
@@ -492,7 +492,7 @@ katjusha.addEventListener('click', function(event){
 
 
 スレッド.アンカー移動 = function(n){
-    const el = スレッド.querySelector(`[data-selected] [data-no="${n}"]`)
+    const el = スレッド.selectedElement.children[n-1]
     if(el){
         el.scrollIntoView()
     }
@@ -546,7 +546,7 @@ katjusha.addEventListener('click', function(event){
 
 
 レスポップアップ.表示 = function(n){
-    const res = スレッド.querySelector(`[data-selected] [data-no="${n}"]`)
+    const res = スレッド.selectedElement.children[n-1]
     if(res){
         const {top, left, width}      = event.target.getBoundingClientRect()
         レスポップアップ.style.left   = `${left + width / 2}px`
@@ -592,14 +592,8 @@ katjusha.addEventListener('click', function(event){
 
 
 投稿フォーム_sage.onchange = function (event){
-    if(event.target.checked){
-        投稿フォーム_メール欄.readOnly = true
-        投稿フォーム_メール欄.value    = 'sage'
-    }
-    else{
-        投稿フォーム_メール欄.readOnly = false
-        投稿フォーム_メール欄.value    = ''
-    }
+    投稿フォーム_メール欄.readOnly = this.checked
+    投稿フォーム_メール欄.value    = this.checked ? 'sage' : ''
 }
 
 
