@@ -63,7 +63,7 @@ katjusha.onclick = function(event){
     event.stopPropagation()
     
     const {left, bottom} = this.getBoundingClientRect()
-    コンテキスト.表示(全板ボタン.コンテキスト(), this, left, bottom)
+    コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
 }
 
 
@@ -96,7 +96,7 @@ katjusha.onclick = function(event){
     event.stopPropagation()
     if(event.target.tagName === 'A'){
         change_selected(掲示板, event.target)
-        コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.target, event.pageX, event.pageY)
+        コンテキスト.表示(掲示板.コンテキスト(event.target.href, event.target.innerHTML), event.pageX, event.pageY)
     }
 }
 
@@ -175,7 +175,7 @@ katjusha.onclick = function(event){
     if(tr){
         const a = tr.querySelector('a')
         change_selected(サブジェクト一覧, tr)
-        コンテキスト.表示(サブジェクト一覧.コンテキスト(a.href, a.innerHTML), a, event.pageX, event.pageY)
+        コンテキスト.表示(サブジェクト一覧.コンテキスト(a.href, a.innerHTML), event.pageX, event.pageY)
     }
 }
 
@@ -335,7 +335,7 @@ katjusha.onclick = function(event){
     event.preventDefault()
     event.stopPropagation()
     if(event.target.tagName === 'LI'){
-        コンテキスト.表示(タブ.コンテキスト(event.target.url, event.target.innerHTML), event.target, event.pageX, event.pageY)
+        コンテキスト.表示(タブ.コンテキスト(event.target.url, event.target.innerHTML), event.pageX, event.pageY)
     }
 }
 
@@ -344,8 +344,8 @@ katjusha.onclick = function(event){
 タブ.コンテキスト = function (url, name){
     return `
     <ul class="menu context-tab">
-      <li><a onclick="タブ.コンテキスト.閉じる()">閉じる</a></li>
-      <li><a onclick="タブ.コンテキスト.このタブ以外全て閉じる()">このタブ以外全て閉じる</a></li>
+      <li><a onclick="タブ.コンテキスト.閉じる('${url}')">閉じる</a></li>
+      <li><a onclick="タブ.コンテキスト.このタブ以外全て閉じる('${url}')">このタブ以外全て閉じる</a></li>
       <li><a onclick="copy('${url}')">URLをコピー</a></li>
       <li><a onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
     </ul>
@@ -354,15 +354,15 @@ katjusha.onclick = function(event){
 
 
 
-タブ.コンテキスト.閉じる = function(){
-    タブ.閉じる(コンテキスト.target)
+タブ.コンテキスト.閉じる = function(url){
+    タブ.閉じる(タブ.検索(url))
 }
 
 
 
-タブ.コンテキスト.このタブ以外全て閉じる = function (){
+タブ.コンテキスト.このタブ以外全て閉じる = function (url){
     for(const tab of タブ.querySelectorAll('li')){
-        if(tab !== コンテキスト.target){
+        if(tab.url !== url){
             タブ.閉じる(tab)
         }
     }
@@ -455,7 +455,7 @@ katjusha.onclick = function(event){
 スレッド.onclick = function (event){
     if(event.target.tagName === 'I'){
         event.stopPropagation()
-        コンテキスト.表示(スレッド.コンテキスト(), event.target, event.pageX, event.pageY)
+        コンテキスト.表示(スレッド.コンテキスト(event.target.textContent), event.pageX, event.pageY)
     }
     else if(event.target.target === '_self'){
         event.preventDefault()
@@ -527,18 +527,17 @@ katjusha.onclick = function(event){
 
 
 
-スレッド.コンテキスト = function (){
+スレッド.コンテキスト = function (n){
     return `
     <ul class="menu">
-      <li><a onclick="スレッド.コンテキスト.これにレス()">これにレス</a></li>
+      <li><a onclick="スレッド.コンテキスト.これにレス(${n})">これにレス</a></li>
     </ul>
     `
 }
 
 
 
-スレッド.コンテキスト.これにレス = function (){
-    const n = コンテキスト.target.textContent
+スレッド.コンテキスト.これにレス = function (n){
     レス投稿アイコン.click()
     insert_text(投稿フォーム_本文欄, `>>${n}\n`)
 }
@@ -547,13 +546,14 @@ katjusha.onclick = function(event){
 
 レスポップアップ.表示 = function(n){
     const res = スレッド.selectedElement.children[n-1]
-    if(res){
-        const {top, left, width}      = event.target.getBoundingClientRect()
-        レスポップアップ.style.left   = `${left + width / 2}px`
-        レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
-        レスポップアップ.innerHTML    = res.outerHTML
-        レスポップアップ.dataset.open = true
+    if(!res){
+        return
     }
+    const {top, left, width}      = event.target.getBoundingClientRect()
+    レスポップアップ.style.left   = `${left + width / 2}px`
+    レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
+    レスポップアップ.innerHTML    = res.outerHTML
+    レスポップアップ.dataset.open = true
 }
 
 
@@ -626,9 +626,8 @@ katjusha.onclick = function(event){
 
 
 
-コンテキスト.表示 = function (html, target, x, y){
+コンテキスト.表示 = function (html, x, y){
     コンテキスト.innerHTML    = html
-    コンテキスト.target       = target
     コンテキスト.style.left   = `${x}px`
     コンテキスト.style.top    = `${y}px`
     コンテキスト.dataset.open = true
@@ -639,7 +638,6 @@ katjusha.onclick = function(event){
 コンテキスト.onclick = function (event){
     if(event.target.onclick || event.target.href){
         delete コンテキスト.dataset.open
-        delete コンテキスト.target
     }
     else{
         event.stopPropagation()
@@ -655,10 +653,7 @@ katjusha.onclick = function(event){
 
 
 katjusha.addEventListener('click', function(event){
-    if(コンテキスト.dataset.open){
-        delete コンテキスト.dataset.open
-        delete コンテキスト.target
-    }
+    delete コンテキスト.dataset.open
 })
 
 
