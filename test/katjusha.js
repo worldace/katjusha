@@ -696,6 +696,12 @@ function ajax(url, body){
         ステータス.textContent = ``
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
         タブ.ロード終了(url)
+        if(!xhr.status){ //エラーなら
+            if(xhr.readyState){ //中断以外なら
+                ステータス.textContent = `${(new URL(url)).hostname}に接続できませんでした`
+            }
+            return
+        }
         ajax[callback](xhr)
     }
     xhr.send(body)
