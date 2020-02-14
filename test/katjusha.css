@@ -620,7 +620,7 @@ body{
     margin-top: 6px;
 }
 #投稿フォーム_タイトルラベル{
-    min-width: 45px;
+    width: 45px;
     text-align: right;
     padding-right: 4px;
 }
@@ -636,7 +636,7 @@ body{
     font-family: var(--font-default), 'MS PGothic', sans-serif;
 }
 #投稿フォーム_タイトル欄{
-    flex: 1;
+    flex-grow: 1;
 }
 #投稿フォーム_タイトル欄:disabled{
     color: #6d6d6d;
@@ -648,37 +648,32 @@ body{
     margin-top: 8px;
 }
 #投稿フォーム_名前ラベル{
-    min-width: 45px;
+    width: 45px;
     text-align: right;
     padding-right: 4px;
 }
-#投稿フォーム_名前類{
-    display: flex;
-    align-items: center;
-    flex: 1;
-    padding-right: 4px;
-}
 #投稿フォーム_名前欄{
-    flex: 1;
+    flex-grow: 1;
     margin-right: 6px;
 }
 #投稿フォーム_メールラベル{
-    min-width: 45px;
+    width: 45px;
     padding-right: 3px;
     text-align: right;
 }
 #投稿フォーム_メール欄{
-    flex: 1;
+    flex-grow: 1;
     margin-right: 6px;
 }
 #投稿フォーム_メール欄:read-only{
     color: #6d6d6d;
 }
-投稿フォーム_sage ~ label{
+#投稿フォーム_sageラベル{
     padding: 2px 0;
 }
+
 #投稿フォーム_本文欄{
-    flex: 1;
+    flex-grow: 1;
     min-height: 120px;
     font-size: 12px;
     border-left: solid 1px #696969;
