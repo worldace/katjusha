@@ -708,7 +708,7 @@ function ajax(url, body){
 
 ajax.cgi = function (xhr){
     if(xhr.status !== 200){
-        alert('投稿できませんでした')
+        alert('エラーが発生して投稿できませんでした')
         return
     }
     if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
@@ -754,6 +754,11 @@ ajax.dat = function (xhr){
     else if(xhr.status === 206){
         const dat = ajax.dat.parse(xhr.responseText, thread.num+1)
 
+        if(dat.isBroken){
+            ajax.dat.retry(xhr.url)
+            return
+        }
+
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
@@ -774,12 +779,9 @@ ajax.dat = function (xhr){
     }
     else if(xhr.status === 404){
         ステータス.textContent = `スレッドが見つかりません (${date()})`
-        // /kako/ を含まなければリトライ？
     }
     else if(xhr.status === 416){
-        スレッド.クリア(xhr.url)
-        delete スレッド[xhr.url]
-        ajax(xhr.url)
+        ajax.dat.retry(xhr.url)
     }
 }
 
@@ -790,13 +792,18 @@ ajax.dat.parse = function(responseText, num){
     list.pop()
 
     const dat = {
-        html   : '',
-        num    : list.length,
-        subject: list[0].split('<>').pop(),
+        html    : '',
+        num     : list.length,
+        subject : list[0].split('<>').pop(),
+        isBroken: false
     }
 
     for(const v of list){
         let [from, mail, date, message, subject] = v.split('<>')
+        if(subject === undefined){
+            from = mail = date = message = subject = 'ここ壊れてます'
+            dat.isBroken = true
+        }
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
@@ -804,6 +811,14 @@ ajax.dat.parse = function(responseText, num){
         num++
     }
     return dat
+}
+
+
+
+ajax.dat.retry = function (url){
+    スレッド.クリア(url)
+    delete スレッド[url]
+    ajax(url)
 }
 
 
