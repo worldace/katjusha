@@ -529,8 +529,6 @@ body{
     position: absolute;
     z-index: 5;
     border: solid 1px #2982cc;
-    min-width: 400px;
-    height: 272px;
     background-color: #f0f0f0;
 }
 [data-open="スレッド"] #投稿フォーム{
@@ -568,91 +566,7 @@ body{
 }
 #投稿フォーム_閉じるボタン:hover{
     background-color: #e81123;
-    
 }
-#投稿フォーム [type="text"]{
-    border-left: solid 1px #696969;
-    border-top: solid 1px #696969;
-    border-right: solid 1px #e3e3e3;
-    border-bottom: solid 1px #e3e3e3;
-    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
-    outline: none;
-    padding-left: 2px;
-    height: 18px;
-    margin-left: 6px;
-    font-family: var(--font-default), 'MS PGothic', sans-serif;
-}
-#投稿フォーム .subject-line{
-    margin: 10px 10px 8px 10px;
-    display: flex;
-    align-items: center;
-}
-#投稿フォーム .FROM-line{
-    margin: 8px 10px 10px 25px;
-    display: flex;
-    align-items: center;
-}
-#投稿フォーム_タイトル欄{
-    width: 330px;
-}
-#投稿フォーム_タイトル欄:disabled{
-    color: #6d6d6d;
-    background-color: #fff;
-}
-#投稿フォーム_名前欄{
-    width: 115px;
-    margin-right: 6px;
-}
-#投稿フォーム_メール欄{
-    width: 115px;
-    margin-right: 6px;
-}
-#投稿フォーム_メール欄:read-only{
-    color: #6d6d6d;
-}
-#投稿フォーム_sage{
-
-}
-#投稿フォーム label{
-    padding: 2px 0;
-}
-#投稿フォーム_本文欄{
-    width: 380px;
-    font-size: 12px;
-    height: 120px;
-    border-left: solid 1px #696969;
-    border-top: solid 1px #696969;
-    border-right: solid 1px #e3e3e3;
-    border-bottom: solid 1px #e3e3e3;
-    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
-    margin: 0 10px 10px 10px;
-    overflow: scroll;
-    outline: none;
-    padding-left: 4px;
-    resize: none;
-}
-
-#投稿フォーム .button-line input{
-    background-color: transparent;
-    width: 80px;
-    font-size: 12px;
-    font-family: var(--font-default), 'MS PGothic', sans-serif;
-    padding: 3px;
-    border-left: solid 1px #e3e3e3;
-    border-top: solid 1px #e3e3e3;
-    border-right: solid 1px #a0a0a0;
-    border-bottom: solid 1px #a0a0a0;
-    box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;
-}
-#投稿フォーム .button-line input:active{
-    transform: translate(1px, 1px);
-}
-
-#投稿フォーム .button-line{
-    text-align: center;
-    margin-top: -5px;
-}
-
 #投稿フォーム_タブ{
     height: 24px;
     list-style: none;
@@ -690,11 +604,114 @@ body{
     height: 22px;
     line-height: 22px;
 }
-#投稿フォーム_タブ .選択::before{
-    box-shadow: 2px 2px 0 #fff;
+
+#投稿フォーム_form{
+    padding: 4px 12px 6px 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: 460px;
+    min-height: 240px;
+    resize: both;
+    overflow: hidden;
 }
-#投稿フォーム_タブ .選択::after{
-    box-shadow: -2px 2px 0 #fff;
+#投稿フォーム_タイトルライン{
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+}
+#投稿フォーム_タイトルラベル{
+    min-width: 45px;
+    text-align: right;
+    padding-right: 4px;
+}
+#投稿フォーム [type="text"]{
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    outline: none;
+    padding-left: 2px;
+    height: 18px;
+    font-family: var(--font-default), 'MS PGothic', sans-serif;
+}
+#投稿フォーム_タイトル欄{
+    flex: 1;
+}
+#投稿フォーム_タイトル欄:disabled{
+    color: #6d6d6d;
+    background-color: #fff;
+}
+#投稿フォーム_名前ライン{
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+#投稿フォーム_名前ラベル{
+    min-width: 45px;
+    text-align: right;
+    padding-right: 4px;
+}
+#投稿フォーム_名前類{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding-right: 4px;
+}
+#投稿フォーム_名前欄{
+    flex: 1;
+    margin-right: 6px;
+}
+#投稿フォーム_メールラベル{
+    min-width: 45px;
+    padding-right: 3px;
+    text-align: right;
+}
+#投稿フォーム_メール欄{
+    flex: 1;
+    margin-right: 6px;
+}
+#投稿フォーム_メール欄:read-only{
+    color: #6d6d6d;
+}
+投稿フォーム_sage ~ label{
+    padding: 2px 0;
+}
+#投稿フォーム_本文欄{
+    flex: 1;
+    min-height: 120px;
+    font-size: 12px;
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    overflow: scroll;
+    outline: none;
+    padding-left: 4px;
+    resize: none;
+    margin-top: 10px;
+}
+
+#投稿フォーム_ボタンライン{
+    text-align: center;
+    margin-top: 6px;
+}
+
+#投稿フォーム_ボタンライン input{
+    background-color: transparent;
+    width: 80px;
+    font-size: 12px;
+    font-family: var(--font-default), 'MS PGothic', sans-serif;
+    padding: 3px;
+    border-left: solid 1px #e3e3e3;
+    border-top: solid 1px #e3e3e3;
+    border-right: solid 1px #a0a0a0;
+    border-bottom: solid 1px #a0a0a0;
+    box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;
+}
+#投稿フォーム_ボタンライン input:active{
+    transform: translate(1px, 1px);
 }
 
 
