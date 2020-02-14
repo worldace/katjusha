@@ -620,7 +620,7 @@ body{
     margin-top: 6px;
 }
 #投稿フォーム_タイトルラベル{
-    width: 45px;
+    min-width: 45px;
     text-align: right;
     padding-right: 4px;
 }
@@ -648,7 +648,7 @@ body{
     margin-top: 8px;
 }
 #投稿フォーム_名前ラベル{
-    width: 45px;
+    min-width: 45px;
     text-align: right;
     padding-right: 4px;
 }
@@ -657,7 +657,7 @@ body{
     margin-right: 6px;
 }
 #投稿フォーム_メールラベル{
-    width: 45px;
+    min-width: 45px;
     padding-right: 3px;
     text-align: right;
 }
