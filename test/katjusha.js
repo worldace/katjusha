@@ -564,6 +564,12 @@ katjusha.onclick = function(event){
 
 
 
+レスポップアップ.onclick = function(){
+    delete レスポップアップ.dataset.open
+}
+
+
+
 投稿フォーム.oncontextmenu = function (event){
     if(event.target.tagName !== 'TEXTAREA'){
         event.preventDefault()
