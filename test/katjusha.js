@@ -216,6 +216,30 @@ katjusha.onclick = function(event){
 
 
 
+サブジェクト一覧.parse = function(str, bbsurl){
+    const list = str.split("\n")
+    list.pop()
+
+    let tr = ''
+    let no = 1
+    for(const v of list){
+        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const key    = file.replace('.dat', '')
+        const url    = スレッド.URL作成(bbsurl, key)
+        const thread = スレッド[url] || {}
+
+        if(num == thread.既得){
+            thread.新着 = 0
+        }
+
+        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        no++
+    }
+    return {html:tr, num:list.length}
+}
+
+
+
 ヘルプアイコン.onclick = function(event){
     event.stopPropagation()
     
@@ -580,6 +604,34 @@ katjusha.onclick = function(event){
 
 
 
+スレッド.parse = function(str, num){
+    const list = str.split("\n")
+    list.pop()
+
+    const dat = {
+        html    : '',
+        num     : list.length,
+        subject : list[0].split('<>').pop(),
+        isBroken: false
+    }
+
+    for(const v of list){
+        let [from, mail, date, message, subject] = v.split('<>')
+        if(subject === undefined){
+            from = mail = date = message = subject = 'ここ壊れてます'
+            dat.isBroken = true
+        }
+        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
+        message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+        message = message.replace(/^ /, '')
+        dat.html += `<article class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
+        num++
+    }
+    return dat
+}
+
+
+
 レスポップアップ.表示 = function(n){
     const res = スレッド.selectedElement.children[n-1]
     if(!res){
@@ -707,7 +759,7 @@ katjusha.addEventListener('click', function(event){
 
 
 async function ajax(url, body){
-    const request = {}
+    const request = {cache:'no-store', host:new URL(url).hostname}
     let   response
     let   callback
 
@@ -741,8 +793,7 @@ async function ajax(url, body){
         callback    = 'subject'
         history.replaceState(null, null, url)
     }
-    request.cache = 'no-store'
-    request.host  = new URL(url).hostname
+
 
     try{
         ステータス.textContent = `${request.host}に接続しています`
@@ -794,7 +845,7 @@ ajax.dat = function (response){
     const {bbsurl, key} = スレッド.URL分解(response.URL)
 
     if(response.status === 200){
-        const dat = ajax.dat.parse(response.str, 1)
+        const dat = スレッド.parse(response.str, 1)
 
         thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
@@ -816,7 +867,7 @@ ajax.dat = function (response){
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
     else if(response.status === 206){
-        const dat = ajax.dat.parse(response.str, thread.num+1)
+        const dat = スレッド.parse(response.str, thread.num+1)
 
         if(dat.isBroken){
             ajax.dat.retry(response.URL)
@@ -851,34 +902,6 @@ ajax.dat = function (response){
 
 
 
-ajax.dat.parse = function(responseText, num){
-    const list = responseText.split("\n")
-    list.pop()
-
-    const dat = {
-        html    : '',
-        num     : list.length,
-        subject : list[0].split('<>').pop(),
-        isBroken: false
-    }
-
-    for(const v of list){
-        let [from, mail, date, message, subject] = v.split('<>')
-        if(subject === undefined){
-            from = mail = date = message = subject = 'ここ壊れてます'
-            dat.isBroken = true
-        }
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
-        message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-        message = message.replace(/^ /, '')
-        dat.html += `<article class="レス" data-no="${num}"><header><i>${num}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
-        num++
-    }
-    return dat
-}
-
-
-
 ajax.dat.retry = function (url){
     delete スレッド[url]
     ajax(url)
@@ -892,7 +915,7 @@ ajax.subject = function (response){
         return
     }
 
-    const {html, num} = ajax.subject.parse(response.str, response.URL)
+    const {html, num} = サブジェクト一覧.parse(response.str, response.URL)
     サブジェクト一覧.innerHTML = html
     サブジェクト一覧.bbsurl    = response.URL
 
@@ -902,30 +925,6 @@ ajax.subject = function (response){
 
     サブジェクト.scrollTop = 0
     ステータス.textContent = `${num}件のスレッドを受信 (${date()})`
-}
-
-
-
-ajax.subject.parse = function(responseText, bbsurl){
-    const list = responseText.split("\n")
-    list.pop()
-
-    let tr = ''
-    let no = 1
-    for(const v of list){
-        const [file, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key    = file.replace('.dat', '')
-        const url    = スレッド.URL作成(bbsurl, key)
-        const thread = スレッド[url] || {}
-
-        if(num == thread.既得){
-            thread.新着 = 0
-        }
-
-        tr += `<tr data-url="${url}"><td>${no}</td><td><a href="${url}">${subject}</a></td><td>${num}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
-        no++
-    }
-    return {html:tr, num:list.length}
 }
 
 
