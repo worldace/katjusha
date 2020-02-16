@@ -604,7 +604,7 @@ katjusha.onclick = function(event){
 
 
 
-スレッド.parse = function(str, num){
+スレッド.parse = function(str, num = 1){
     const list = str.split("\n")
     list.pop()
 
@@ -812,20 +812,20 @@ async function ajax(url, body){
     }
 
     const buffer = await response.arrayBuffer()
-    response.str = new TextDecoder('shift-jis').decode(buffer)
+    const text   = new TextDecoder('shift-jis').decode(buffer)
 
-    callback(response, url)
+    callback(response, url, text)
 }
 
 
 
-ajax.cgi = function (response, url){
+ajax.cgi = function (response, url, text){
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
         return
     }
-    if(response.str.includes('<title>ＥＲＲＯＲ！')){
-        alert(response.str.match(/<b>(.+?)</i)[1])
+    if(text.includes('<title>ＥＲＲＯＲ！')){
+        alert(text.match(/<b>(.+?)</i)[1])
         return
     }
 
@@ -839,12 +839,12 @@ ajax.cgi = function (response, url){
 
 
 
-ajax.dat = function (response, url){
+ajax.dat = function (response, url, text){
     const thread        = スレッド[url]
     const {bbsurl, key} = スレッド.URL分解(url)
 
     if(response.status === 200){
-        const dat = スレッド.parse(response.str, 1)
+        const dat = スレッド.parse(text)
 
         thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
@@ -866,7 +866,7 @@ ajax.dat = function (response, url){
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
     else if(response.status === 206){
-        const dat = スレッド.parse(response.str, thread.num+1)
+        const dat = スレッド.parse(text, thread.num+1)
 
         if(dat.isBroken){
             ajax.dat.retry(url)
@@ -908,13 +908,13 @@ ajax.dat.retry = function (url){
 
 
 
-ajax.subject = function (response, url){
+ajax.subject = function (response, url, text){
     if(response.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
     }
 
-    const {html, num} = サブジェクト一覧.parse(response.str, url)
+    const {html, num} = サブジェクト一覧.parse(text, url)
     サブジェクト一覧.innerHTML = html
     サブジェクト一覧.bbsurl    = url
 
