@@ -276,28 +276,27 @@ katjusha.onclick = function(event){
     if(katjusha.dataset.open){
         return
     }
-    const tab = タブ.selectedElement
-    if(!tab || !tab.url){
+    if(!タブ.selectedElement || !タブ.selectedElement.url){
         return
     }
 
-    const {bbsurl, key} = スレッド.URL分解(tab.url)
-    const bbs = 掲示板[bbsurl]
+    const thread = スレッド[タブ.selectedElement.url]
+    const bbs    = 掲示板[thread.bbsurl]
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
-        subject : tab.innerHTML,
+        subject : thread.subject,
         FROM    : '',
         mail    : '',
         MESSAGE : '',
-        bbs     : bbs.key,
-        key     : key
+        bbs     : thread.bbs,
+        key     : thread.key
     })
 
     投稿フォーム_sage.checked        = false
     投稿フォーム_メール欄.readOnly   = false
     投稿フォーム_タイトル欄.disabled = true
-    投稿フォーム_タイトル.innerHTML  = `「${tab.innerHTML}」にレス`
+    投稿フォーム_タイトル.innerHTML  = `「${thread.subject}」にレス`
     katjusha.dataset.open = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
@@ -307,11 +306,23 @@ katjusha.onclick = function(event){
 
 レス更新アイコン.onclick = function (event){
     const tab = タブ.selectedElement
-    if(!tab || !tab.url){
+    if(tab && tab.url){
+        タブ.選択(tab)
+        ajax(tab.url)
+    }
+}
+
+
+
+ごみ箱アイコン.onclick = function (event){
+    if(!タブ.selectedElement){
         return
     }
-    タブ.選択(tab)
-    ajax(tab.url)
+    const url = タブ.selectedElement.url
+    if(スレッド[url]){
+        ステータス.textContent = `「${スレッド[url].subject}」のログを削除しました`
+        delete スレッド[url]
+    }
 }
 
 
@@ -432,6 +443,9 @@ katjusha.onclick = function(event){
 
 
 タブ.閉じる = function (tab){
+    if(!tab){
+        return
+    }
     タブ.選択(tab.previousElementSibling || tab.nextElementSibling || タブ.初期化())
     tab.el.remove()
     tab.remove()
@@ -551,7 +565,7 @@ katjusha.onclick = function(event){
     dir.pop()
     url = dir.join('/') + '/'
     const bbsurl = (url in 掲示板) ? url : `${url}${bbs}/`
-    return {bbsurl, key}
+    return {bbsurl, key, bbs}
 }
 
 
@@ -774,14 +788,15 @@ ajax.cgi = function (xhr){
 
 
 ajax.dat = function (xhr){
-    const thread        = スレッド[xhr.url]
-    const {bbsurl, key} = スレッド.URL分解(xhr.url)
+    const thread             = スレッド[xhr.url]
+    const {bbsurl, key, bbs} = スレッド.URL分解(xhr.url)
 
     if(xhr.status === 200){
         const dat = ajax.dat.parse(xhr.responseText, 1)
 
-        thread.key     = key
+        thread.bbs     = bbs
         thread.bbsurl  = bbsurl
+        thread.key     = key
         thread.url     = xhr.url
         thread.scroll  = 0
         thread.subject = dat.subject
@@ -794,6 +809,7 @@ ajax.dat = function (xhr){
         thread.新着    = dat.num
         thread.最終取得= date()
 
+        スレッド.クリア(thread.url)
         スレッド.追記(thread.url, thread.subject, thread.html)
         サブジェクト一覧.更新(thread)
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
@@ -863,7 +879,6 @@ ajax.dat.parse = function(responseText, num){
 
 
 ajax.dat.retry = function (url){
-    スレッド.クリア(url)
     delete スレッド[url]
     ajax(url)
 }
