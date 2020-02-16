@@ -45,8 +45,7 @@ katjusha.onclick = function(event){
         ajax(url)
     }
     else if(url.includes('read.cgi')){
-        const thread = スレッド[url] || {}
-        タブ.開く(url, event.target.target, thread.subject, thread.html)
+        タブ.開く(url, event.target.target, スレッド[url])
         ajax(url)
     }
 }
@@ -198,8 +197,7 @@ katjusha.onclick = function(event){
 
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
-    const thread = スレッド[url] || {} //new thread
-    タブ.開く(url, '_blank', thread.subject, thread.html)
+    タブ.開く(url, '_blank', スレッド[url])
     ajax(url)
 }
 
@@ -281,15 +279,14 @@ katjusha.onclick = function(event){
     }
 
     const thread = スレッド[タブ.selectedElement.url]
-    const bbs    = 掲示板[thread.bbsurl]
 
-    投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
+    投稿フォーム_form.setAttribute('action', `${thread.bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
         subject : thread.subject,
         FROM    : '',
         mail    : '',
         MESSAGE : '',
-        bbs     : thread.bbs,
+        bbs     : thread.bbs.key,
         key     : thread.key
     })
 
@@ -343,7 +340,7 @@ katjusha.onclick = function(event){
     const thread = スレッド[url]
     if(thread){
         スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
-        スレッドヘッダ_掲示板名.innerHTML = `<a href="${thread.bbsurl}">[${掲示板[thread.bbsurl].name}]</a>`
+        スレッドヘッダ_掲示板名.innerHTML = `<a href="${thread.bbs.url}">[${掲示板[thread.bbs.url].name}]</a>`
         document.title = thread.subject
         スレッド.scrollTop = thread.scroll
     }
@@ -429,12 +426,12 @@ katjusha.onclick = function(event){
 
 
 
-タブ.開く = function (url, target, title = '', html = ''){
+タブ.開く = function (url, target = '_self', thread = {}){
     let tab = タブ.検索(url) || タブ.初期化()
     if(tab.url !== url){
         tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
-        tab.innerHTML    = title
-        tab.el.innerHTML = html
+        tab.innerHTML    = thread.subject || ''
+        tab.el.innerHTML = thread.html || ''
     }
     タブ.選択(tab)
     return tab
@@ -499,10 +496,6 @@ katjusha.onclick = function(event){
     if(event.target.tagName === 'I'){
         event.stopPropagation()
         コンテキスト.表示(スレッド.コンテキスト(event.target.textContent), event.pageX, event.pageY)
-    }
-    else if(event.target.target === '_self'){
-        event.preventDefault()
-        掲示板[event.target.href] ? 全板ボタン.コンテキスト.掲示板に移動(event.target.href) : サブジェクト一覧.コンテキスト.新しいタブで開く(event.target.href)
     }
 }
 
@@ -746,7 +739,7 @@ function ajax(url, body){
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
     xhr.setRequestHeader('Cache-Controll', 'no-store')
-    xhr.timeout = 30 * 1000
+    xhr.timeout = 20 * 1000
     xhr.onloadend = function(){
         ステータス.textContent = ``
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
@@ -788,14 +781,13 @@ ajax.cgi = function (xhr){
 
 
 ajax.dat = function (xhr){
-    const thread             = スレッド[xhr.url]
-    const {bbsurl, key, bbs} = スレッド.URL分解(xhr.url)
+    const thread        = スレッド[xhr.url]
+    const {bbsurl, key} = スレッド.URL分解(xhr.url)
 
     if(xhr.status === 200){
         const dat = ajax.dat.parse(xhr.responseText, 1)
 
-        thread.bbs     = bbs
-        thread.bbsurl  = bbsurl
+        thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
         thread.url     = xhr.url
         thread.scroll  = 0
