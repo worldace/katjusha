@@ -62,8 +62,13 @@ katjusha.onclick = function(event){
 全板ボタン.onclick = function(event){
     event.stopPropagation()
     
-    const {left, bottom} = this.getBoundingClientRect()
-    コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
+    if(!コンテキスト.dataset.open){
+        const {left, bottom} = this.getBoundingClientRect()
+        コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
+    }
+    else{
+        コンテキスト.閉じる()
+    }
 }
 
 
@@ -209,6 +214,30 @@ katjusha.onclick = function(event){
         tr.cells[5].textContent = thread.最終取得 || ''
         tr.cells[6].textContent = thread.最終書き込み || ''
     }
+}
+
+
+
+ヘルプアイコン.onclick = function(event){
+    event.stopPropagation()
+    
+    if(!コンテキスト.dataset.open){
+        const {left, bottom} = this.getBoundingClientRect()
+        コンテキスト.表示(ヘルプアイコン.コンテキスト(), left, bottom)
+    }
+    else{
+        コンテキスト.閉じる()
+    }
+}
+
+
+
+ヘルプアイコン.コンテキスト = function (){
+    return `
+    <ul class="menu">
+      <li><a href="https://spelunker2.wordpress.com//" target="_blank">かちゅぼ～どサイト</a></li>
+    </ul>
+    `
 }
 
 
@@ -641,9 +670,15 @@ katjusha.onclick = function(event){
 
 
 
+コンテキスト.閉じる = function (){
+    delete コンテキスト.dataset.open
+}
+
+
+
 コンテキスト.onclick = function (event){
     if(event.target.onclick || event.target.href){
-        delete コンテキスト.dataset.open
+        コンテキスト.閉じる()
     }
     else{
         event.stopPropagation()
