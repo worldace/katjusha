@@ -759,24 +759,25 @@ katjusha.addEventListener('click', function(event){
 
 
 async function ajax(url, body){
-    const request = {cache:'no-store', host:new URL(url).hostname}
+    const request = {cache:'no-store', host:new URL(url).hostname, result:''}
     let   response
     let   callback
 
     if(url.includes('bbs.cgi')){
+        callback       = 'cgi'
         request.url    = url
         request.method = 'POST'
         request.body   = body
-        callback       = 'cgi'
 
         let bbsurl = url.replace('test/bbs.cgi', '')
         bbsurl     = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
         url        = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
     }
     else if(url.includes('read.cgi')){
+        callback = 'dat'
+
         const {bbsurl, key} = スレッド.URL分解(url)
         request.url = `${bbsurl}dat/${key}.dat`
-        callback    = 'dat'
         if(スレッド[url]){
             request.headers = {
                 'Range': `bytes=${スレッド[url].byte || 0}-`,
@@ -789,8 +790,8 @@ async function ajax(url, body){
         history.replaceState(null, null, url)
     }
     else{
-        request.url = `${url}subject.txt`
         callback    = 'subject'
+        request.url = `${url}subject.txt`
         history.replaceState(null, null, url)
     }
 
@@ -800,13 +801,13 @@ async function ajax(url, body){
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
         タブ.ロード開始(url)
         response = await fetch(request.url, request)
-        ステータス.textContent = ``
     }
     catch(e){
-        ステータス.textContent = `${request.host}に接続できませんでした`
+        request.result = `${request.host}に接続できませんでした`
         return
     }
     finally{
+        ステータス.textContent = request.result
         アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
         タブ.ロード終了(url)
     }
