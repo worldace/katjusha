@@ -759,12 +759,12 @@ katjusha.addEventListener('click', function(event){
 
 
 async function ajax(url, body){
-    const request = {cache:'no-store', host:new URL(url).hostname, result:''}
+    const request = {cache:'no-store', host:new URL(url).hostname}
     let   response
     let   callback
 
     if(url.includes('bbs.cgi')){
-        callback       = 'cgi'
+        callback       = ajax.cgi
         request.url    = url
         request.method = 'POST'
         request.body   = body
@@ -774,7 +774,7 @@ async function ajax(url, body){
         url        = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
     }
     else if(url.includes('read.cgi')){
-        callback = 'dat'
+        callback = ajax.dat
 
         const {bbsurl, key} = スレッド.URL分解(url)
         request.url = `${bbsurl}dat/${key}.dat`
@@ -790,11 +790,10 @@ async function ajax(url, body){
         history.replaceState(null, null, url)
     }
     else{
-        callback    = 'subject'
+        callback    = ajax.subject
         request.url = `${url}subject.txt`
         history.replaceState(null, null, url)
     }
-
 
     try{
         ステータス.textContent = `${request.host}に接続しています`
@@ -803,25 +802,24 @@ async function ajax(url, body){
         response = await fetch(request.url, request)
     }
     catch(e){
-        request.result = `${request.host}に接続できませんでした`
+        request.error = `${request.host}に接続できませんでした`
         return
     }
     finally{
-        ステータス.textContent = request.result
+        ステータス.textContent = request.error || ''
         アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
         タブ.ロード終了(url)
     }
 
     const buffer = await response.arrayBuffer()
     response.str = new TextDecoder('shift-jis').decode(buffer)
-    response.URL = url
 
-    ajax[callback](response)
+    callback(response, url)
 }
 
 
 
-ajax.cgi = function (response){
+ajax.cgi = function (response, url){
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
         return
@@ -831,26 +829,26 @@ ajax.cgi = function (response){
         return
     }
 
-    if(response.URL.includes('read.cgi')){
-        スレッド[response.URL].最終書き込み = date()
+    if(url.includes('read.cgi')){
+        スレッド[url].最終書き込み = date()
     }
 
-    ajax(response.URL)
+    ajax(url)
     delete katjusha.dataset.open
 }
 
 
 
-ajax.dat = function (response){
-    const thread        = スレッド[response.URL]
-    const {bbsurl, key} = スレッド.URL分解(response.URL)
+ajax.dat = function (response, url){
+    const thread        = スレッド[url]
+    const {bbsurl, key} = スレッド.URL分解(url)
 
     if(response.status === 200){
         const dat = スレッド.parse(response.str, 1)
 
         thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
-        thread.url     = response.URL
+        thread.url     = url
         thread.scroll  = 0
         thread.subject = dat.subject
         thread.html    = dat.html
@@ -871,7 +869,7 @@ ajax.dat = function (response){
         const dat = スレッド.parse(response.str, thread.num+1)
 
         if(dat.isBroken){
-            ajax.dat.retry(response.URL)
+            ajax.dat.retry(url)
             return
         }
 
@@ -897,7 +895,7 @@ ajax.dat = function (response){
         ステータス.textContent = `スレッドが見つかりません (${date()})`
     }
     else if(response.status === 416){
-        ajax.dat.retry(response.URL)
+        ajax.dat.retry(url)
     }
 }
 
@@ -910,17 +908,17 @@ ajax.dat.retry = function (url){
 
 
 
-ajax.subject = function (response){
+ajax.subject = function (response, url){
     if(response.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
     }
 
-    const {html, num} = サブジェクト一覧.parse(response.str, response.URL)
+    const {html, num} = サブジェクト一覧.parse(response.str, url)
     サブジェクト一覧.innerHTML = html
-    サブジェクト一覧.bbsurl    = response.URL
+    サブジェクト一覧.bbsurl    = url
 
-    const bbs      = 掲示板[response.URL]
+    const bbs      = 掲示板[url]
     change_selected(掲示板, bbs.el)
     document.title = `${base.title} [ ${bbs.name} ]`
 
