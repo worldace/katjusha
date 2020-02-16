@@ -706,95 +706,105 @@ katjusha.addEventListener('click', function(event){
 
 
 
-function ajax(url, body){
-    const xhr = new XMLHttpRequest()
-    let callback
+async function ajax(url, body){
+    const request = {}
+    let   response
+    let   callback
 
     if(url.includes('bbs.cgi')){
-        xhr.open('POST', url)
+        request.url    = url
+        request.method = 'POST'
+        request.body   = body
+        callback       = 'cgi'
+
         let bbsurl = url.replace('test/bbs.cgi', '')
-        bbsurl   = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        xhr.url  = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
-        callback = 'cgi'
+        bbsurl     = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
+        url        = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = スレッド.URL分解(url)
-        xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
-        xhr.url = url
-        if(url in スレッド){
-            xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
-            xhr.setRequestHeader('If-None-Match', スレッド[url].etag)
+        request.url = `${bbsurl}dat/${key}.dat`
+        callback    = 'dat'
+        if(スレッド[url]){
+            request.headers = {
+                'Range': `bytes=${スレッド[url].byte || 0}-`,
+                'If-None-Match': スレッド[url].etag,
+            }
         }
         else{
             スレッド[url] = {}
         }
-        callback = 'dat'
         history.replaceState(null, null, url)
     }
     else{
-        xhr.open('GET', `${url}subject.txt?${Date.now()}`)
-        xhr.url  = url
-        callback = 'subject'
+        request.url = `${url}subject.txt`
+        callback    = 'subject'
         history.replaceState(null, null, url)
     }
-    xhr.overrideMimeType('text/plain; charset=shift_jis')
-    xhr.timeout = 20 * 1000
-    xhr.onloadend = function(){
+    request.cache = 'no-store'
+    request.host  = new URL(url).hostname
+
+    try{
+        ステータス.textContent = `${request.host}に接続しています`
+        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
+        タブ.ロード開始(url)
+        response = await fetch(request.url, request)
         ステータス.textContent = ``
-        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
-        タブ.ロード終了(url)
-        if(!xhr.status){ //エラーなら
-            if(xhr.readyState){ //中断以外なら
-                ステータス.textContent = `${(new URL(url)).hostname}に接続できませんでした`
-            }
-            return
-        }
-        ajax[callback](xhr)
     }
-    xhr.send(body)
-    ステータス.textContent = `${(new URL(url)).hostname}に接続しています`
-    アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
-    タブ.ロード開始(url)
+    catch(e){
+        ステータス.textContent = `${request.host}に接続できませんでした`
+        return
+    }
+    finally{
+        アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
+        タブ.ロード終了(url)
+    }
+
+    const buffer = await response.arrayBuffer()
+    response.str = new TextDecoder('shift-jis').decode(buffer)
+    response.URL = url
+
+    ajax[callback](response)
 }
 
 
 
-ajax.cgi = function (xhr){
-    if(xhr.status !== 200){
+ajax.cgi = function (response){
+    if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
         return
     }
-    if(xhr.responseText.includes('<title>ＥＲＲＯＲ！')){
-        alert(xhr.responseText.match(/<b>(.+?)</i)[1])
+    if(response.str.includes('<title>ＥＲＲＯＲ！')){
+        alert(response.str.match(/<b>(.+?)</i)[1])
         return
     }
 
-    if(xhr.url.includes('read.cgi')){
-        スレッド[xhr.url].最終書き込み = date()
+    if(response.URL.includes('read.cgi')){
+        スレッド[response.URL].最終書き込み = date()
     }
 
-    ajax(xhr.url)
+    ajax(response.URL)
     delete katjusha.dataset.open
 }
 
 
 
-ajax.dat = function (xhr){
-    const thread        = スレッド[xhr.url]
-    const {bbsurl, key} = スレッド.URL分解(xhr.url)
+ajax.dat = function (response){
+    const thread        = スレッド[response.URL]
+    const {bbsurl, key} = スレッド.URL分解(response.URL)
 
-    if(xhr.status === 200){
-        const dat = ajax.dat.parse(xhr.responseText, 1)
+    if(response.status === 200){
+        const dat = ajax.dat.parse(response.str, 1)
 
         thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
-        thread.url     = xhr.url
+        thread.url     = response.URL
         thread.scroll  = 0
         thread.subject = dat.subject
         thread.html    = dat.html
         thread.num     = dat.num
-        thread.byte    = Number(xhr.getResponseHeader('Content-Length'))
-        thread.etag    = String(xhr.getResponseHeader('ETag')).replace('W/', '')
+        thread.byte    = Number(response.headers.get('Content-Length'))
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = dat.num
         thread.新着    = dat.num
@@ -805,18 +815,18 @@ ajax.dat = function (xhr){
         サブジェクト一覧.更新(thread)
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
-    else if(xhr.status === 206){
-        const dat = ajax.dat.parse(xhr.responseText, thread.num+1)
+    else if(response.status === 206){
+        const dat = ajax.dat.parse(response.str, thread.num+1)
 
         if(dat.isBroken){
-            ajax.dat.retry(xhr.url)
+            ajax.dat.retry(response.URL)
             return
         }
 
         thread.html   += dat.html
         thread.num    += dat.num
-        thread.byte   += Number(xhr.getResponseHeader('Content-Length') || 0)
-        thread.etag    = String(xhr.getResponseHeader('ETag')).replace('W/', '')
+        thread.byte   += Number(response.headers.get('Content-Length') || 0)
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = thread.num
         thread.新着    = dat.num
@@ -826,16 +836,16 @@ ajax.dat = function (xhr){
         サブジェクト一覧.更新(thread)
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
    }
-    else if(xhr.status === 304){
+    else if(response.status === 304){
         thread.新着 = 0
         サブジェクト一覧.更新(thread)
         ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
     }
-    else if(xhr.status === 404){
+    else if(response.status === 404){
         ステータス.textContent = `スレッドが見つかりません (${date()})`
     }
-    else if(xhr.status === 416){
-        ajax.dat.retry(xhr.url)
+    else if(response.status === 416){
+        ajax.dat.retry(response.URL)
     }
 }
 
@@ -876,19 +886,19 @@ ajax.dat.retry = function (url){
 
 
 
-ajax.subject = function (xhr){
-    if(xhr.status !== 200){
+ajax.subject = function (response){
+    if(response.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
     }
 
-    const {html, num} = ajax.subject.parse(xhr.responseText, xhr.url)
+    const {html, num} = ajax.subject.parse(response.str, response.URL)
     サブジェクト一覧.innerHTML = html
-    サブジェクト一覧.bbsurl    = xhr.url
+    サブジェクト一覧.bbsurl    = response.URL
 
-    const bbs      = 掲示板[xhr.url]
-    document.title = `${base.title} [ ${bbs.name} ]`
+    const bbs      = 掲示板[response.URL]
     change_selected(掲示板, bbs.el)
+    document.title = `${base.title} [ ${bbs.name} ]`
 
     サブジェクト.scrollTop = 0
     ステータス.textContent = `${num}件のスレッドを受信 (${date()})`
