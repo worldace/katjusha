@@ -719,7 +719,7 @@ function ajax(url, body){
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = スレッド.URL分解(url)
-        xhr.open('GET', `${bbsurl}dat/${key}.dat`)
+        xhr.open('GET', `${bbsurl}dat/${key}.dat?${Date.now()}`)
         xhr.url = url
         if(url in スレッド){
             xhr.setRequestHeader('Range', `bytes=${スレッド[url].byte || 0}-`)
@@ -732,13 +732,12 @@ function ajax(url, body){
         history.replaceState(null, null, url)
     }
     else{
-        xhr.open('GET', `${url}subject.txt`)
+        xhr.open('GET', `${url}subject.txt?${Date.now()}`)
         xhr.url  = url
         callback = 'subject'
         history.replaceState(null, null, url)
     }
     xhr.overrideMimeType('text/plain; charset=shift_jis')
-    xhr.setRequestHeader('Cache-Controll', 'no-store')
     xhr.timeout = 20 * 1000
     xhr.onloadend = function(){
         ステータス.textContent = ``
