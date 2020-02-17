@@ -774,19 +774,17 @@ katjusha.addEventListener('click', function(event){
 
 
 async function ajax(url, body){
-    const hostname = new URL(url).hostname
-    const request  = {cache:'no-store', mode:'cors'}
+    const request  = {cache:'no-store', mode:'cors', body}
     let   response
     let   callback
 
     if(url.includes('bbs.cgi')){
         request.url    = url
         request.method = 'POST'
-        request.body   = body
 
         const home   = url.replace('test/bbs.cgi', '')
         const bbsurl = (home in 掲示板) ? home : `${home}${body.get('bbs')}/`
-        url          = body.has('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
+        url          = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
         callback     = ajax.cgi
     }
     else if(url.includes('read.cgi')){
@@ -804,14 +802,14 @@ async function ajax(url, body){
 
 
     try{
-        ステータス.textContent = `${hostname}に接続しています`
+        ステータス.textContent = `${new URL(url).hostname}に接続しています`
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
         タブ.ロード開始(url)
         response = await fetch(request.url, request)
     }
     catch(error){
         if(error.name !== 'AbortError'){
-            request.error = `${hostname}に接続できませんでした`
+            request.error = `${new URL(url).hostname}に接続できませんでした`
         }
         return
     }
