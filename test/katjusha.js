@@ -13,9 +13,9 @@ katjusha.start = function (){
 
     掲示板.ホスト一覧 = new Set
 
-    for(const el of 掲示板.querySelectorAll('a')){
-        掲示板[el.href] = new 掲示板.オブジェクト(el)
-        掲示板.ホスト一覧.add(掲示板[el.href].host)
+    for(const a of 掲示板.querySelectorAll('a')){
+        掲示板[a.href] = new 掲示板.オブジェクト(a)
+        掲示板.ホスト一覧.add(掲示板[a.href].host)
     }
 
     if(url !== base.href){
@@ -777,7 +777,8 @@ katjusha.addEventListener('click', function(event){
 
 
 async function ajax(url, body){
-    const request = {cache:'no-store', host:new URL(url).hostname}
+    const hostname = new URL(url).hostname
+    const request  = {cache:'no-store', mode:'cors'}
     let   response
     let   callback
 
@@ -808,14 +809,14 @@ async function ajax(url, body){
 
 
     try{
-        ステータス.textContent = `${request.host}に接続しています`
+        ステータス.textContent = `${hostname}に接続しています`
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
         タブ.ロード開始(url)
         response = await fetch(request.url, request)
     }
     catch(error){
         if(error.name !== 'AbortError'){
-            request.error = `${request.host}に接続できませんでした`
+            request.error = `${hostname}に接続できませんでした`
         }
         return
     }
