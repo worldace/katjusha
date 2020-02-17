@@ -18,9 +18,12 @@ katjusha.start = function (){
         掲示板.ホスト一覧.add(掲示板[el.href].host)
     }
 
-    タブ.新しく開く()
     if(url !== base.href){
+        タブ.新しく開く(url)
         ajax(url)
+    }
+    else{
+        タブ.新しく開く()
     }
 }
 
@@ -449,7 +452,7 @@ katjusha.onclick = function(event){
     tab.innerHTML    = thread.subject || ''
     tab.el.url       = url
     tab.el.innerHTML = thread.html || ''
-    タブ.選択(tab)
+    return タブ.選択(tab)
 }
 
 
@@ -473,7 +476,7 @@ katjusha.onclick = function(event){
 
     タブ.append(tab)
     スレッド.append(tab.el)
-    タブ.選択(tab)
+    return タブ.選択(tab)
 }
 
 
@@ -482,9 +485,10 @@ katjusha.onclick = function(event){
     if(!tab || !tab.url){
         return
     }
-    (タブ.childElementCount > 1) ? タブ.選択(tab.previousElementSibling || tab.nextElementSibling) : タブ.新しく開く()
+    const next = tab.previousElementSibling || tab.nextElementSibling || タブ.新しく開く()
     tab.el.remove()
     tab.remove()
+    タブ.選択(next)
 }
 
 
@@ -504,6 +508,7 @@ katjusha.onclick = function(event){
     change_selected(スレッド, tab.el)
     スレッドヘッダ.描画(tab.url) //密結合
     history.replaceState(null, null, tab.url || サブジェクト一覧.bbsurl || base.href)
+    return tab
 }
 
 
