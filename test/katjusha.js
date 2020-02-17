@@ -1,5 +1,5 @@
 /*
-「タブ.開く」時に thread がない問題。スレッド.オブジェクト
+「タブ.新しく開く」時に thread がない問題。スレッド.オブジェクト
 全板ボタン 増えたとき
 */
 
@@ -19,7 +19,7 @@ katjusha.start = function (){
 
     if(document.URL !== base.href){
         if(document.URL.includes('read.cgi')){
-            タブ.開く(document.URL)
+            タブ.新しく開く(document.URL)
         }
         ajax(document.URL)
     }
@@ -45,7 +45,7 @@ katjusha.onclick = function(event){
         ajax(url)
     }
     else if(url.includes('read.cgi')){
-        タブ.開く(url, event.target.target, スレッド[url])
+        (event.target.target) ? タブ.新しく開く(url, スレッド[url]) : タブ.開く(url, スレッド[url])
         ajax(url)
     }
 }
@@ -197,7 +197,7 @@ katjusha.onclick = function(event){
 
 
 サブジェクト一覧.コンテキスト.新しいタブで開く = function (url){
-    タブ.開く(url, '_blank', スレッド[url])
+    タブ.新しく開く(url, スレッド[url])
     ajax(url)
 }
 
@@ -437,43 +437,52 @@ katjusha.onclick = function(event){
 
 
 
-タブ.初期化 = function (tab, url){
-    if(!tab){
-        tab = document.createElement('li')
-        タブ.appendChild(tab)
+タブ.開く = function (url, thread = {}){
+    const tab = タブ.検索(url)
+    if(tab){
+        return タブ.選択(tab)
     }
-    if(tab.el){
-        tab.el.remove()
+    else if(!タブ.childElementCount){
+        return タブ.新しく開く(url, thread)
     }
-    tab.url          = url
-    tab.el           = document.createElement('div')
-    tab.el.url       = url
-    tab.el.className = 'スレッド'
-    スレッド.appendChild(tab.el)
-
-    return tab
+    タブ.selectedElement.url          = url
+    タブ.selectedElement.innerHTML    = thread.subject || ''
+    タブ.selectedElement.el.url       = url
+    タブ.selectedElement.el.innerHTML = thread.html || ''
+    タブ.選択(タブ.selectedElement)
 }
 
 
 
-タブ.開く = function (url, target = '_self', thread = {}){
-    let tab = タブ.検索(url) || タブ.初期化()
-    if(tab.url !== url){
-        tab = (target === '_blank' && tab.url) ? タブ.初期化(null, url) : タブ.初期化(tab, url)
-        tab.innerHTML    = thread.subject || ''
-        tab.el.innerHTML = thread.html || ''
+タブ.新しく開く = function (url, thread = {}){
+    const tab = タブ.検索(url)
+    if(tab){
+        return タブ.選択(tab)
     }
-    タブ.選択(tab)
-    return tab
+    else if(タブ.childElementCount === 1 && !タブ.firstChild.url){
+        return タブ.開く(url, thread)
+    }
+    const newtab        = document.createElement('li')
+    newtab.url          = url
+    newtab.innerHTML    = thread.subject || ''
+
+    newtab.el           = document.createElement('div')
+    newtab.el.url       = url
+    newtab.el.className = 'スレッド'
+    newtab.el.innerHTML = thread.html || ''
+
+    タブ.append(newtab)
+    スレッド.append(newtab.el)
+    タブ.選択(newtab)
 }
 
 
 
 タブ.閉じる = function (tab){
-    if(!tab){
+    if(!tab || !tab.url){
         return
     }
-    タブ.選択(tab.previousElementSibling || tab.nextElementSibling || タブ.初期化())
+    (タブ.childElementCount > 1) ? タブ.選択(tab.previousElementSibling || tab.nextElementSibling) : タブ.新しく開く()
     tab.el.remove()
     tab.remove()
 }
@@ -486,7 +495,6 @@ katjusha.onclick = function(event){
             return tab
         }
     }
-    return タブ.querySelector('[data-selected]')
 }
 
 
@@ -496,8 +504,6 @@ katjusha.onclick = function(event){
     change_selected(スレッド, tab.el)
     スレッドヘッダ.描画(tab.url) //密結合
     history.replaceState(null, null, tab.url || サブジェクト一覧.bbsurl || base.href)
-
-    return tab
 }
 
 
@@ -506,7 +512,6 @@ katjusha.onclick = function(event){
     for(const tab of タブ.children){
         if(tab.url === url){
             tab.dataset.loading = true
-            return tab
         }
     }
 }
@@ -515,7 +520,6 @@ katjusha.onclick = function(event){
     for(const tab of タブ.children){
         if(tab.url === url){
             delete tab.dataset.loading
-            return tab
         }
     }
 }
@@ -541,7 +545,7 @@ katjusha.onclick = function(event){
 
 
 スレッド.追記 = function(url, title, html){
-    const tab         = タブ.検索(url)
+    const tab         = タブ.検索(url) || タブ.selectedElement
     tab.innerHTML     = title
     tab.el.innerHTML += html
 
