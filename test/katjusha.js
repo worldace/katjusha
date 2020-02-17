@@ -335,6 +335,11 @@ katjusha.onclick = function(event){
 
 
 
+中止アイコン.onclick = function (event){
+}
+
+
+
 ごみ箱アイコン.onclick = function (event){
     if(!タブ.selectedElement){
         return
@@ -526,7 +531,11 @@ katjusha.onclick = function(event){
 
 
 スレッド.onscroll = function(event){
-    スレッド[スレッド.selectedElement.url].scroll = スレッド.scrollTop
+    const url = スレッド.selectedElement.url
+    if(!スレッド[url]){
+        return
+    }
+    スレッド[url].scroll = スレッド.scrollTop
 }
 
 
@@ -764,36 +773,30 @@ async function ajax(url, body){
     let   callback
 
     if(url.includes('bbs.cgi')){
-        callback       = ajax.cgi
         request.url    = url
         request.method = 'POST'
         request.body   = body
 
-        let bbsurl = url.replace('test/bbs.cgi', '')
-        bbsurl     = (bbsurl in 掲示板) ? bbsurl : `${bbsurl}${body.get('bbs')}/`
-        url        = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
+        const home   = url.replace('test/bbs.cgi', '')
+        const bbsurl = (home in 掲示板) ? home : `${home}${body.get('bbs')}/`
+        url          = body.has('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
+        callback     = ajax.cgi
     }
     else if(url.includes('read.cgi')){
-        callback = ajax.dat
-
         const {bbsurl, key} = スレッド.URL分解(url)
         request.url = `${bbsurl}dat/${key}.dat`
         if(スレッド[url]){
-            request.headers = {
-                'Range': `bytes=${スレッド[url].byte || 0}-`,
-                'If-None-Match': スレッド[url].etag,
-            }
-        }
-        else{
-            スレッド[url] = {}
+            request.headers = {'Range': `bytes=${スレッド[url].byte || 0}-`, 'If-None-Match': スレッド[url].etag}
         }
         history.replaceState(null, null, url)
+        callback = ajax.dat
     }
     else{
-        callback    = ajax.subject
         request.url = `${url}subject.txt`
         history.replaceState(null, null, url)
+        callback = ajax.subject
     }
+
 
     try{
         ステータス.textContent = `${request.host}に接続しています`
@@ -801,8 +804,10 @@ async function ajax(url, body){
         タブ.ロード開始(url)
         response = await fetch(request.url, request)
     }
-    catch(e){
-        request.error = `${request.host}に接続できませんでした`
+    catch(error){
+        if(error.name !== 'AbortError'){
+            request.error = `${request.host}に接続できませんでした`
+        }
         return
     }
     finally{
@@ -840,11 +845,10 @@ ajax.cgi = function (response, url, text){
 
 
 ajax.dat = function (response, url, text){
-    const thread        = スレッド[url]
-    const {bbsurl, key} = スレッド.URL分解(url)
-
     if(response.status === 200){
-        const dat = スレッド.parse(text)
+        const thread        = スレッド[url] = {}
+        const dat           = スレッド.parse(text)
+        const {bbsurl, key} = スレッド.URL分解(url)
 
         thread.bbs     = 掲示板[bbsurl]
         thread.key     = key
@@ -866,7 +870,8 @@ ajax.dat = function (response, url, text){
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
     }
     else if(response.status === 206){
-        const dat = スレッド.parse(text, thread.num+1)
+        const thread = スレッド[url]
+        const dat    = スレッド.parse(text, thread.num+1)
 
         if(dat.isBroken){
             ajax.dat.retry(url)
@@ -887,6 +892,7 @@ ajax.dat = function (response, url, text){
         ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
    }
     else if(response.status === 304){
+        const thread = スレッド[url]
         thread.新着 = 0
         サブジェクト一覧.更新(thread)
         ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
