@@ -438,42 +438,43 @@ katjusha.onclick = function(event){
 
 
 タブ.開く = function (url, thread = {}){
-    const tab = タブ.検索(url)
-    if(tab){
-        return タブ.選択(tab)
+    const result = タブ.検索(url)
+    if(result){
+        return タブ.選択(result)
     }
     else if(!タブ.childElementCount){
         return タブ.新しく開く(url, thread)
     }
-    タブ.selectedElement.url          = url
-    タブ.selectedElement.innerHTML    = thread.subject || ''
-    タブ.selectedElement.el.url       = url
-    タブ.selectedElement.el.innerHTML = thread.html || ''
-    タブ.選択(タブ.selectedElement)
+    const tab = タブ.selectedElement
+    tab.url          = url
+    tab.innerHTML    = thread.subject || ''
+    tab.el.url       = url
+    tab.el.innerHTML = thread.html || ''
+    タブ.選択(tab)
 }
 
 
 
 タブ.新しく開く = function (url, thread = {}){
-    const tab = タブ.検索(url)
-    if(tab){
-        return タブ.選択(tab)
+    const result = タブ.検索(url)
+    if(result){
+        return タブ.選択(result)
     }
     else if(タブ.childElementCount === 1 && !タブ.firstChild.url){
         return タブ.開く(url, thread)
     }
-    const newtab        = document.createElement('li')
-    newtab.url          = url
-    newtab.innerHTML    = thread.subject || ''
+    const tab        = document.createElement('li')
+    tab.url          = url
+    tab.innerHTML    = thread.subject || ''
 
-    newtab.el           = document.createElement('div')
-    newtab.el.url       = url
-    newtab.el.className = 'スレッド'
-    newtab.el.innerHTML = thread.html || ''
+    tab.el           = document.createElement('div')
+    tab.el.url       = url
+    tab.el.className = 'スレッド'
+    tab.el.innerHTML = thread.html || ''
 
-    タブ.append(newtab)
-    スレッド.append(newtab.el)
-    タブ.選択(newtab)
+    タブ.append(tab)
+    スレッド.append(tab.el)
+    タブ.選択(tab)
 }
 
 
