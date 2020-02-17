@@ -366,8 +366,9 @@ katjusha.onclick = function(event){
 
 
 スレッドヘッダ.描画 = function (url){
-    const thread = スレッド[url]
-    if(thread){
+    if(スレッド[url]){
+        const thread = スレッド[url]
+
         スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
         スレッドヘッダ_掲示板名.innerHTML = `<a href="${thread.bbs.url}">[${掲示板[thread.bbs.url].name}]</a>`
         document.title = thread.subject
@@ -532,10 +533,9 @@ katjusha.onclick = function(event){
 
 スレッド.onscroll = function(event){
     const url = スレッド.selectedElement.url
-    if(!スレッド[url]){
-        return
+    if(スレッド[url]){
+        スレッド[url].scroll = スレッド.scrollTop
     }
-    スレッド[url].scroll = スレッド.scrollTop
 }
 
 
