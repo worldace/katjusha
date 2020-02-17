@@ -7,8 +7,9 @@
 
 
 katjusha.start = function (){
+    const url  = document.URL
     base.title = document.title
-    全板ボタン.textContent = `▽${document.title}`
+    全板ボタン.textContent = `▽${base.title}`
 
     掲示板.ホスト一覧 = new Set
 
@@ -17,11 +18,9 @@ katjusha.start = function (){
         掲示板.ホスト一覧.add(掲示板[el.href].host)
     }
 
-    if(document.URL !== base.href){
-        if(document.URL.includes('read.cgi')){
-            タブ.新しく開く(document.URL)
-        }
-        ajax(document.URL)
+    タブ.新しく開く()
+    if(url !== base.href){
+        ajax(url)
     }
 }
 
