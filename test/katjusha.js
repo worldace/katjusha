@@ -7,8 +7,8 @@
 
 
 katjusha.start = function (){
-    const url  = document.URL
-    base.title = document.title
+    katjusha.href = document.URL
+    base.title    = document.title
     全板ボタン.textContent = `▽${base.title}`
 
     掲示板.ホスト一覧 = new Set
@@ -18,12 +18,9 @@ katjusha.start = function (){
         掲示板.ホスト一覧.add(掲示板[a.href].host)
     }
 
-    if(url !== base.href){
-        タブ.新しく開く(url)
-        ajax(url)
-    }
-    else{
-        タブ.新しく開く()
+    タブ.新しく開く()
+    if(base.href !== katjusha.href){
+        katjusha.click()
     }
 }
 
@@ -798,13 +795,11 @@ async function ajax(url, body){
         if(スレッド[url]){
             request.headers = {'Range': `bytes=${スレッド[url].byte || 0}-`, 'If-None-Match': スレッド[url].etag}
         }
-        history.replaceState(null, null, url)
         callback = ajax.dat
     }
     else{
         request.url = `${url}subject.txt`
-        history.replaceState(null, null, url)
-        callback = ajax.subject
+        callback    = ajax.subject
     }
 
 
@@ -855,6 +850,7 @@ ajax.cgi = function (response, url, text){
 
 
 ajax.dat = function (response, url, text){
+    history.replaceState(null, null, url)
     if(response.status === 200){
         const thread        = スレッド[url] = {}
         const dat           = スレッド.parse(text)
@@ -925,6 +921,7 @@ ajax.dat.retry = function (url){
 
 
 ajax.subject = function (response, url, text){
+    history.replaceState(null, null, url)
     if(response.status !== 200){
         サブジェクト一覧.innerHTML = ''
         return
