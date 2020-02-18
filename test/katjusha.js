@@ -297,11 +297,11 @@ katjusha.onclick = function(event){
     if(katjusha.dataset.open){
         return
     }
-    if(!タブ.selectedElement || !タブ.selectedElement.url){
+    if(!現在のタブ.url){
         return
     }
 
-    const thread = スレッド[タブ.selectedElement.url]
+    const thread = スレッド[現在のタブ.url]
 
     投稿フォーム_form.setAttribute('action', `${thread.bbs.home}test/bbs.cgi`)
     set_value(投稿フォーム, {
@@ -325,10 +325,9 @@ katjusha.onclick = function(event){
 
 
 レス更新アイコン.onclick = function (event){
-    const tab = タブ.selectedElement
-    if(tab && tab.url){
-        タブ.選択(tab)
-        ajax(tab.url)
+    if(現在のタブ.url){
+        タブ.選択(現在のタブ)
+        ajax(現在のタブ.url)
     }
 }
 
@@ -340,10 +339,7 @@ katjusha.onclick = function(event){
 
 
 ごみ箱アイコン.onclick = function (event){
-    if(!タブ.selectedElement){
-        return
-    }
-    const url = タブ.selectedElement.url
+    const url = 現在のタブ.url
     if(スレッド[url]){
         ステータス.textContent = `「${スレッド[url].subject}」のログを削除しました`
         delete スレッド[url]
@@ -353,7 +349,7 @@ katjusha.onclick = function(event){
 
 
 タブ閉じるアイコン.onclick = function (event){
-    タブ.閉じる(タブ.selectedElement)
+    タブ.閉じる(現在のタブ)
 }
 
 
@@ -383,7 +379,7 @@ katjusha.onclick = function(event){
 
 
 タブ.onclick = function (event){
-    if(event.target.tagName !== 'LI' || event.target.dataset.selected){
+    if(event.target.tagName !== 'LI' || event.target.id){
         return
     }
     タブ.選択(event.target)
@@ -444,7 +440,7 @@ katjusha.onclick = function(event){
     if(result){
         return タブ.選択(result)
     }
-    const tab = タブ.selectedElement
+    const tab = 現在のタブ
     tab.url          = url
     tab.innerHTML    = thread.subject || ''
     tab.el.url       = url
@@ -538,7 +534,7 @@ katjusha.onclick = function(event){
 
 
 スレッド.onscroll = function(event){
-    const url = スレッド.selectedElement.url
+    const url = 現在のスレッド.url
     if(スレッド[url]){
         スレッド[url].scroll = スレッド.scrollTop
     }
@@ -547,7 +543,7 @@ katjusha.onclick = function(event){
 
 
 スレッド.追記 = function(url, title, html){
-    const tab         = タブ.検索(url) || タブ.selectedElement
+    const tab         = タブ.検索(url) || 現在のタブ
     tab.innerHTML     = title
     tab.el.innerHTML += html
 
@@ -567,7 +563,7 @@ katjusha.onclick = function(event){
 
 
 スレッド.アンカー移動 = function(n){
-    const el = スレッド.selectedElement.children[n-1]
+    const el = 現在のスレッド.children[n-1]
     if(el){
         el.scrollIntoView()
     }
@@ -648,7 +644,7 @@ katjusha.onclick = function(event){
 
 
 レスポップアップ.表示 = function(n){
-    const res = スレッド.selectedElement.children[n-1]
+    const res = 現在のスレッド.children[n-1]
     if(!res){
         return
     }
@@ -940,12 +936,11 @@ ajax.subject = function (response, url, text){
 
 
 function change_selected(parent, el){
-    const before = parent.querySelector('[data-selected]')
-    if(before){
-        delete before.dataset.selected
+    const id = `現在の${parent.id}`
+    if(window[id]){
+        window[id].id = ''
     }
-    parent.selectedElement = el
-    el.dataset.selected    = 'selected'
+    el.id = id
 }
 
 

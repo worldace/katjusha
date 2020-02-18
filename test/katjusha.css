@@ -130,7 +130,7 @@ body{
     margin: 1px 0;
     display: block;
 }
-#掲示板 [data-selected]{
+#掲示板 #現在の掲示板{
     color: #fff;
     background-color: #0078d7;
 }
@@ -321,11 +321,11 @@ body{
     color: #000;
     cursor: default;
 }
-#サブジェクト一覧 [data-selected]{
+#サブジェクト一覧 #現在のサブジェクト一覧{
     color: #fff;
     background-color: #0078d7;
 }
-#サブジェクト一覧 [data-selected] a{
+#サブジェクト一覧 #現在のサブジェクト一覧 a{
     color: #fff;
 }
 
@@ -405,16 +405,16 @@ body{
     line-height: 20px;
     box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
 }
-#タブ [data-selected]{
+#タブ #現在のタブ{
     color: #000;
     z-index: 2;
     height: 22px;
     line-height: 22px;
 }
-#タブ [data-selected]::before{
+#タブ #現在のタブ::before{
     box-shadow: 2px 2px 0 #fff;
 }
-#タブ [data-selected]::after{
+#タブ #現在のタブ::after{
     box-shadow: -2px 2px 0 #fff;
 }
 #タブ [data-loading]{
@@ -437,7 +437,7 @@ body{
 .スレッド{
     display: none;
 }
-.スレッド[data-selected]{
+.スレッド#現在のスレッド{
     display: block;
 }
 
