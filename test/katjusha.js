@@ -437,12 +437,12 @@ katjusha.onclick = function(event){
 
 
 タブ.開く = function (url, thread = {}){
+    if(!タブ.childElementCount){
+        return タブ.新しく開く(url, thread)
+    }
     const result = タブ.検索(url)
     if(result){
         return タブ.選択(result)
-    }
-    else if(!タブ.childElementCount){
-        return タブ.新しく開く(url, thread)
     }
     const tab = タブ.selectedElement
     tab.url          = url
@@ -455,12 +455,12 @@ katjusha.onclick = function(event){
 
 
 タブ.新しく開く = function (url, thread = {}){
+    if(タブ.childElementCount === 1 && !タブ.firstChild.url){
+        return タブ.開く(url, thread)
+    }
     const result = タブ.検索(url)
     if(result){
         return タブ.選択(result)
-    }
-    else if(タブ.childElementCount === 1 && !タブ.firstChild.url){
-        return タブ.開く(url, thread)
     }
     const tab        = document.createElement('li')
     tab.url          = url
