@@ -499,7 +499,7 @@ katjusha.onclick = function(event){
 タブ.選択 = function (tab){
     change_selected(タブ, tab)
     change_selected(スレッド, tab.el)
-    スレッドヘッダ.描画(tab.url) //密結合
+    スレッドヘッダ.描画(tab.url)
     history.replaceState(null, null, tab.url || サブジェクト一覧.bbsurl || base.href)
     return tab
 }
@@ -718,8 +718,8 @@ katjusha.onclick = function(event){
 
 
 投稿フォーム.移動 = function (event){
-    投稿フォーム.style.left = Math.min(Math.max(0, 投稿フォーム.startX+event.pageX), 投稿フォーム.limitX) + 'px'
-    投稿フォーム.style.top  = Math.min(Math.max(0, 投稿フォーム.startY+event.pageY), 投稿フォーム.limitY) + 'px'
+    投稿フォーム.style.left = minmax(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
+    投稿フォーム.style.top  = minmax(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
 }
 
 
@@ -990,6 +990,12 @@ function date(){
     const 秒 = String(d.getSeconds()).padStart(2, 0)
 
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
+}
+
+
+
+function minmax(min, val, max){
+    return Math.min(Math.max(min, val), max)
 }
 
 
