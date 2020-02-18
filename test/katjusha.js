@@ -44,7 +44,7 @@ katjusha.onclick = function(event){
         ajax(url)
     }
     else if(url.includes('read.cgi')){
-        (event.target.target) ? タブ.新しく開く(url, スレッド[url]) : タブ.開く(url, スレッド[url])
+        event.target.target ? タブ.新しく開く(url, スレッド[url]) : タブ.開く(url, スレッド[url])
         ajax(url)
     }
 }
@@ -427,7 +427,7 @@ katjusha.onclick = function(event){
 
 
 タブ.コンテキスト.このタブ以外全て閉じる = function (url){
-    for(const tab of タブ.querySelectorAll('li')){
+    for(const tab of Array.from(タブ.children)){
         if(tab.url !== url){
             タブ.閉じる(tab)
         }
