@@ -712,19 +712,19 @@ katjusha.onclick = function(event){
     投稿フォーム.limitY = innerHeight - height - 1
 
     document.addEventListener('mousemove', 投稿フォーム.移動,     {passive:true})
-    document.addEventListener('mouseup'  , 投稿フォーム.移動解除, {once:true})
+    document.addEventListener('mouseup'  , 投稿フォーム.移動完了, {once:true})
 }
 
 
 
 投稿フォーム.移動 = function (event){
-    投稿フォーム.style.left = minmax(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
-    投稿フォーム.style.top  = minmax(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
+    投稿フォーム.style.left = between(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
+    投稿フォーム.style.top  = between(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
 }
 
 
 
-投稿フォーム.移動解除 = function (event){
+投稿フォーム.移動完了 = function (event){
     document.removeEventListener('mousemove', 投稿フォーム.移動)
     投稿フォーム_本文欄.focus()
 }
@@ -994,7 +994,7 @@ function date(){
 
 
 
-function minmax(min, val, max){
+function between(min, val, max){
     return Math.min(Math.max(min, val), max)
 }
 
