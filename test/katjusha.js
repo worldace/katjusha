@@ -211,9 +211,12 @@ katjusha.onclick = function(event){
 
 
 サブジェクト一覧.parse = function(text, bbsurl){
+    const subjects = text.split('\n')
+    subjects.pop()
+
     let html = ''
     let num  = 0
-    for(const v of text.trimEnd().split('\n')){
+    for(const v of subjects){
         const [datfile, subject, resnum] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key    = datfile.replace('.dat', '')
         const url    = スレッド.URL作成(bbsurl, key)
@@ -607,10 +610,12 @@ katjusha.onclick = function(event){
 
 
 スレッド.parse = function(text, no = 0){
-    const list     = text.trimEnd().split('\n')
-    let   isBroken = false
-    let   html     = ''
-    for(const v of list){
+    const dat = text.split('\n')
+    dat.pop()
+
+    let isBroken = false
+    let html     = ''
+    for(const v of dat){
         no++
         let [from, mail, date, message, subject] = v.split('<>')
         if(subject === undefined){
@@ -622,7 +627,7 @@ katjusha.onclick = function(event){
         message = message.replace(/^ /, '')
         html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
     }
-    return {html, num:list.length, subject:list[0].split('<>').pop(), isBroken}
+    return {html, num:dat.length, subject:dat[0].split('<>').pop(), isBroken}
 }
 
 
@@ -990,4 +995,4 @@ function format_KB(byte = 0){
 
 
 
-document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', katjusha.start) : katjusha.start()
+katjusha.start()
