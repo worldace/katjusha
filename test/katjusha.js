@@ -250,7 +250,7 @@ katjusha.onclick = function(event){
 ヘルプアイコン.コンテキスト = function (){
     return `
     <ul class="menu">
-      <li><a href="https://spelunker2.wordpress.com//" target="_blank">かちゅぼ～どサイト</a></li>
+      <li><a href="https://spelunker2.wordpress.com/2020/02/21/katjusha/" target="_blank">かちゅぼ～どサイト</a></li>
     </ul>
     `
 }
