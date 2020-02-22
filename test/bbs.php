@@ -55,7 +55,7 @@ if(!$is_thread and !thread::is_live($bbs_path, $key)){
 if($is_thread and !$subject){
     error('タイトルを入力してください');
 }
-if($is_thread and !is_utf8($subject)){
+if($is_thread and !str::is_utf8($subject)){
     error('文字コードが不正です');
 }
 if($is_thread and strlen($subject) > 96){
@@ -65,14 +65,14 @@ if($is_thread and strlen($subject) > 96){
 if(strlen($from) > 32){
     error('名前が長すぎます');
 }
-if(!is_utf8($from)){
+if(!str::is_utf8($from)){
     error('文字コードが不正です');
 }
 
 if(strlen($mail) > 64){
     error('メールが長すぎます');
 }
-if(!is_utf8($mail)){
+if(!str::is_utf8($mail)){
     error('文字コードが不正です');
 }
 
@@ -85,13 +85,13 @@ if(strlen($message) > 4096){
 
 
 
-$from    = $from !== '' ? res::escape($from) : '名無しさん';
+$from    = res::from($from);
 $mail    = res::mail($mail);
 $message = res::message($message);
 
 
 if($is_thread){
-    $subject = res::escape($subject);
+    $subject = res::subject($subject);
     $key     = $_SERVER['REQUEST_TIME'];
     thread::create($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッド書き込みエラー');
 }

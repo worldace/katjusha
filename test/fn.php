@@ -98,9 +98,18 @@ class subject{
 
 
 class res{
+    static function from($from, $nanashi = '名無しさん'){
+        if($from === ''){
+            $from = $nanashi;
+        }
+        $from = str::escape($from);
+        return $from;
+    }
+
+
     static function mail($mail){
         $mail = preg_replace('/#.*/', '', $mail);
-        $mail = self::escape($mail);
+        $mail = str::escape($mail);
         return $mail;
     }
 
@@ -111,22 +120,15 @@ class res{
     }
 
 
-    static function message($message){
-        $message = rtrim($message);
-        $message = self::escape($message, '<br>');
-        return $message;
+    static function subject($subject){
+        return str::escape($subject);
     }
 
 
-    static function escape($str, $br = ''){
-        $str = str_replace('<', '&lt;', $str);
-        $str = str_replace('>', '&gt;', $str);
-        $str = str_replace('"', '&quot;', $str);
-        $str = str_replace("'", '&apos;', $str);
-        $str = str_replace("\r", '', $str);
-        $str = str_replace("\n", $br, $str);
-
-    	return $str;
+    static function message($message){
+        $message = rtrim($message);
+        $message = str::escape($message, '<br>');
+        return $message;
     }
 
 
@@ -229,6 +231,26 @@ class maintenance{
 
 
 
+class str{
+    static function escape($str, $br = ''){
+        $str = str_replace('<', '&lt;', $str);
+        $str = str_replace('>', '&gt;', $str);
+        $str = str_replace('"', '&quot;', $str);
+        $str = str_replace("'", '&apos;', $str);
+        $str = str_replace("\r", '', $str);
+        $str = str_replace("\n", $br, $str);
+
+    	return $str;
+    }
+
+
+    static function is_utf8($str){
+        return preg_match('//u', $str);
+    }
+}
+
+
+
 function file_edit(string $file, callable $fn, ...$args){
     $fp = fopen($file, 'cb+');
     if(!$fp){
@@ -258,12 +280,6 @@ function file_edit(string $file, callable $fn, ...$args){
         fclose($fp);
         return false;
     }
-}
-
-
-
-function is_utf8($str){
-    return preg_match('//u', $str);
 }
 
 
