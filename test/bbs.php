@@ -49,7 +49,7 @@ if(!$is_thread and preg_match('/[^\d]/', $key)){
     error('keyが不正です');
 }
 if(!$is_thread and !file_exists(thread::path($bbs_path, $key))){
-    thread::_kako_path($bbs_path, $key) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
+    file_exists(thread::_kako_path($bbs_path, $key)) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 
 if($is_thread and !$subject){

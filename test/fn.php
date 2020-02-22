@@ -27,7 +27,7 @@ class thread{
 
 
     static function kako_path($bbs_path, $key){
-        return sprintf('%s/kako/%s/', $bbs_path, substr($key,0,3));
+        return sprintf('%s/kako/%s/%s.dat', $bbs_path, substr($key,0,3), $key);
     }
 
 
@@ -66,11 +66,11 @@ class thread{
 
 
     static function move($bbs_path, $key){
-        $kako_path = thread::kako_path($bbs_path, $key);
-        if(!is_dir($kako_path)){
-            mkdir($kako_path, 0777, true);
+        $kako_dir = dirname(thread::kako_path($bbs_path, $key));
+        if(!is_dir($kako_dir)){
+            mkdir($kako_dir, 0777, true);
         }
-        rename("$bbs_path/dat/$key.dat", "$kako_path/$key.dat");
+        rename(thread::path($bbs_path, $key), thread::kako_path($bbs_path, $key));
         subject::delete($bbs_path, $key);
     }
 }
