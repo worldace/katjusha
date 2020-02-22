@@ -36,6 +36,11 @@ class thread{
     }
 
 
+    static function is_kako($bbs_path, $key){
+        return file_exists(thread::kako_path($bbs_path, $key));
+    }
+
+
     static function create($bbs_path, $key, $from, $mail, $message, $subject){
         $date    = res::date($key);
         $dat     = "$from<>$mail<>$date<> $message <>$subject\n";
@@ -257,8 +262,8 @@ function file_edit(string $file, callable $fn, ...$args){
 
 
 
-function is_utf8($v){
-    return preg_match('//u', $v);
+function is_utf8($str){
+    return preg_match('//u', $str);
 }
 
 
