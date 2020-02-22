@@ -11,27 +11,27 @@ $password = '#default';
 
 
 if(!$_POST){
-    $_POST = raw_post();
+    $_POST = request::raw();
 }
-if($_POST['submit'] !== '書き込む'){
+if(request::post('submit') !== '書き込む'){
     mb_convert_variables('utf-8', 'sjis', $_POST);
 }
 
 
-$bbs     = $_POST['bbs'] ?? '';
-$key     = $_POST['key'] ?? '';
-$from    = $_POST['FROM'] ?? '';
-$mail    = $_POST['mail'] ?? '';
-$subject = $_POST['subject'] ?? '';
-$message = $_POST['MESSAGE'] ?? '';
+$bbs     = request::post('bbs');
+$key     = request::post('key');
+$from    = request::post('FROM');
+$mail    = request::post('mail');
+$subject = request::post('subject');
+$message = request::post('MESSAGE');
 
 $is_thread = !$key;
 $bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
 
 
 
-if($mail === $password and in_array($from, ['削除','倉庫','復帰'])){
-    error($from($bbs_path, $message, $key));
+if($mail === $password and method_exists('maintenance', $from)){
+    error(maintenance::$from($bbs_path, $message, $key));
 }
 
 
@@ -41,15 +41,15 @@ if(!$bbs){
 if(strpos($bbs, '/') !== false){
     error('bbsが不正です');
 }
-if(!file_exists(get_subject_path($bbs_path))){
+if(!file_exists(subject::path($bbs_path))){
     error('板が存在しません');
 }
 
 if(!$is_thread and preg_match('/[^\d]/', $key)){
     error('keyが不正です');
 }
-if(!$is_thread and !file_exists(get_dat_path($bbs_path, $key))){
-    get_kako_path($bbs_path, $key) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
+if(!$is_thread and !file_exists(thread::path($bbs_path, $key))){
+    thread::_kako_path($bbs_path, $key) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 
 if($is_thread and !$subject){
@@ -85,16 +85,16 @@ if(strlen($message) > 4096){
 
 
 
-$from    = $from !== '' ? html_escape($from) : '名無しさん';
-$mail    = replace_mail($mail);
-$message = replace_message($message);
+$from    = $from !== '' ? res::escape($from) : '名無しさん';
+$mail    = res::mail($mail);
+$message = res::message($message);
 
 
 if($is_thread){
-    $subject = html_escape($subject);
+    $subject = res::escape($subject);
     $key     = $_SERVER['REQUEST_TIME'];
-    thread($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッド書き込みエラー');
+    thread::create($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッド書き込みエラー');
 }
 else{
-    res($bbs_path, $key, $from, $mail, $message) ? success($bbs, $key) : error('レス書き込みエラー');
+    res::create($bbs_path, $key, $from, $mail, $message) ? success($bbs, $key) : error('レス書き込みエラー');
 }
