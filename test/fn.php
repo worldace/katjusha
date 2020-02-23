@@ -98,11 +98,16 @@ class subject{
 
 
 class res{
-    static function from($from, $nanashi = '名無しさん'){
+    static function from($from, $password){
+        $admin_name = admin::name($password);
+        if($admin_name){
+            return  "$admin_name ★";
+        }
         if($from === ''){
-            $from = $nanashi;
+            $from = setting('nanashi');
         }
         $from = str::escape($from);
+        $from = str_replace('★', '☆', $from);
         return $from;
     }
 
@@ -231,6 +236,22 @@ class maintenance{
 
 
 
+class admin{
+    static function is_admin($password){
+        $index = array_search($password, array_column(setting('cap'), 'password'));
+        return is_numeric($index);
+    }
+
+
+    static function name($password){
+        $cap   = setting('cap');
+        $index = array_search($password, array_column($cap, 'password'));
+        return is_numeric($index) ? $cap[$index]['name'] : null;
+    }
+}
+
+
+
 class str{
     static function escape($str, $br = ''){
         $str = str_replace('<', '&lt;', $str);
@@ -280,6 +301,19 @@ function file_edit(string $file, callable $fn, ...$args){
         fclose($fp);
         return false;
     }
+}
+
+
+
+function setting($name){
+    static $setting;
+    if(!$setting){
+        $setting = (function (){
+            include './setting.php';
+            return get_defined_vars();
+        })();
+    }
+    return $setting[$name];
 }
 
 

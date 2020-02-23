@@ -659,9 +659,10 @@ katjusha.onclick = function(event){
 
 
 投稿フォーム.oncontextmenu = function (event){
-    if(event.target.tagName !== 'TEXTAREA'){
-        event.preventDefault()
+    if(event.target.tagName === 'TEXTAREA' || event.target.type === 'text'){
+        return
     }
+    event.preventDefault()
 }
 
 

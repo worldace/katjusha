@@ -1,11 +1,8 @@
 <?php
 include './fn.php';
 
-
-$password = '#default';
 /*
 トリップ
-管理者
 二重書き込み
 */
 
@@ -30,7 +27,7 @@ $bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
 
 
 
-if($mail === $password and method_exists('maintenance', $from)){
+if(admin::is_admin($mail) and method_exists('maintenance', $from)){
     error(maintenance::$from($bbs_path, $message, $key));
 }
 
@@ -85,7 +82,7 @@ if(strlen($message) > 4096){
 
 
 
-$from    = res::from($from);
+$from    = res::from($from, $mail);
 $mail    = res::mail($mail);
 $message = res::message($message);
 
