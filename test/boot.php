@@ -7,6 +7,9 @@ request::init();
 
 class request{
     static function init(){
+        if(filter_input(INPUT_SERVER, 'REQUEST_METHOD') !== 'POST'){
+            return;
+        }
         if(!$_POST){
             $_POST = request::raw();
         }
