@@ -3,6 +3,16 @@
 
 
 class request{
+    static function init(){
+        if(!$_POST){
+            $_POST = request::raw();
+        }
+        if(request::post('submit') !== '書き込む'){
+            mb_convert_variables('utf-8', 'sjis', $_POST);
+        }
+    }
+
+
     static function post($name){
         return $_POST[$name] ?? '';
     }
@@ -314,12 +324,8 @@ function error($str){
 
 
 
-if(!$_POST){
-    $_POST = request::raw();
-}
-if(request::post('submit') !== '書き込む'){
-    mb_convert_variables('utf-8', 'sjis', $_POST);
-}
+request::init();
+
 
 
 define('BBS_IS_THREAD', !request::post('key'));
