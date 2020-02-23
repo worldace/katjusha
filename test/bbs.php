@@ -19,14 +19,14 @@ if(!BBS_BBS){
 if(strpos(BBS_BBS, '/') !== false){
     error('bbsが不正です');
 }
-if(!file_exists(subject::path(BBS_PATH))){
+if(!subject::exists(BBS_PATH)){
     error('板が存在しません');
 }
 
 if(!BBS_IS_THREAD and preg_match('/[^\d]/', BBS_KEY)){
     error('keyが不正です');
 }
-if(!BBS_IS_THREAD and !thread::is_live(BBS_PATH, BBS_KEY)){
+if(!BBS_IS_THREAD and !thread::exists(BBS_PATH, BBS_KEY)){
     thread::is_kako(BBS_PATH, BBS_KEY) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 

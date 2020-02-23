@@ -33,6 +33,26 @@ class request{
 
 
 
+class subject{
+    static function path($bbs_path){
+        return "$bbs_path/subject.txt";
+    }
+
+
+    static function exists($bbs_path){
+        return file_exists(subject::path($bbs_path));
+    }
+
+
+    static function delete($bbs_path, $key){
+        file_edit(subject::path($bbs_path), function($contents) use($key){
+            return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
+        });
+    }
+}
+
+
+
 class thread{
     static function path($bbs_path, $key){
         return "$bbs_path/dat/$key.dat";
@@ -44,7 +64,7 @@ class thread{
     }
 
 
-    static function is_live($bbs_path, $key){
+    static function exists($bbs_path, $key){
         return file_exists(thread::path($bbs_path, $key));
     }
 
@@ -73,7 +93,7 @@ class thread{
 
 
     static function delete($bbs_path, $key){
-        if(thread::is_live($bbs_path, $key)){
+        if(thread::exists($bbs_path, $key)){
             unlink(thread::path($bbs_path, $key));
             subject::delete($bbs_path, $key);
         }
@@ -90,21 +110,6 @@ class thread{
         }
         rename(thread::path($bbs_path, $key), thread::kako_path($bbs_path, $key));
         subject::delete($bbs_path, $key);
-    }
-}
-
-
-
-class subject{
-    static function path($bbs_path){
-        return "$bbs_path/subject.txt";
-    }
-
-
-    static function delete($bbs_path, $key){
-        file_edit(subject::path($bbs_path), function($contents) use($key){
-            return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
-        });
     }
 }
 
@@ -183,7 +188,7 @@ class res{
 
 
     static function delete($bbs_path, $key, $num){
-        $dat_path = thread::is_live($bbs_path, $key) ? thread::path($bbs_path, $key) : thread::kako_path($bbs_path, $key);
+        $dat_path = thread::exists($bbs_path, $key) ? thread::path($bbs_path, $key) : thread::kako_path($bbs_path, $key);
         file_edit($dat_path, function($contents) use($num){
             $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
             return $contents;
