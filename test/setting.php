@@ -1,6 +1,6 @@
 <?php
 
-$cap = [
+$admin = [
     ['name'=>'管理人', 'password'=>'#default'],
 ];
 

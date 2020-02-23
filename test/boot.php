@@ -336,8 +336,6 @@ define('BBS_MAIL', request::post('mail'));
 define('BBS_SUBJECT', request::post('subject'));
 define('BBS_MESSAGE', request::post('MESSAGE'));
 
-define('BBS_PASSWORD', BBS_MAIL); //
-
 define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
 
 define('BBS_SETTING', (function(){
@@ -345,5 +343,7 @@ define('BBS_SETTING', (function(){
     return get_defined_vars();
 })());
 
-define('BBS_ADMIN_INDEX', array_search(BBS_PASSWORD, array_column(BBS_SETTING['cap'], 'password')));
-define('BBS_ADMIN', is_numeric(BBS_ADMIN_INDEX) ? BBS_SETTING['cap'][BBS_ADMIN_INDEX] : null);
+define('BBS_ADMIN', (function (){
+    $index = array_search(BBS_MAIL, array_column(BBS_SETTING['admin'], 'password'));
+    return is_numeric($index) ? BBS_SETTING['admin'][$index] : null;
+})());
