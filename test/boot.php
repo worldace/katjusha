@@ -344,7 +344,7 @@ define('BBS_MESSAGE', request::post('MESSAGE'));
 define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
 
 define('BBS_SETTING', (function(){
-    include './setting.php';
+    include __DIR__.'/setting.php';
     return get_defined_vars();
 })());
 
