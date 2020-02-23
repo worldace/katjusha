@@ -8,7 +8,7 @@ include './boot.php';
 
 
 
-if(BBS_IS_ADMIN and method_exists('maintenance', BBS_FROM)){
+if(BBS_ADMIN and method_exists('maintenance', BBS_FROM)){
     error(['maintenance', BBS_FROM](BBS_PATH, BBS_MESSAGE, BBS_KEY));
 }
 
@@ -66,7 +66,6 @@ if(strlen(BBS_MESSAGE) > 4096){
 $from    = res::from(BBS_FROM);
 $mail    = res::mail(BBS_MAIL);
 $message = res::message(BBS_MESSAGE);
-
 
 if(BBS_IS_THREAD){
     $subject = res::subject(BBS_SUBJECT);

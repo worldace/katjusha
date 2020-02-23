@@ -1,6 +1,9 @@
 <?php
 
 
+request::init();
+
+
 
 class request{
     static function init(){
@@ -109,8 +112,8 @@ class subject{
 
 class res{
     static function from($from){
-        if(BBS_IS_ADMIN){
-            return  BBS_ADMIN_NAME . ' ★';
+        if(BBS_ADMIN){
+            return  BBS_ADMIN['name'] . ' ★';
         }
         if($from === ''){
             $from = BBS_SETTING['nanashi'];
@@ -324,10 +327,6 @@ function error($str){
 
 
 
-request::init();
-
-
-
 define('BBS_IS_THREAD', !request::post('key'));
 
 define('BBS_BBS', request::post('bbs'));
@@ -347,6 +346,4 @@ define('BBS_SETTING', (function(){
 })());
 
 define('BBS_ADMIN_INDEX', array_search(BBS_PASSWORD, array_column(BBS_SETTING['cap'], 'password')));
-define('BBS_IS_ADMIN', is_numeric(BBS_ADMIN_INDEX));
-define('BBS_ADMIN_NAME', BBS_IS_ADMIN ? BBS_SETTING['cap'][BBS_ADMIN_INDEX]['name'] : null);
-
+define('BBS_ADMIN', is_numeric(BBS_ADMIN_INDEX) ? BBS_SETTING['cap'][BBS_ADMIN_INDEX] : null);
