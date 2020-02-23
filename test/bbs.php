@@ -1,5 +1,5 @@
 <?php
-include './fn.php';
+include './boot.php';
 
 /*
 トリップ
@@ -7,91 +7,71 @@ include './fn.php';
 */
 
 
-if(!$_POST){
-    $_POST = request::raw();
-}
-if(request::post('submit') !== '書き込む'){
-    mb_convert_variables('utf-8', 'sjis', $_POST);
+
+if(BBS_IS_ADMIN and method_exists('maintenance', BBS_FROM)){
+    error(['maintenance', BBS_FROM](BBS_PATH, BBS_MESSAGE, BBS_KEY));
 }
 
 
-$bbs     = request::post('bbs');
-$key     = request::post('key');
-$from    = request::post('FROM');
-$mail    = request::post('mail');
-$subject = request::post('subject');
-$message = request::post('MESSAGE');
-
-$is_thread = !$key;
-$bbs_path  = sprintf('%s/../%s', __DIR__, $bbs);
-
-
-
-if(admin::is_admin($mail) and method_exists('maintenance', $from)){
-    error(maintenance::$from($bbs_path, $message, $key));
-}
-
-
-if(!$bbs){
+if(!BBS_BBS){
     error('bbsが存在しません');
 }
-if(strpos($bbs, '/') !== false){
+if(strpos(BBS_BBS, '/') !== false){
     error('bbsが不正です');
 }
-if(!file_exists(subject::path($bbs_path))){
+if(!file_exists(subject::path(BBS_PATH))){
     error('板が存在しません');
 }
 
-if(!$is_thread and preg_match('/[^\d]/', $key)){
+if(!BBS_IS_THREAD and preg_match('/[^\d]/', BBS_KEY)){
     error('keyが不正です');
 }
-if(!$is_thread and !thread::is_live($bbs_path, $key)){
-    thread::is_kako($bbs_path, $key) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
+if(!BBS_IS_THREAD and !thread::is_live(BBS_PATH, BBS_KEY)){
+    thread::is_kako(BBS_PATH, BBS_KEY) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 
-if($is_thread and !$subject){
+if(BBS_IS_THREAD and !BBS_SUBJECT){
     error('タイトルを入力してください');
 }
-if($is_thread and !str::is_utf8($subject)){
+if(BBS_IS_THREAD and !str::is_utf8(BBS_SUBJECT)){
     error('文字コードが不正です');
 }
-if($is_thread and strlen($subject) > 96){
+if(BBS_IS_THREAD and strlen(BBS_SUBJECT) > 96){
     error('タイトルが長すぎます');
 }
 
-if(strlen($from) > 32){
+if(strlen(BBS_FROM) > 32){
     error('名前が長すぎます');
 }
-if(!str::is_utf8($from)){
+if(!str::is_utf8(BBS_FROM)){
     error('文字コードが不正です');
 }
 
-if(strlen($mail) > 64){
+if(strlen(BBS_MAIL) > 64){
     error('メールが長すぎます');
 }
-if(!str::is_utf8($mail)){
+if(!str::is_utf8(BBS_MAIL)){
     error('文字コードが不正です');
 }
 
-if(!$message){
+if(!BBS_MESSAGE){
     error('本文を入力してください');
 }
-if(strlen($message) > 4096){
+if(strlen(BBS_MESSAGE) > 4096){
     error('本文が長すぎます');
 }
 
 
 
-$from    = res::from($from, $mail);
-$mail    = res::mail($mail);
-$message = res::message($message);
+$from    = res::from(BBS_FROM);
+$mail    = res::mail(BBS_MAIL);
+$message = res::message(BBS_MESSAGE);
 
 
-if($is_thread){
-    $subject = res::subject($subject);
-    $key     = $_SERVER['REQUEST_TIME'];
-    thread::create($bbs_path, $key, $from, $mail, $message, $subject) ? success($bbs, $key) : error('スレッド書き込みエラー');
+if(BBS_IS_THREAD){
+    $subject = res::subject(BBS_SUBJECT);
+    thread::create(BBS_PATH, BBS_KEY, $from, $mail, $message, $subject) ? success(BBS_BBS, BBS_KEY) : error('スレッド書き込みエラー');
 }
 else{
-    res::create($bbs_path, $key, $from, $mail, $message) ? success($bbs, $key) : error('レス書き込みエラー');
+    res::create(BBS_PATH, BBS_KEY, $from, $mail, $message) ? success(BBS_BBS, BBS_KEY) : error('レス書き込みエラー');
 }

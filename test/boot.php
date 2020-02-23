@@ -98,13 +98,12 @@ class subject{
 
 
 class res{
-    static function from($from, $password){
-        $admin_name = admin::name($password);
-        if($admin_name){
-            return  "$admin_name ★";
+    static function from($from){
+        if(BBS_IS_ADMIN){
+            return  BBS_ADMIN_NAME . ' ★';
         }
         if($from === ''){
-            $from = setting('nanashi');
+            $from = BBS_SETTING['nanashi'];
         }
         $from = str::escape($from);
         $from = str_replace('★', '☆', $from);
@@ -236,22 +235,6 @@ class maintenance{
 
 
 
-class admin{
-    static function is_admin($password){
-        $index = array_search($password, array_column(setting('cap'), 'password'));
-        return is_numeric($index);
-    }
-
-
-    static function name($password){
-        $cap   = setting('cap');
-        $index = array_search($password, array_column($cap, 'password'));
-        return is_numeric($index) ? $cap[$index]['name'] : null;
-    }
-}
-
-
-
 class str{
     static function escape($str, $br = ''){
         $str = str_replace('<', '&lt;', $str);
@@ -305,19 +288,6 @@ function file_edit(string $file, callable $fn, ...$args){
 
 
 
-function setting($name){
-    static $setting;
-    if(!$setting){
-        $setting = (function (){
-            include './setting.php';
-            return get_defined_vars();
-        })();
-    }
-    return $setting[$name];
-}
-
-
-
 function success($bbs, $key){
     header('Cache-Control: no-cache');
     header('Content-type: text/html; charset=shift_jis');
@@ -341,3 +311,36 @@ function error($str){
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
 }
+
+
+
+if(!$_POST){
+    $_POST = request::raw();
+}
+if(request::post('submit') !== '書き込む'){
+    mb_convert_variables('utf-8', 'sjis', $_POST);
+}
+
+
+define('BBS_IS_THREAD', !request::post('key'));
+
+define('BBS_BBS', request::post('bbs'));
+define('BBS_KEY', request::post('key') ?: $_SERVER['REQUEST_TIME']);
+define('BBS_FROM', request::post('FROM'));
+define('BBS_MAIL', request::post('mail'));
+define('BBS_SUBJECT', request::post('subject'));
+define('BBS_MESSAGE', request::post('MESSAGE'));
+
+define('BBS_PASSWORD', BBS_MAIL); //
+
+define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
+
+define('BBS_SETTING', (function(){
+    include './setting.php';
+    return get_defined_vars();
+})());
+
+define('BBS_ADMIN_INDEX', array_search(BBS_PASSWORD, array_column(BBS_SETTING['cap'], 'password')));
+define('BBS_IS_ADMIN', is_numeric(BBS_ADMIN_INDEX));
+define('BBS_ADMIN_NAME', BBS_IS_ADMIN ? BBS_SETTING['cap'][BBS_ADMIN_INDEX]['name'] : null);
+
