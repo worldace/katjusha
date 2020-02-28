@@ -60,12 +60,12 @@ katjusha.onclick = function(event){
 全板ボタン.onclick = function(event){
     event.stopPropagation()
     
-    if(!コンテキスト.dataset.open){
-        const {left, bottom} = this.getBoundingClientRect()
-        コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
+    if(コンテキスト.firstChild){
+        コンテキスト.閉じる()
     }
     else{
-        コンテキスト.閉じる()
+        const {left, bottom} = this.getBoundingClientRect()
+        コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
     }
 }
 
@@ -236,12 +236,12 @@ katjusha.onclick = function(event){
 ヘルプアイコン.onclick = function(event){
     event.stopPropagation()
     
-    if(!コンテキスト.dataset.open){
-        const {left, bottom} = this.getBoundingClientRect()
-        コンテキスト.表示(ヘルプアイコン.コンテキスト(), left, bottom)
+    if(コンテキスト.firstChild){
+        コンテキスト.閉じる()
     }
     else{
-        コンテキスト.閉じる()
+        const {left, bottom} = this.getBoundingClientRect()
+        コンテキスト.表示(ヘルプアイコン.コンテキスト(), left, bottom)
     }
 }
 
@@ -641,19 +641,18 @@ katjusha.onclick = function(event){
     レスポップアップ.style.left   = `${left + width / 2}px`
     レスポップアップ.style.bottom = `${innerHeight - top + 6}px`
     レスポップアップ.innerHTML    = res.outerHTML
-    レスポップアップ.dataset.open = true
 }
 
 
 
 レスポップアップ.閉じる = function(){
-    delete レスポップアップ.dataset.open
+    レスポップアップ.innerHTML = ''
 }
 
 
 
 レスポップアップ.onclick = function(){
-    delete レスポップアップ.dataset.open
+    レスポップアップ.閉じる()
 }
 
 
@@ -722,16 +721,15 @@ katjusha.onclick = function(event){
 
 
 コンテキスト.表示 = function (html, x, y){
-    コンテキスト.innerHTML    = html
-    コンテキスト.style.left   = `${x}px`
-    コンテキスト.style.top    = `${y}px`
-    コンテキスト.dataset.open = true
+    コンテキスト.style.left = `${x}px`
+    コンテキスト.style.top  = `${y}px`
+    コンテキスト.innerHTML  = html
 }
 
 
 
 コンテキスト.閉じる = function (){
-    delete コンテキスト.dataset.open
+    コンテキスト.innerHTML = ''
 }
 
 
@@ -754,7 +752,7 @@ katjusha.onclick = function(event){
 
 
 katjusha.addEventListener('click', function(event){
-    delete コンテキスト.dataset.open
+    コンテキスト.閉じる()
 })
 
 
