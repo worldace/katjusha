@@ -6,7 +6,7 @@
 html{
     --font-default: 'MS PGothic';
     font-size: 12px;
-    font-family: var(--font-default), 'MS PGothic', sans-serif;
+    font-family: var(--font-default), sans-serif;
 }
 body{
     width: 100%;
@@ -633,7 +633,7 @@ body{
     outline: none;
     padding-left: 2px;
     height: 18px;
-    font-family: var(--font-default), 'MS PGothic', sans-serif;
+    font-family: var(--font-default), sans-serif;
 }
 #投稿フォーム_タイトル欄{
     flex-grow: 1;
@@ -697,7 +697,7 @@ body{
     background-color: transparent;
     width: 80px;
     font-size: 12px;
-    font-family: var(--font-default), 'MS PGothic', sans-serif;
+    font-family: var(--font-default), sans-serif;
     padding: 3px;
     border-left: solid 1px #e3e3e3;
     border-top: solid 1px #e3e3e3;

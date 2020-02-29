@@ -16,14 +16,14 @@ if(BBS_ADMIN and method_exists('maintenance', BBS_FROM)){
 if(!BBS_BBS){
     error('bbsが存在しません');
 }
-if(strpos(BBS_BBS, '/') !== false){
+if(preg_match('/[\W]/', BBS_BBS)){
     error('bbsが不正です');
 }
 if(!subject::exists(BBS_PATH)){
     error('板が存在しません');
 }
 
-if(!BBS_IS_THREAD and preg_match('/[^\d]/', BBS_KEY)){
+if(!BBS_IS_THREAD and preg_match('/[\D]/', BBS_KEY)){
     error('keyが不正です');
 }
 if(!BBS_IS_THREAD and !thread::exists(BBS_PATH, BBS_KEY)){
