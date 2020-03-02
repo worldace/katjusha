@@ -47,6 +47,9 @@
         event.target.target ? タブ.新しく開く(url, スレッド[url]) : タブ.開く(url, スレッド[url])
         ajax(url)
     }
+    else if(url === base.href){
+        history.replaceState(null, null, url)
+    }
 }
 
 
@@ -264,6 +267,8 @@
     return `
     <ul class="menu">
       <li><a href="https://spelunker2.wordpress.com/2020/02/21/katjusha/" target="_blank">かちゅぼ～どサイト</a></li>
+      <li></li>
+      <li><a href="${base.href}">${base.title}</a></li>
     </ul>
     `
 }
