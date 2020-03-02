@@ -6,9 +6,9 @@
 
 
 
-katjusha.start = function (){
-    katjusha.href = document.URL
-    base.title    = document.title
+かちゅぼーど.開始 = function (){
+    かちゅぼーど.href = document.URL
+    base.title        = document.title
     全板ボタン.textContent = `▽${base.title}`
 
     掲示板.ホスト一覧 = new Set
@@ -19,23 +19,23 @@ katjusha.start = function (){
     }
 
     タブ.新しく開く()
-    if(base.href !== katjusha.href){
-        katjusha.click()
+    if(かちゅぼーど.href !== base.href){
+        かちゅぼーど.click()
     }
 }
 
 
 
-katjusha.is_internal_url = function(url){
+かちゅぼーど.is_internal_url = function(url){
     url = new URL(url)
     return 掲示板.ホスト一覧.has(url.hostname)
 }
 
 
 
-katjusha.onclick = function(event){
+かちゅぼーど.onclick = function(event){
     const url = event.target.href
-    if(!url || !katjusha.is_internal_url(url)){
+    if(!url || !かちゅぼーど.is_internal_url(url)){
         return
     }
     event.preventDefault()
@@ -271,7 +271,7 @@ katjusha.onclick = function(event){
 
 
 スレッド投稿アイコン.onclick = function (event){
-    if(katjusha.dataset.open){
+    if(かちゅぼーど.dataset.open){
         return
     }
     const bbs = 掲示板[サブジェクト一覧.bbsurl]
@@ -294,7 +294,7 @@ katjusha.onclick = function(event){
     投稿フォーム_タイトル欄.disabled = false
     投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
-    katjusha.dataset.open = 'スレッド'
+    かちゅぼーど.dataset.open = 'スレッド'
     centering(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
@@ -302,7 +302,7 @@ katjusha.onclick = function(event){
 
 
 レス投稿アイコン.onclick = function (event){
-    if(katjusha.dataset.open){
+    if(かちゅぼーど.dataset.open){
         return
     }
     if(!現在のタブ.url){
@@ -326,7 +326,7 @@ katjusha.onclick = function(event){
     投稿フォーム_タイトル欄.disabled = true
     投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `「${thread.subject}」にレス`
-    katjusha.dataset.open = 'レス'
+    かちゅぼーど.dataset.open = 'レス'
     centering(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
@@ -823,7 +823,7 @@ katjusha.onclick = function(event){
 
 
 投稿フォーム.閉じる = function (){
-    delete katjusha.dataset.open
+    delete かちゅぼーど.dataset.open
 }
 
 
@@ -990,4 +990,4 @@ function format_KB(byte = 0){
 
 
 
-katjusha.start()
+かちゅぼーど.開始()
