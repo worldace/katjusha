@@ -215,20 +215,20 @@ katjusha.onclick = function(event){
     subjects.pop()
 
     let html = ''
-    let num  = 0
+    let num  = 1
     for(const v of subjects){
         const [datfile, subject, resnum] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key    = datfile.replace('.dat', '')
         const url    = スレッド.URL作成(bbsurl, key)
         const thread = スレッド[url] || {}
 
-        html += `<tr data-url="${url}"><td>${++num}</td><td><a href="${url}">${subject}</a></td><td>${resnum}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        html += `<tr data-url="${url}"><td>${num++}</td><td><a href="${url}">${subject}</a></td><td>${resnum}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
 
         if(resnum == thread.既得){
             thread.新着 = 0
         }
     }
-    return {html, num}
+    return html
 }
 
 
@@ -674,13 +674,13 @@ katjusha.onclick = function(event){
 
 
 投稿フォーム_form.onreset = function (event){
-    delete katjusha.dataset.open
+    投稿フォーム.閉じる()
 }
 
 
 
 投稿フォーム_閉じるボタン.onclick = function (event){
-    delete katjusha.dataset.open
+    投稿フォーム.閉じる()
 }
 
 
@@ -702,6 +702,12 @@ katjusha.onclick = function(event){
 
     document.addEventListener('mousemove', 投稿フォーム.移動,     {passive:true})
     document.addEventListener('mouseup'  , 投稿フォーム.移動完了, {once:true})
+}
+
+
+
+投稿フォーム.閉じる = function (){
+    delete katjusha.dataset.open
 }
 
 
@@ -826,7 +832,7 @@ ajax.cgi = function (response, url, text){
     }
 
     ajax(url)
-    delete katjusha.dataset.open
+    投稿フォーム.閉じる()
 }
 
 
@@ -909,16 +915,14 @@ ajax.subject = function (response, url, text){
         return
     }
 
-    const {html, num} = サブジェクト一覧.parse(text, url)
-    サブジェクト一覧.innerHTML = html
+    サブジェクト一覧.innerHTML = サブジェクト一覧.parse(text, url)
     サブジェクト一覧.bbsurl    = url
 
-    const bbs      = 掲示板[url]
-    change_selected(掲示板, bbs.el)
-    document.title = `${base.title} [ ${bbs.name} ]`
+    document.title = `${base.title} [ ${掲示板[url].name} ]`
+    change_selected(掲示板, 掲示板[url].el)
 
     サブジェクト.scrollTop = 0
-    ステータス.textContent = `${num}件のスレッドを受信 (${date()})`
+    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${date()})`
 }
 
 
