@@ -197,6 +197,25 @@ katjusha.onclick = function(event){
 
 
 
+サブジェクト一覧.通信後 = function (response, url, text){
+    history.replaceState(null, null, url)
+    if(response.status !== 200){
+        サブジェクト一覧.innerHTML = ''
+        return
+    }
+
+    サブジェクト一覧.innerHTML = サブジェクト一覧.parse(text, url)
+    サブジェクト一覧.bbsurl    = url
+
+    document.title = `${base.title} [ ${掲示板[url].name} ]`
+    change_selected(掲示板, 掲示板[url].el)
+
+    サブジェクト.scrollTop = 0
+    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${date()})`
+}
+
+
+
 サブジェクト一覧.更新 = function (thread){
     const tr = サブジェクト一覧.querySelector(`[data-url="${thread.url}"]`)
     if(tr){
@@ -611,6 +630,70 @@ katjusha.onclick = function(event){
 
 
 
+スレッド.通信後 = function (response, url, text){
+    history.replaceState(null, null, url)
+    if(response.status === 200){
+        const thread        = スレッド[url] = {}
+        const dat           = スレッド.parse(text)
+        const {bbsurl, key} = スレッド.URL分解(url)
+
+        thread.bbs     = 掲示板[bbsurl]
+        thread.key     = key
+        thread.url     = url
+        thread.scroll  = 0
+        thread.subject = dat.subject
+        thread.html    = dat.html
+        thread.num     = dat.num
+        thread.byte    = Number(response.headers.get('Content-Length'))
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
+
+        thread.既得    = dat.num
+        thread.新着    = dat.num
+        thread.最終取得= date()
+
+        スレッド.クリア(thread.url)
+        スレッド.追記(thread.url, thread.subject, thread.html)
+        サブジェクト一覧.更新(thread)
+        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
+    }
+    else if(response.status === 206){
+        const thread = スレッド[url]
+        const dat    = スレッド.parse(text, thread.num)
+
+        if(dat.isBroken){
+            ajax.retry(url)
+            return
+        }
+
+        thread.html   += dat.html
+        thread.num    += dat.num
+        thread.byte   += Number(response.headers.get('Content-Length') || 0)
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
+
+        thread.既得    = thread.num
+        thread.新着    = dat.num
+        thread.最終取得= date()
+
+        スレッド.追記(thread.url, thread.subject, dat.html)
+        サブジェクト一覧.更新(thread)
+        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
+   }
+    else if(response.status === 304){
+        const thread = スレッド[url]
+        thread.新着 = 0
+        サブジェクト一覧.更新(thread)
+        ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
+    }
+    else if(response.status === 404){
+        ステータス.textContent = `スレッドが見つかりません (${date()})`
+    }
+    else if(response.status === 416){
+        ajax.retry(url)
+    }
+}
+
+
+
 スレッド.parse = function(text, no = 0){
     const dat = text.split('\n')
     dat.pop()
@@ -668,14 +751,6 @@ katjusha.onclick = function(event){
 
 
 
-投稿フォーム_form.onsubmit = function (event){
-    event.preventDefault()
-    投稿フォーム_投稿ボタン.disabled = true
-    ajax(this.getAttribute('action'), new FormData(this))
-}
-
-
-
 投稿フォーム_form.onreset = function (event){
     投稿フォーム.閉じる()
 }
@@ -709,8 +784,32 @@ katjusha.onclick = function(event){
 
 
 
-投稿フォーム.閉じる = function (){
-    delete katjusha.dataset.open
+投稿フォーム_form.onsubmit = function (event){
+    event.preventDefault()
+    投稿フォーム_投稿ボタン.disabled = true
+    ajax(this.getAttribute('action'), new FormData(this))
+}
+
+
+
+投稿フォーム.通信後 = function (response, url, text){
+    if(response.status !== 200){
+        alert('エラーが発生して投稿できませんでした')
+        投稿フォーム_投稿ボタン.disabled = false
+        return
+    }
+    if(text.includes('<title>ＥＲＲＯＲ！')){
+        alert(text.match(/<b>(.+?)</i)[1])
+        投稿フォーム_投稿ボタン.disabled = false
+        return
+    }
+
+    if(url.includes('read.cgi')){
+        スレッド[url].最終書き込み = date()
+    }
+
+    ajax(url)
+    投稿フォーム.閉じる()
 }
 
 
@@ -725,6 +824,12 @@ katjusha.onclick = function(event){
 投稿フォーム.移動完了 = function (event){
     document.removeEventListener('mousemove', 投稿フォーム.移動)
     投稿フォーム_本文欄.focus()
+}
+
+
+
+投稿フォーム.閉じる = function (){
+    delete katjusha.dataset.open
 }
 
 
@@ -778,7 +883,7 @@ async function ajax(url, body){
         const home   = url.replace('test/bbs.cgi', '')
         const bbsurl = (home in 掲示板) ? home : `${home}${body.get('bbs')}/`
         url          = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
-        callback     = ajax.cgi
+        callback     = 投稿フォーム.通信後
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = スレッド.URL分解(url)
@@ -786,11 +891,11 @@ async function ajax(url, body){
         if(スレッド[url]){
             request.headers = {'Range': `bytes=${スレッド[url].byte || 0}-`, 'If-None-Match': スレッド[url].etag}
         }
-        callback = ajax.dat
+        callback = スレッド.通信後
     }
     else{
         request.url = `${url}subject.txt`
-        callback    = ajax.subject
+        callback    = サブジェクト一覧.通信後
     }
 
 
@@ -820,114 +925,9 @@ async function ajax(url, body){
 
 
 
-ajax.cgi = function (response, url, text){
-    if(response.status !== 200){
-        alert('エラーが発生して投稿できませんでした')
-        投稿フォーム_投稿ボタン.disabled = false
-        return
-    }
-    if(text.includes('<title>ＥＲＲＯＲ！')){
-        alert(text.match(/<b>(.+?)</i)[1])
-        投稿フォーム_投稿ボタン.disabled = false
-        return
-    }
-
-    if(url.includes('read.cgi')){
-        スレッド[url].最終書き込み = date()
-    }
-
-    ajax(url)
-    投稿フォーム.閉じる()
-}
-
-
-
-ajax.dat = function (response, url, text){
-    history.replaceState(null, null, url)
-    if(response.status === 200){
-        const thread        = スレッド[url] = {}
-        const dat           = スレッド.parse(text)
-        const {bbsurl, key} = スレッド.URL分解(url)
-
-        thread.bbs     = 掲示板[bbsurl]
-        thread.key     = key
-        thread.url     = url
-        thread.scroll  = 0
-        thread.subject = dat.subject
-        thread.html    = dat.html
-        thread.num     = dat.num
-        thread.byte    = Number(response.headers.get('Content-Length'))
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
-
-        thread.既得    = dat.num
-        thread.新着    = dat.num
-        thread.最終取得= date()
-
-        スレッド.クリア(thread.url)
-        スレッド.追記(thread.url, thread.subject, thread.html)
-        サブジェクト一覧.更新(thread)
-        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
-    }
-    else if(response.status === 206){
-        const thread = スレッド[url]
-        const dat    = スレッド.parse(text, thread.num)
-
-        if(dat.isBroken){
-            ajax.dat.retry(url)
-            return
-        }
-
-        thread.html   += dat.html
-        thread.num    += dat.num
-        thread.byte   += Number(response.headers.get('Content-Length') || 0)
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
-
-        thread.既得    = thread.num
-        thread.新着    = dat.num
-        thread.最終取得= date()
-
-        スレッド.追記(thread.url, thread.subject, dat.html)
-        サブジェクト一覧.更新(thread)
-        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
-   }
-    else if(response.status === 304){
-        const thread = スレッド[url]
-        thread.新着 = 0
-        サブジェクト一覧.更新(thread)
-        ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
-    }
-    else if(response.status === 404){
-        ステータス.textContent = `スレッドが見つかりません (${date()})`
-    }
-    else if(response.status === 416){
-        ajax.dat.retry(url)
-    }
-}
-
-
-
-ajax.dat.retry = function (url){
+ajax.retry = function (url){
     delete スレッド[url]
     ajax(url)
-}
-
-
-
-ajax.subject = function (response, url, text){
-    history.replaceState(null, null, url)
-    if(response.status !== 200){
-        サブジェクト一覧.innerHTML = ''
-        return
-    }
-
-    サブジェクト一覧.innerHTML = サブジェクト一覧.parse(text, url)
-    サブジェクト一覧.bbsurl    = url
-
-    document.title = `${base.title} [ ${掲示板[url].name} ]`
-    change_selected(掲示板, 掲示板[url].el)
-
-    サブジェクト.scrollTop = 0
-    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${date()})`
 }
 
 
