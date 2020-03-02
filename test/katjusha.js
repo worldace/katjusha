@@ -58,15 +58,12 @@ katjusha.onclick = function(event){
 
 
 全板ボタン.onclick = function(event){
-    event.stopPropagation()
-    
     if(コンテキスト.firstChild){
-        コンテキスト.閉じる()
+        return
     }
-    else{
-        const {left, bottom} = this.getBoundingClientRect()
-        コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
-    }
+    event.stopPropagation()
+    const {left, bottom} = this.getBoundingClientRect()
+    コンテキスト.表示(全板ボタン.コンテキスト(), left, bottom)
 }
 
 
@@ -253,15 +250,12 @@ katjusha.onclick = function(event){
 
 
 ヘルプアイコン.onclick = function(event){
-    event.stopPropagation()
-    
     if(コンテキスト.firstChild){
-        コンテキスト.閉じる()
+        return
     }
-    else{
-        const {left, bottom} = this.getBoundingClientRect()
-        コンテキスト.表示(ヘルプアイコン.コンテキスト(), left, bottom)
-    }
+    event.stopPropagation()
+    const {left, bottom} = this.getBoundingClientRect()
+    コンテキスト.表示(ヘルプアイコン.コンテキスト(), left, bottom)
 }
 
 
@@ -838,6 +832,7 @@ katjusha.onclick = function(event){
     コンテキスト.style.left = `${x}px`
     コンテキスト.style.top  = `${y}px`
     コンテキスト.innerHTML  = html
+    document.addEventListener('click', コンテキスト.閉じる, {once:true})
 }
 
 
@@ -850,11 +845,9 @@ katjusha.onclick = function(event){
 
 コンテキスト.onclick = function (event){
     if(event.target.onclick || event.target.href){
-        コンテキスト.閉じる()
+        return
     }
-    else{
-        event.stopPropagation()
-    }
+    event.stopPropagation()
 }
 
 
@@ -862,12 +855,6 @@ katjusha.onclick = function(event){
 コンテキスト.oncontextmenu = function (event){
     event.preventDefault()
 }
-
-
-
-katjusha.addEventListener('click', function(event){
-    コンテキスト.閉じる()
-})
 
 
 
