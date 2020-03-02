@@ -279,6 +279,7 @@ katjusha.onclick = function(event){
     投稿フォーム_sage.checked        = false
     投稿フォーム_メール欄.readOnly   = false
     投稿フォーム_タイトル欄.disabled = false
+    投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
     katjusha.dataset.open = 'スレッド'
     centering(投稿フォーム)
@@ -310,6 +311,7 @@ katjusha.onclick = function(event){
     投稿フォーム_sage.checked        = false
     投稿フォーム_メール欄.readOnly   = false
     投稿フォーム_タイトル欄.disabled = true
+    投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `「${thread.subject}」にレス`
     katjusha.dataset.open = 'レス'
     centering(投稿フォーム)
@@ -668,6 +670,7 @@ katjusha.onclick = function(event){
 
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
+    投稿フォーム_投稿ボタン.disabled = true
     ajax(this.getAttribute('action'), new FormData(this))
 }
 
@@ -820,10 +823,12 @@ async function ajax(url, body){
 ajax.cgi = function (response, url, text){
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
+        投稿フォーム_投稿ボタン.disabled = false
         return
     }
     if(text.includes('<title>ＥＲＲＯＲ！')){
         alert(text.match(/<b>(.+?)</i)[1])
+        投稿フォーム_投稿ボタン.disabled = false
         return
     }
 
