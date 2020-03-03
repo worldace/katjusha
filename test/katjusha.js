@@ -521,18 +521,16 @@
 
 
 タブ.ロード開始 = function (url){
-    for(const tab of タブ.children){
-        if(tab.url === url){
-            tab.dataset.loading = true
-        }
+    const tab = タブ.検索(url)
+    if(tab){
+        tab.dataset.loading = true
     }
 }
 
 タブ.ロード終了 = function (url){
-    for(const tab of タブ.children){
-        if(tab.url === url){
-            delete tab.dataset.loading
-        }
+    const tab = タブ.検索(url)
+    if(tab){
+        delete tab.dataset.loading
     }
 }
 
