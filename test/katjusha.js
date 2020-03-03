@@ -197,7 +197,7 @@
 
 
 
-サブジェクト一覧.通信後 = function (response, url, text){
+サブジェクト一覧.受信後 = function (response, url, text){
     history.replaceState(null, null, url)
     if(response.status !== 200){
         サブジェクト一覧.innerHTML = ''
@@ -627,7 +627,7 @@
 
 
 
-スレッド.通信後 = function (response, url, text){
+スレッド.受信後 = function (response, url, text){
     history.replaceState(null, null, url)
     if(response.status === 200){
         const thread        = スレッド[url] = {}
@@ -803,7 +803,7 @@
 
 
 
-投稿フォーム.通信後 = function (response, url, text){
+投稿フォーム.受信後 = function (response, url, text){
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
         投稿フォーム_投稿ボタン.disabled = false
@@ -873,7 +873,7 @@ async function ajax(url, body){
         const home   = url.replace('test/bbs.cgi', '')
         const bbsurl = (home in 掲示板) ? home : `${home}${body.get('bbs')}/`
         url          = body.get('key') ? スレッド.URL作成(bbsurl, body.get('key')) : bbsurl
-        callback     = 投稿フォーム.通信後
+        callback     = 投稿フォーム.受信後
     }
     else if(url.includes('read.cgi')){
         const {bbsurl, key} = スレッド.URL分解(url)
@@ -881,11 +881,11 @@ async function ajax(url, body){
         if(スレッド[url]){
             request.headers = {'Range': `bytes=${スレッド[url].byte || 0}-`, 'If-None-Match': スレッド[url].etag}
         }
-        callback = スレッド.通信後
+        callback = スレッド.受信後
     }
     else{
         request.url = `${url}subject.txt`
-        callback    = サブジェクト一覧.通信後
+        callback    = サブジェクト一覧.受信後
     }
 
 
