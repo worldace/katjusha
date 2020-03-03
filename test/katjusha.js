@@ -6,7 +6,7 @@
 
 
 
-かちゅぼーど.開始 = function (){
+かちゅぼーど.スタート = function (){
     かちゅぼーど.href = document.URL
     base.title        = document.title
     全板ボタン.textContent = `▽${base.title}`
@@ -781,6 +781,20 @@
 
 
 
+投稿フォーム.移動 = function (event){
+    投稿フォーム.style.left = between(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
+    投稿フォーム.style.top  = between(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
+}
+
+
+
+投稿フォーム.移動完了 = function (event){
+    document.removeEventListener('mousemove', 投稿フォーム.移動)
+    投稿フォーム_本文欄.focus()
+}
+
+
+
 投稿フォーム_form.onsubmit = function (event){
     event.preventDefault()
     投稿フォーム_投稿ボタン.disabled = true
@@ -807,20 +821,6 @@
 
     ajax(url)
     投稿フォーム.閉じる()
-}
-
-
-
-投稿フォーム.移動 = function (event){
-    投稿フォーム.style.left = between(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
-    投稿フォーム.style.top  = between(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
-}
-
-
-
-投稿フォーム.移動完了 = function (event){
-    document.removeEventListener('mousemove', 投稿フォーム.移動)
-    投稿フォーム_本文欄.focus()
 }
 
 
@@ -993,4 +993,4 @@ function format_KB(byte = 0){
 
 
 
-かちゅぼーど.開始()
+かちゅぼーど.スタート()
