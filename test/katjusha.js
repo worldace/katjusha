@@ -707,7 +707,7 @@
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
-        html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<b>${from}</b> 投稿日：<time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
+        html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<span class="from"><b>${from}</b></span> <time>投稿日：${date}</time><address>${mail}</address></header><p>${message}</p></article>`
     }
     return {html, num:dat.length, subject:dat[0].split('<>').pop(), isBroken}
 }
