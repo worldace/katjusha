@@ -121,13 +121,16 @@ class thread{
 class res{
     static function from($from){
         if(BBS_ADMIN){
-            return  BBS_ADMIN['name'] . ' ★';
+            return BBS_ADMIN['name'] . ' ★';
         }
         if($from === ''){
-            $from = BBS_SETTING['nanashi'];
+            return BBS_SETTING['nanashi'];
         }
         $from = str::escape($from);
         $from = str_replace('★', '☆', $from);
+        $from = str_replace('◆', '◇', $from);
+        $from = preg_replace_callback('/#(.+)/', function($m){ return ' ◆</b>'.res::trip($m[1]).'<b>'; }, $from);
+
         return $from;
     }
 
@@ -196,6 +199,28 @@ class res{
             $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
             return $contents;
         });
+    }
+
+
+    static function trip($tripkey){
+        if(strlen($tripkey) >= 12){
+            return str_replace('+', '.', substr(base64_encode(sha1($tripkey, true)), 0, 12));
+        }
+        else{
+            $salt = preg_replace('/[^.-z]/', '.', substr($tripkey.'H.', 1, 2));
+            $map  = [':'=>'A', ';'=>'B', '<'=>'C', '='=>'D', '>'=>'E', '?'=>'F', '@'=>'G', '['=>'a', '\\'=>'b', ']'=>'c', '^'=>'d', '_'=>'e', '`'=>'f'];
+            return substr(crypt($tripkey, strtr($salt, $map)), -10);
+        }
+    }
+
+
+    static function id($bbs = ''){
+        $ip   = substr(getenv('REMOTE_ADDR'), -5);
+        $date = date('Ymd');
+        $pass = BBS_SETTING['keyid'];
+        $md5  = md5($ip.$date.$pass.$bbs);
+
+        return substr($md5, 0, 10);
     }
 }
 

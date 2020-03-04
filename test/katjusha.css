@@ -453,9 +453,8 @@ body{
 .レス i:hover{
     text-decoration: underline;
 }
-.レス b{
+.レス .from{
     color: forestgreen;
-    font-weight: bold;
     margin-left: 4px;
 }
 .レス time{
