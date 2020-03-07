@@ -1,6 +1,7 @@
 <?php
 
 
+mb_substitute_character('entity');
 request::init();
 
 
