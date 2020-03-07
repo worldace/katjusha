@@ -28,7 +28,7 @@
 
 かちゅぼーど.onclick = function(event){
     const url = event.target.href
-    if(!url || !掲示板.is_internal_url(url)){
+    if(!url || !掲示板.ホスト一覧.has(new URL(url).hostname)){
         return
     }
     event.preventDefault()
@@ -119,13 +119,6 @@
         this.key  = dir[2].slice(0, dir[2].indexOf('.'))
         this.home = el.href
     }
-}
-
-
-
-掲示板.is_internal_url = function(url){
-    url = new URL(url)
-    return 掲示板.ホスト一覧.has(url.hostname)
 }
 
 
@@ -733,7 +726,7 @@
 
 
 
-レスポップアップ.onclick = function(){
+レスポップアップ.onclick = function(event){
     レスポップアップ.閉じる()
 }
 
