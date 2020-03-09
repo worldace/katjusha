@@ -130,19 +130,9 @@
 
 
 サブジェクトヘッダ.ondblclick = function (event){
-    if(event.target.tagName !== 'TH'){
-        return
+    if(event.target.tagName === 'TH'){
+        sort_table(event.target)
     }
-    const index = event.target.cellIndex
-    const order = Number(event.target.dataset.order || -1)
-    const tbody = this.parentElement.tBodies[0]
-    const rows  = Array.from(tbody.rows)
-    const compare = new Intl.Collator(undefined, {numeric: true}).compare
-
-    rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
-    rows.forEach(tr  => tbody.append(tr))
-
-    event.target.dataset.order = -order
 }
 
 
@@ -278,7 +268,7 @@
     }
 
     投稿フォーム_form.setAttribute('action', `${bbs.home}test/bbs.cgi`)
-    set_value(投稿フォーム, {
+    set_form(投稿フォーム, {
         subject : '',
         FROM    : '',
         mail    : '',
@@ -310,7 +300,7 @@
     const thread = スレッド[現在のタブ.url]
 
     投稿フォーム_form.setAttribute('action', `${thread.bbs.home}test/bbs.cgi`)
-    set_value(投稿フォーム, {
+    set_form(投稿フォーム, {
         subject : thread.subject,
         FROM    : '',
         mail    : '',
@@ -921,6 +911,9 @@ function dnd_window(el, event, fn){
     const limitX = innerWidth  - width  - 1
     const limitY = innerHeight - height - 1
 
+    document.addEventListener('mousemove', move, {passive:true})
+    document.addEventListener('mouseup'  , end,  {once:true})
+
     function move(event){
         el.style.left = Math.min(Math.max(0, startX+event.pageX), limitX) + 'px'
         el.style.top  = Math.min(Math.max(0, startY+event.pageY), limitY) + 'px'
@@ -932,25 +925,16 @@ function dnd_window(el, event, fn){
             fn(event)
         }
     }
-
-    document.addEventListener('mousemove', move, {passive:true})
-    document.addEventListener('mouseup'  , end,  {once:true})
 }
 
 
 
-function set_value(form, value){
+function set_form(form, map){
     for(const el of form.querySelectorAll('[name]')){
-        if(el.name in value){
-            el.value = value[el.name]
+        if(el.name in map){
+            el.value = map[el.name]
         }
     }
-}
-
-
-
-function copy(str){
-    navigator.clipboard.writeText(str)
 }
 
 
@@ -961,6 +945,21 @@ function insert_text(textarea, text){
     const after  = textarea.value.substr(cursor, textarea.value.length)
 
     textarea.value = before + text + after
+}
+
+
+
+function sort_table(th){
+    const index = th.cellIndex
+    const order = Number(th.dataset.order || -1)
+    const tbody = th.closest('table').tBodies[0]
+    const rows  = Array.from(tbody.rows)
+    const compare = new Intl.Collator(undefined, {numeric: true}).compare
+
+    rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
+    rows.forEach(tr  => tbody.append(tr))
+
+    th.dataset.order = -order
 }
 
 
@@ -976,6 +975,12 @@ function date(){
     const 秒 = String(d.getSeconds()).padStart(2, 0)
 
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
+}
+
+
+
+function copy(str){
+    navigator.clipboard.writeText(str)
 }
 
 
