@@ -697,6 +697,8 @@
             from = mail = date = message = subject = 'ここ壊れてます'
             isBroken = true
         }
+        //datファイルにaタグが含まれる場合は下記コメントを外す
+        //message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
         message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
@@ -761,29 +763,7 @@
 
 
 投稿フォーム_ヘッダ.onmousedown = function (event){
-    const {left, top, width, height} = 投稿フォーム.getBoundingClientRect()
-
-    投稿フォーム.startX = left - event.pageX
-    投稿フォーム.startY = top  - event.pageY
-    投稿フォーム.limitX = innerWidth  - width  - 1
-    投稿フォーム.limitY = innerHeight - height - 1
-
-    document.addEventListener('mousemove', 投稿フォーム.移動,     {passive:true})
-    document.addEventListener('mouseup'  , 投稿フォーム.移動完了, {once:true})
-}
-
-
-
-投稿フォーム.移動 = function (event){
-    投稿フォーム.style.left = between(0, 投稿フォーム.startX+event.pageX, 投稿フォーム.limitX) + 'px'
-    投稿フォーム.style.top  = between(0, 投稿フォーム.startY+event.pageY, 投稿フォーム.limitY) + 'px'
-}
-
-
-
-投稿フォーム.移動完了 = function (event){
-    document.removeEventListener('mousemove', 投稿フォーム.移動)
-    投稿フォーム_本文欄.focus()
+    dnd_window(投稿フォーム, event, () => 投稿フォーム_本文欄.focus())
 }
 
 
@@ -933,6 +913,32 @@ function centering(el){
 
 
 
+function dnd_window(el, event, fn){
+    const {left, top, width, height} = el.getBoundingClientRect()
+
+    const startX = left - event.pageX
+    const startY = top  - event.pageY
+    const limitX = innerWidth  - width  - 1
+    const limitY = innerHeight - height - 1
+
+    function move(event){
+        el.style.left = Math.min(Math.max(0, startX+event.pageX), limitX) + 'px'
+        el.style.top  = Math.min(Math.max(0, startY+event.pageY), limitY) + 'px'
+    }
+
+    function end(event){
+        document.removeEventListener('mousemove', move)
+        if(fn){
+            fn(event)
+        }
+    }
+
+    document.addEventListener('mousemove', move, {passive:true})
+    document.addEventListener('mouseup'  , end,  {once:true})
+}
+
+
+
 function set_value(form, value){
     for(const el of form.querySelectorAll('[name]')){
         if(el.name in value){
@@ -970,12 +976,6 @@ function date(){
     const 秒 = String(d.getSeconds()).padStart(2, 0)
 
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
-}
-
-
-
-function between(min, val, max){
-    return Math.min(Math.max(min, val), max)
 }
 
 
