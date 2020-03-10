@@ -610,7 +610,7 @@
 
 
 
-スレッド.受信後 = function (response, url, text){
+スレッド.受信後 = function (response, url, text, size){
     history.replaceState(null, null, url)
     if(response.status === 200){
         const thread        = スレッド[url] = {}
@@ -624,7 +624,7 @@
         thread.subject = dat.subject
         thread.html    = dat.html
         thread.num     = dat.num
-        thread.byte    = Number(response.headers.get('Content-Length'))
+        thread.byte    = size
         thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = dat.num
@@ -647,7 +647,7 @@
 
         thread.html   += dat.html
         thread.num    += dat.num
-        thread.byte   += Number(response.headers.get('Content-Length') || 0)
+        thread.byte   += size || 0
         thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = thread.num
@@ -873,7 +873,7 @@ async function ajax(url, body){
     const buffer = await response.arrayBuffer()
     const text   = new TextDecoder('shift-jis').decode(buffer)
 
-    callback(response, url, text)
+    callback(response, url, text, buffer.byteLength)
 }
 
 
@@ -911,16 +911,16 @@ function dnd_window(el, event, fn){
     const limitX = innerWidth  - width  - 1
     const limitY = innerHeight - height - 1
 
-    document.addEventListener('mousemove', move, {passive:true})
-    document.addEventListener('mouseup'  , end,  {once:true})
+    document.addEventListener('mousemove', mousemove, {passive:true})
+    document.addEventListener('mouseup',   mouseup,   {once:true})
 
-    function move(event){
+    function mousemove(event){
         el.style.left = Math.min(Math.max(0, startX+event.pageX), limitX) + 'px'
         el.style.top  = Math.min(Math.max(0, startY+event.pageY), limitY) + 'px'
     }
 
-    function end(event){
-        document.removeEventListener('mousemove', move)
+    function mouseup(event){
+        document.removeEventListener('mousemove', mousemove)
         if(fn){
             fn(event)
         }
