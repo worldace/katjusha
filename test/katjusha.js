@@ -610,7 +610,7 @@
 
 
 
-スレッド.受信後 = function (response, url, text, size){
+スレッド.受信後 = function (response, url, text, byte){
     history.replaceState(null, null, url)
     if(response.status === 200){
         const thread        = スレッド[url] = {}
@@ -624,7 +624,7 @@
         thread.subject = dat.subject
         thread.html    = dat.html
         thread.num     = dat.num
-        thread.byte    = size
+        thread.byte    = byte
         thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = dat.num
@@ -647,7 +647,7 @@
 
         thread.html   += dat.html
         thread.num    += dat.num
-        thread.byte   += size || 0
+        thread.byte   += byte || 0
         thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
 
         thread.既得    = thread.num
@@ -689,7 +689,7 @@
         }
         //datファイルにaタグが含まれる場合は下記コメントを外す
         //message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-        message = message.replace(/&gt;&gt;(\d{1,4})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
+        message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
         html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<span class="from"><b>${from}</b></span> <time>投稿日：${date}</time><address>${mail}</address></header><p>${message}</p></article>`
