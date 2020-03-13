@@ -104,8 +104,8 @@
 掲示板.コンテキスト = function (url, name) {
     return `
     <ul class="menu">
-      <li><a onclick="copy('${url}')">URLをコピー</a></li>
-      <li><a onclick="copy('${name}\\n${url}\\n')">掲示板名とURLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${name}\\n${url}\\n')">掲示板名とURLをコピー</a></li>
     </ul>
     `
 }
@@ -178,8 +178,8 @@
     return `
     <ul class="menu context-subject">
       <li><a onclick="サブジェクト一覧.コンテキスト.新しいタブで開く('${url}')">新しいタブで開く</a></li>
-      <li><a onclick="copy('${url}')">URLをコピー</a></li>
-      <li><a onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
     </ul>
     `
 }
@@ -207,7 +207,7 @@
     change_selected(掲示板, 掲示板[url].el)
 
     サブジェクト.scrollTop = 0
-    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${date()})`
+    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${get_date()})`
 }
 
 
@@ -302,7 +302,7 @@
     投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `『${bbs.name}』に新規スレッド`
     かちゅぼーど.dataset.open = 'スレッド'
-    centering(投稿フォーム)
+    centering_window(投稿フォーム)
     投稿フォーム_タイトル欄.focus()
 }
 
@@ -331,7 +331,7 @@
     投稿フォーム_投稿ボタン.disabled = false
     投稿フォーム_タイトル.innerHTML  = `「${thread.subject}」にレス`
     かちゅぼーど.dataset.open = 'レス'
-    centering(投稿フォーム)
+    centering_window(投稿フォーム)
     投稿フォーム_本文欄.focus()
 }
 
@@ -377,7 +377,6 @@
 スレッドヘッダ.描画 = function (url) {
     if (スレッド[url]) {
         const thread = スレッド[url]
-
         スレッドヘッダ_タイトル.innerHTML = `${thread.subject} (${thread.num})`
         スレッドヘッダ_掲示板名.innerHTML = `<a href="${thread.bbs.url}">[${掲示板[thread.bbs.url].name}]</a>`
         document.title = thread.subject
@@ -422,8 +421,8 @@
     <ul class="menu context-tab">
       <li><a onclick="タブ.コンテキスト.閉じる('${url}')">閉じる</a></li>
       <li><a onclick="タブ.コンテキスト.このタブ以外全て閉じる('${url}')">このタブ以外全て閉じる</a></li>
-      <li><a onclick="copy('${url}')">URLをコピー</a></li>
-      <li><a onclick="copy('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${url}')">URLをコピー</a></li>
+      <li><a onclick="copy_clipboard('${name}\\n${url}\\n')">タイトルとURLをコピー</a></li>
     </ul>
     `
 }
@@ -652,16 +651,16 @@
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = byte
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '').replace('-gzip', '')
 
         thread.既得    = dat.num
         thread.新着    = dat.num
-        thread.最終取得= date()
+        thread.最終取得= get_date()
 
         スレッド.クリア(thread.url)
         スレッド.追記(thread.url, thread.subject, thread.html)
         サブジェクト一覧.更新(thread)
-        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
+        ステータス.textContent = `${dat.num}のレスを受信 (${get_date()}) ${format_KB(thread.byte)}`
     }
     else if (response.status === 206) {
         const thread = スレッド[url]
@@ -675,24 +674,24 @@
         thread.html   += dat.html
         thread.num    += dat.num
         thread.byte   += byte || 0
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '')
+        thread.etag    = String(response.headers.get('ETag')).replace('W/', '').replace('-gzip', '')
 
         thread.既得    = thread.num
         thread.新着    = dat.num
-        thread.最終取得= date()
+        thread.最終取得= get_date()
 
         スレッド.追記(thread.url, thread.subject, dat.html)
         サブジェクト一覧.更新(thread)
-        ステータス.textContent = `${dat.num}のレスを受信 (${date()}) ${format_KB(thread.byte)}`
+        ステータス.textContent = `${dat.num}のレスを受信 (${get_date()}) ${format_KB(thread.byte)}`
     }
     else if (response.status === 304) {
         const thread = スレッド[url]
         thread.新着 = 0
         サブジェクト一覧.更新(thread)
-        ステータス.textContent = `新着なし (${date()}) ${format_KB(thread.byte)}`
+        ステータス.textContent = `新着なし (${get_date()}) ${format_KB(thread.byte)}`
     }
     else if (response.status === 404) {
-        ステータス.textContent = `スレッドが見つかりません (${date()})`
+        ステータス.textContent = `スレッドが見つかりません (${get_date()})`
     }
     else if (response.status === 416) {
         ajax.retry(url)
@@ -722,6 +721,7 @@
         message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="レスポップアップ.表示($1)" onmouseleave="レスポップアップ.閉じる()">&gt;&gt;$1</span>')
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
+
         html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<span class="from"><b>${from}</b></span> <time>投稿日：${date}</time><address>${mail}</address></header><p>${message}</p></article>`
     }
 
@@ -812,7 +812,7 @@
     }
 
     if (url.includes('read.cgi')) {
-        スレッド[url].最終書き込み = date()
+        スレッド[url].最終書き込み = get_date()
     }
 
     ajax(url)
@@ -930,7 +930,7 @@ function change_selected(parent, el) {
 
 
 
-function centering(el) {
+function centering_window(el) {
     const {width, height} = el.getBoundingClientRect()
     el.style.left = `${innerWidth/2 - width/2}px`
     el.style.top  = `${innerHeight/2 - height/2}px`
@@ -1000,7 +1000,7 @@ function sort_table(th) {
 
 
 
-function date() {
+function get_date() {
     const d  = new Date()
 
     const 年 = d.getFullYear()
@@ -1015,7 +1015,7 @@ function date() {
 
 
 
-function copy(str) {
+function copy_clipboard(str) {
     navigator.clipboard.writeText(str)
 }
 
