@@ -218,7 +218,7 @@ class res{
     static function id($bbs = ''){
         $ip   = substr(getenv('REMOTE_ADDR'), -5);
         $date = date('Ymd');
-        $pass = BBS_SETTING['keyid'];
+        $pass = __FILE__;
         $md5  = md5($ip.$date.$pass.$bbs);
 
         return substr($md5, 0, 10);

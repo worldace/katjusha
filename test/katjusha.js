@@ -900,7 +900,7 @@ async function ajax(url, body) {
     }
     finally {
         ステータス.textContent = request.error || ''
-        アニメ.dataset.ajax = Number(アニメ.dataset.ajax) - 1
+        アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
         タブ.ロード終了(url)
     }
 
@@ -990,7 +990,7 @@ function sort_table(th) {
     const order = Number(th.dataset.order || -1)
     const tbody = th.closest('table').tBodies[0]
     const rows  = Array.from(tbody.rows)
-    const compare = new Intl.Collator(undefined, {numeric: true}).compare
+    const compare = new Intl.Collator('ja-JP', {numeric: true}).compare
 
     rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
     rows.forEach(tr  => tbody.append(tr))
