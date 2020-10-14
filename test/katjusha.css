@@ -609,7 +609,7 @@ body{
     display: flex;
     flex-direction: column;
     min-width: 460px;
-    min-height: 240px;
+    min-height: 260px;
     resize: both;
     overflow: hidden;
 }
@@ -673,7 +673,7 @@ body{
 
 #投稿フォーム_本文欄{
     flex-grow: 1;
-    min-height: 120px;
+    min-height: 140px;
     font-size: 12px;
     border-left: solid 1px #696969;
     border-top: solid 1px #696969;
