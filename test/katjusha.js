@@ -722,7 +722,7 @@
         message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
         message = message.replace(/^ /, '')
 
-        html += `<article class="レス" data-no="${no}"><header><i>${no}</i> 名前：<span class="from"><b>${from}</b></span> <time>投稿日：${date}</time><address>${mail}</address></header><p>${message}</p></article>`
+        html += `<article class="レス" data-no="${no}"><header><i>${no}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header><p>${message}</p></article>`
     }
 
     return {html, num:dat.length, subject:dat[0].split('<>').pop(), isBroken}

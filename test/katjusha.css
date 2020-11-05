@@ -448,17 +448,25 @@ body{
     color: blue;
     font-style: normal;
     cursor: pointer;
-    margin-right: 3px;
 }
 .レス i:hover{
     text-decoration: underline;
 }
 .レス .from{
     color: forestgreen;
-    margin-left: 4px;
+}
+.レス .from::before{
+    content: '名前：';
+    color: #000;
+    margin: 0 0.1rem 0 0.7rem;
+    user-select: text;
 }
 .レス time{
-    margin-left: 4px;
+}
+.レス time::before{
+    content: '投稿日：';
+    margin: 0 0.1rem 0 0.7rem;
+    user-select: text;
 }
 .レス address{
     display: inline;
