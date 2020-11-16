@@ -25,14 +25,14 @@ class request{
 
         define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
 
-        define('BBS_SETTING', (function(){
+        define('BBS_SET', (function(){
             include __DIR__.'/set.php';
             return get_defined_vars();
         })());
 
         define('BBS_ADMIN', (function (){
-            $index = array_search(BBS_MAIL, array_column(BBS_SETTING['admin'], 'password'));
-            return is_numeric($index) ? BBS_SETTING['admin'][$index] : null;
+            $index = array_search(BBS_MAIL, array_column(BBS_SET['admin'], 'password'));
+            return ($index === false) ?: BBS_SET['admin'][$index];
         })());
     }
 
@@ -142,7 +142,7 @@ class res{
             return BBS_ADMIN['name'] . ' ★';
         }
         if($from === ''){
-            return BBS_SETTING['nanashi'];
+            return BBS_SET['nanashi'];
         }
         $from = str::escape($from);
         $from = str_replace('★', '☆', $from);
