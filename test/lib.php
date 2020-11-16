@@ -179,15 +179,13 @@ class res{
 
     static function create($bbs_path, $key, $from, $mail, $message){
         $date = res::date($_SERVER['REQUEST_TIME']);
-        $dat  = "$from<>$mail<>$date<> $message <>\n";
-        $dat  = mb_convert_encoding($dat, 'sjis', 'utf-8');
+        $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>\n", 'sjis', 'utf-8');
 
         return file_edit(subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat){
             $num = 0;
             foreach($contents as $i => $v){
                 if(strpos($v, "$key.") === 0){
-                    preg_match('/(\d+)\)$/', $v, $m);
-                    $num = $m[1];
+                    $v = preg_replace_callback('/\d+(?=\)$)/', function($m) use(&$num){$num=$m[0]; return $num+1;}, $v);
                     break;
                 }
             }
@@ -200,10 +198,8 @@ class res{
 
             file_put_contents(thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
-            $num++;
-            $line = preg_replace('/\d+\)$/', "$num)", $v);
             array_splice($contents, $i, 1);
-    	    array_unshift($contents, $line);
+    	    array_unshift($contents, $v);
 
             return $contents;
         });
