@@ -301,12 +301,9 @@ class maintenance{
 
 class str{
     static function escape($str, $br = ''){
-        $str = str_replace('<', '&lt;', $str);
-        $str = str_replace('>', '&gt;', $str);
-        $str = str_replace('"', '&quot;', $str);
-        $str = str_replace("'", '&apos;', $str);
-        $str = str_replace("\r", '', $str);
+        $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8', false);
         $str = str_replace("\n", $br, $str);
+        $str = preg_replace('/[[:cntrl:]]/', '', $str);
 
     	return $str;
     }
