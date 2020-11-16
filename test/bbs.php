@@ -3,13 +3,13 @@
 二重書き込み
 */
 
-include './lib.php';
+require_once './lib.php';
 request::init();
 
 
 
 if(BBS_ADMIN and method_exists('maintenance', BBS_FROM)){
-    error(['maintenance', BBS_FROM](BBS_PATH, BBS_MESSAGE, BBS_KEY));
+    error(maintenance::{BBS_FROM}(BBS_PATH, BBS_MESSAGE, BBS_KEY));
 }
 
 
