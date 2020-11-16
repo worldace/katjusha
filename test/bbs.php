@@ -1,9 +1,10 @@
 <?php
-include './boot.php';
-
 /*
 二重書き込み
 */
+
+include './lib.php';
+request::init();
 
 
 

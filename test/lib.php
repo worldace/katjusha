@@ -1,13 +1,9 @@
 <?php
 
-
-mb_substitute_character('entity');
-request::init();
-
-
-
 class request{
     static function init(){
+        mb_substitute_character('entity');
+
         if(getenv('REQUEST_METHOD') !== 'POST'){
             return;
         }
@@ -17,6 +13,27 @@ class request{
         if(request::post('submit') !== '書き込む'){
             mb_convert_variables('utf-8', 'sjis', $_POST);
         }
+
+        define('BBS_IS_THREAD', !request::post('key'));
+
+        define('BBS_BBS', request::post('bbs'));
+        define('BBS_KEY', request::post('key') ?: $_SERVER['REQUEST_TIME']);
+        define('BBS_FROM', request::post('FROM'));
+        define('BBS_MAIL', request::post('mail'));
+        define('BBS_SUBJECT', request::post('subject'));
+        define('BBS_MESSAGE', request::post('MESSAGE'));
+
+        define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
+
+        define('BBS_SETTING', (function(){
+            include __DIR__.'/set.php';
+            return get_defined_vars();
+        })());
+
+        define('BBS_ADMIN', (function (){
+            $index = array_search(BBS_MAIL, array_column(BBS_SETTING['admin'], 'password'));
+            return is_numeric($index) ? BBS_SETTING['admin'][$index] : null;
+        })());
     }
 
 
@@ -358,26 +375,3 @@ function error($str){
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
 }
-
-
-
-define('BBS_IS_THREAD', !request::post('key'));
-
-define('BBS_BBS', request::post('bbs'));
-define('BBS_KEY', request::post('key') ?: $_SERVER['REQUEST_TIME']);
-define('BBS_FROM', request::post('FROM'));
-define('BBS_MAIL', request::post('mail'));
-define('BBS_SUBJECT', request::post('subject'));
-define('BBS_MESSAGE', request::post('MESSAGE'));
-
-define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
-
-define('BBS_SETTING', (function(){
-    include __DIR__.'/setting.php';
-    return get_defined_vars();
-})());
-
-define('BBS_ADMIN', (function (){
-    $index = array_search(BBS_MAIL, array_column(BBS_SETTING['admin'], 'password'));
-    return is_numeric($index) ? BBS_SETTING['admin'][$index] : null;
-})());
