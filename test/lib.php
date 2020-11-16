@@ -32,7 +32,7 @@ class request{
 
         define('BBS_ADMIN', (function (){
             $index = array_search(BBS_MAIL, array_column(BBS_SET['admin'], 'password'));
-            return ($index === false) ?: BBS_SET['admin'][$index];
+            return ($index !== false) ? BBS_SET['admin'][$index] : null;
         })());
     }
 
@@ -96,18 +96,17 @@ class thread{
 
 
     static function create($bbs_path, $key, $from, $mail, $message, $subject){
-        $date    = res::date($key);
-        $dat     = "$from<>$mail<>$date<> $message <>$subject\n";
-        $dat     = mb_convert_encoding($dat, 'sjis', 'utf-8');
-        $subject = mb_convert_encoding($subject, 'sjis', 'utf-8');
+        $date     = res::date($key);
+        $dat      = mb_convert_encoding("$from<>$mail<>$date<> $message <>$subject\n", 'sjis', 'utf-8');
+        $txt      = mb_convert_encoding("$key.dat<>$subject (1)\n", 'sjis', 'utf-8');
+        $dat_path = thread::path($bbs_path, $key);
 
-        return file_edit(subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat, $subject){
-            $dat_path = thread::path($bbs_path, $key);
+        return file_edit(subject::path($bbs_path), function($contents) use($dat_path, $dat, $txt){
             if(file_exists($dat_path)){
                 error('再度スレを立ててください');
             }
             file_put_contents($dat_path, $dat, LOCK_EX);
-            array_unshift($contents, "$key.dat<>$subject (1)\n");
+            array_unshift($contents, $txt);
             return $contents;
         });
     }
