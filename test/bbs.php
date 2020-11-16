@@ -33,7 +33,7 @@ if(!BBS_IS_THREAD and !thread::exists(BBS_PATH, BBS_KEY)){
 if(BBS_IS_THREAD and !BBS_SUBJECT){
     error('タイトルを入力してください');
 }
-if(BBS_IS_THREAD and !str::is_utf8(BBS_SUBJECT)){
+if(BBS_IS_THREAD and !is_utf8(BBS_SUBJECT)){
     error('文字コードが不正です');
 }
 if(BBS_IS_THREAD and strlen(BBS_SUBJECT) > 96){
@@ -43,14 +43,14 @@ if(BBS_IS_THREAD and strlen(BBS_SUBJECT) > 96){
 if(strlen(BBS_FROM) > 32){
     error('名前が長すぎます');
 }
-if(!str::is_utf8(BBS_FROM)){
+if(!is_utf8(BBS_FROM)){
     error('文字コードが不正です');
 }
 
 if(strlen(BBS_MAIL) > 64){
     error('メールが長すぎます');
 }
-if(!str::is_utf8(BBS_MAIL)){
+if(!is_utf8(BBS_MAIL)){
     error('文字コードが不正です');
 }
 

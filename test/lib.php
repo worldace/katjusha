@@ -144,7 +144,7 @@ class res{
         if($from === ''){
             return BBS_SET['nanashi'];
         }
-        $from = str::escape($from);
+        $from = res::escape($from);
         $from = str_replace('★', '☆', $from);
         $from = str_replace('◆', '◇', $from);
         $from = preg_replace_callback('/#(.+)/', function($m){ return ' ◆</b>'.res::trip($m[1]).'<b>'; }, $from);
@@ -155,7 +155,7 @@ class res{
 
     static function mail($mail){
         $mail = preg_replace('/#.*/', '', $mail);
-        $mail = str::escape($mail);
+        $mail = res::escape($mail);
         return $mail;
     }
 
@@ -167,13 +167,13 @@ class res{
 
 
     static function subject($subject){
-        return str::escape($subject);
+        return res::escape($subject);
     }
 
 
     static function message($message){
         $message = rtrim($message);
-        $message = str::escape($message, '<br>');
+        $message = res::escape($message, '<br>');
         return $message;
     }
 
@@ -240,6 +240,15 @@ class res{
 
         return substr($md5, 0, 10);
     }
+
+
+    static function escape($str, $br = ''){
+        $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8', false);
+        $str = str_replace("\n", $br, $str);
+        $str = preg_replace('/[[:cntrl:]]/', '', $str);
+
+    	return $str;
+    }
 }
 
 
@@ -299,21 +308,9 @@ class maintenance{
 
 
 
-class str{
-    static function escape($str, $br = ''){
-        $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8', false);
-        $str = str_replace("\n", $br, $str);
-        $str = preg_replace('/[[:cntrl:]]/', '', $str);
-
-    	return $str;
-    }
-
-
-    static function is_utf8($str){
-        return preg_match('//u', $str);
-    }
+function is_utf8($str){
+    return preg_match('//u', $str);
 }
-
 
 
 function file_edit(string $file, callable $fn, ...$args){
