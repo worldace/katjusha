@@ -183,7 +183,7 @@ class res{
 
         return file_edit(subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat){
             $num = 0;
-            foreach($contents as $i => $v){
+            foreach($contents as $k => $v){
                 if(strpos($v, "$key.") === 0){
                     $v = preg_replace_callback('/\d+(?=\)$)/', function($m) use(&$num){$num=$m[0]; return $num+1;}, $v);
                     break;
@@ -198,7 +198,7 @@ class res{
 
             file_put_contents(thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
-            array_splice($contents, $i, 1);
+            array_splice($contents, $k, 1);
     	    array_unshift($contents, $v);
 
             return $contents;

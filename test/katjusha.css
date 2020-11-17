@@ -616,7 +616,7 @@ body{
     padding: 4px 12px 6px 12px;
     display: flex;
     flex-direction: column;
-    min-width: 460px;
+    min-width: max-content;
     min-height: 260px;
     resize: both;
     overflow: hidden;
@@ -627,7 +627,7 @@ body{
     margin-top: 6px;
 }
 #投稿フォーム_タイトルラベル{
-    min-width: 45px;
+    min-width: 50px;
     text-align: right;
     padding-right: 4px;
 }
@@ -655,7 +655,7 @@ body{
     margin-top: 8px;
 }
 #投稿フォーム_名前ラベル{
-    min-width: 45px;
+    min-width: 50px;
     text-align: right;
     padding-right: 4px;
 }
@@ -664,7 +664,7 @@ body{
     margin-right: 6px;
 }
 #投稿フォーム_メールラベル{
-    min-width: 45px;
+    min-width: 50px;
     padding-right: 3px;
     text-align: right;
 }
