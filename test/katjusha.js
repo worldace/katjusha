@@ -231,22 +231,38 @@
     subjects.pop()
 
     let html = ''
-    let num  = 1
+    let i    = 1
 
     for (const v of subjects) {
-        const [datfile, subject, resnum] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
+        const [datfile, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
         const key    = datfile.replace('.dat', '')
         const url    = スレッド.URL作成(bbsurl, key)
-        const thread = スレッド[url] || {}
+        const thread = スレッド[url] || {url, subject, num}
 
-        html += `<tr data-url="${url}"><td>${num++}</td><td><a href="${url}">${subject}</a></td><td>${resnum}</td><td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+        html += サブジェクト一覧.render(thread, i)
+        i++
 
-        if (resnum == thread.既得) {
+        if (num == thread.既得) {
             thread.新着 = 0
         }
     }
 
     return html
+}
+
+
+
+サブジェクト一覧.render = function (thread, i){
+    return `<tr data-url="${thread.url}">
+              <td>${i}</td>
+              <td><a href="${thread.url}">${thread.subject}</a></td>
+              <td>${thread.num}</td>
+              <td>${thread.既得 || ''}</td>
+              <td>${thread.新着 || ''}</td>
+              <td>${thread.最終取得 || ''}</td>
+              <td>${thread.最終書き込み || ''}</td>
+              <td></td>
+            </tr>`
 }
 
 
