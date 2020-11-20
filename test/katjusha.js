@@ -228,8 +228,10 @@
     for (const v of text.trim().split('\n')) {
         const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url = スレッド.URL作成(bbsurl, key)
+        const thread = スレッド[url] || {url, subject}
+        thread.num = num
 
-        result.push(スレッド[url] || {url, subject, num})
+        result.push(thread)
     }
 
     return result
