@@ -192,8 +192,8 @@
 
 
 
-サブジェクト一覧.受信後 = function (response, url, text) {
-    history.replaceState(null, null, url)
+サブジェクト一覧.受信後 = function (response, bbsurl, text) {
+    history.replaceState(null, null, bbsurl)
 
     if (response.status !== 200) {
         サブジェクト一覧.innerHTML = ''
@@ -202,39 +202,26 @@
 
     let html = ''
     let i    = 0
-    for(const v of サブジェクト一覧.parse(text, url)){
+    for(const str of text.trim().split('\n')){
         i++
-        if (v.num == v.既得) {
-            v.新着 = 0
-        }
-        html += サブジェクト一覧.render(v, i)
-    }
-
-    サブジェクト一覧.innerHTML = html
-    サブジェクト一覧.bbsurl    = url
-
-    document.title = `${base.title} [ ${掲示板[url].name} ]`
-    change_selected(掲示板, 掲示板[url].el)
-
-    サブジェクト.scrollTop = 0
-    ステータス.textContent = `${i}件のスレッドを受信 (${get_date()})`
-}
-
-
-
-サブジェクト一覧.parse = function (text, bbsurl) {
-    const result = []
-
-    for (const v of text.trim().split('\n')) {
-        const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+        const [, key, subject, num] = str.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url = スレッド.URL作成(bbsurl, key)
         const thread = スレッド[url] || {url, subject}
         thread.num = num
-
-        result.push(thread)
+        if (thread.num == thread.既得) {
+            thread.新着 = 0
+        }
+        html += サブジェクト一覧.render(thread, i)
     }
 
-    return result
+    サブジェクト一覧.innerHTML = html
+    サブジェクト一覧.bbsurl    = bbsurl
+
+    document.title = `${base.title} [ ${掲示板[bbsurl].name} ]`
+    change_selected(掲示板, 掲示板[bbsurl].el)
+
+    サブジェクト.scrollTop = 0
+    ステータス.textContent = `${i}件のスレッドを受信 (${get_date()})`
 }
 
 
