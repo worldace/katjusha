@@ -3,6 +3,7 @@
 
 function start(){
     mb_substitute_character('entity');
+    $post = function ($name){ return $_POST[$name] ?? ''; };
 
     if(getenv('REQUEST_METHOD') !== 'POST'){
         exit;
@@ -10,18 +11,18 @@ function start(){
     if(!$_POST){
         parse_str(file_get_contents('php://input'), $_POST);
     }
-    if(post('submit') !== '書き込む'){
+    if($post('submit') !== '書き込む'){
         mb_convert_variables('utf-8', 'sjis', $_POST);
     }
 
-    define('BBS_IS_THREAD', !post('key'));
+    define('BBS_IS_THREAD', !$post('key'));
 
-    define('BBS_BBS', post('bbs'));
-    define('BBS_KEY', post('key') ?: $_SERVER['REQUEST_TIME']);
-    define('BBS_FROM', post('FROM'));
-    define('BBS_MAIL', post('mail'));
-    define('BBS_SUBJECT', post('subject'));
-    define('BBS_MESSAGE', post('MESSAGE'));
+    define('BBS_BBS', $post('bbs'));
+    define('BBS_KEY', $post('key') ?: $_SERVER['REQUEST_TIME']);
+    define('BBS_FROM', $post('FROM'));
+    define('BBS_MAIL', $post('mail'));
+    define('BBS_SUBJECT', $post('subject'));
+    define('BBS_MESSAGE', $post('MESSAGE'));
 
     define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
 
@@ -288,17 +289,12 @@ class maintenance{
 
 
 
-function post($name){
-    return $_POST[$name] ?? '';
-}
-
-
 function is_utf8($str){
     return preg_match('//u', $str);
 }
 
 
-function file_edit(string $file, callable $fn, ...$args){
+function file_edit($file, $fn){
     $fp = fopen($file, 'cb+');
     if(!$fp){
         return false;
@@ -310,7 +306,7 @@ function file_edit(string $file, callable $fn, ...$args){
         $contents[] = $line;
     }
 
-    $contents = $fn($contents, ...$args);
+    $contents = $fn($contents);
 
     if(is_array($contents)){
         $contents = implode('', $contents);
