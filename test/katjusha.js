@@ -200,7 +200,17 @@
         return
     }
 
-    サブジェクト一覧.innerHTML = サブジェクト一覧.parse(text, url)
+    let html = ''
+    let i    = 1
+    for(const v of サブジェクト一覧.parse(text, url)){
+        html += サブジェクト一覧.render(v, i)
+        i++
+        if (v.num == v.既得) {
+            v.新着 = 0
+        }
+    }
+
+    サブジェクト一覧.innerHTML = html
     サブジェクト一覧.bbsurl    = url
 
     document.title = `${base.title} [ ${掲示板[url].name} ]`
@@ -212,42 +222,17 @@
 
 
 
-サブジェクト一覧.更新 = function (thread) {
-    const tr = サブジェクト一覧.querySelector(`[data-url="${thread.url}"]`)
-
-    if (tr) {
-        tr.cells[2].textContent = thread.num || ''
-        tr.cells[3].textContent = thread.既得 || ''
-        tr.cells[4].textContent = thread.新着 || ''
-        tr.cells[5].textContent = thread.最終取得 || ''
-        tr.cells[6].textContent = thread.最終書き込み || ''
-    }
-}
-
-
-
 サブジェクト一覧.parse = function (text, bbsurl) {
-    const subjects = text.split('\n')
-    subjects.pop()
+    const result = []
 
-    let html = ''
-    let i    = 1
+    for (const v of text.trim().split('\n')) {
+        const [key, subject, num] = v.replace('.dat', '').replace(/\s\((\d+)\)$/, '<>$1').split('<>')
+        const url = スレッド.URL作成(bbsurl, key)
 
-    for (const v of subjects) {
-        const [datfile, subject, num] = v.replace(/\s?\((\d+)\)$/, '<>$1').split('<>')
-        const key    = datfile.replace('.dat', '')
-        const url    = スレッド.URL作成(bbsurl, key)
-        const thread = スレッド[url] || {url, subject, num}
-
-        html += サブジェクト一覧.render(thread, i)
-        i++
-
-        if (num == thread.既得) {
-            thread.新着 = 0
-        }
+        result.push(スレッド[url] || {url, subject, num})
     }
 
-    return html
+    return result
 }
 
 
@@ -263,6 +248,20 @@
               <td>${thread.最終書き込み || ''}</td>
               <td></td>
             </tr>`
+}
+
+
+
+サブジェクト一覧.更新 = function (thread) {
+    const tr = サブジェクト一覧.querySelector(`[data-url="${thread.url}"]`)
+
+    if (tr) {
+        tr.cells[2].textContent = thread.num || ''
+        tr.cells[3].textContent = thread.既得 || ''
+        tr.cells[4].textContent = thread.新着 || ''
+        tr.cells[5].textContent = thread.最終取得 || ''
+        tr.cells[6].textContent = thread.最終書き込み || ''
+    }
 }
 
 
