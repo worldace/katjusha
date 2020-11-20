@@ -203,11 +203,11 @@
     let html = ''
     let i    = 1
     for(const v of サブジェクト一覧.parse(text, url)){
-        html += サブジェクト一覧.render(v, i)
-        i++
         if (v.num == v.既得) {
             v.新着 = 0
         }
+        html += サブジェクト一覧.render(v, i)
+        i++
     }
 
     サブジェクト一覧.innerHTML = html
@@ -226,7 +226,7 @@
     const result = []
 
     for (const v of text.trim().split('\n')) {
-        const [key, subject, num] = v.replace('.dat', '').replace(/\s\((\d+)\)$/, '<>$1').split('<>')
+        const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url = スレッド.URL作成(bbsurl, key)
 
         result.push(スレッド[url] || {url, subject, num})
