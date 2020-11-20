@@ -5,7 +5,7 @@
 
 require_once './lib.php';
 
-request::init();
+start();
 
 
 

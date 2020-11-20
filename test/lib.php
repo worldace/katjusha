@@ -1,56 +1,41 @@
 <?php
 
-class request{
-    static function init(){
-        mb_substitute_character('entity');
 
-        if(getenv('REQUEST_METHOD') !== 'POST'){
-            return;
-        }
-        if(!$_POST){
-            $_POST = request::raw();
-        }
-        if(request::post('submit') !== '書き込む'){
-            mb_convert_variables('utf-8', 'sjis', $_POST);
-        }
+function start(){
+    mb_substitute_character('entity');
 
-        define('BBS_IS_THREAD', !request::post('key'));
-
-        define('BBS_BBS', request::post('bbs'));
-        define('BBS_KEY', request::post('key') ?: $_SERVER['REQUEST_TIME']);
-        define('BBS_FROM', request::post('FROM'));
-        define('BBS_MAIL', request::post('mail'));
-        define('BBS_SUBJECT', request::post('subject'));
-        define('BBS_MESSAGE', request::post('MESSAGE'));
-
-        define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
-
-        define('BBS_SET', (function(){
-            include __DIR__.'/set.php';
-            return get_defined_vars();
-        })());
-
-        define('BBS_ADMIN', (function (){
-            $index = array_search(BBS_MAIL, array_column(BBS_SET['admin'], 'password'));
-            return ($index !== false) ? BBS_SET['admin'][$index] : null;
-        })());
+    if(getenv('REQUEST_METHOD') !== 'POST'){
+        exit;
+    }
+    if(!$_POST){
+        parse_str(file_get_contents('php://input'), $_POST);
+    }
+    if(post('submit') !== '書き込む'){
+        mb_convert_variables('utf-8', 'sjis', $_POST);
     }
 
+    define('BBS_IS_THREAD', !post('key'));
 
-    static function post($name){
-        return $_POST[$name] ?? '';
-    }
+    define('BBS_BBS', post('bbs'));
+    define('BBS_KEY', post('key') ?: $_SERVER['REQUEST_TIME']);
+    define('BBS_FROM', post('FROM'));
+    define('BBS_MAIL', post('mail'));
+    define('BBS_SUBJECT', post('subject'));
+    define('BBS_MESSAGE', post('MESSAGE'));
 
+    define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
 
-    static function raw(){
-        $post  = [];
-        foreach(explode('&', file_get_contents('php://input')) as $kv){
-            [$k, $v]  = explode('=', $kv);
-            $post[$k] = urldecode($v);
-        }
-        return $post;
-    }
+    define('BBS_SET', (function(){
+        include __DIR__.'/set.php';
+        return get_defined_vars();
+    })());
+
+    define('BBS_ADMIN', (function (){
+        $index = array_search(BBS_MAIL, array_column(BBS_SET['admin'], 'password'));
+        return ($index !== false) ? BBS_SET['admin'][$index] : null;
+    })());
 }
+
 
 
 
@@ -160,8 +145,8 @@ class res{
 
 
     static function date($time){
-	    $week = ['日','月','火','水','木','金','土'][date('w', $time)];
-	    return date("Y/m/d($week) H:i:s", $time);
+        $week = ['日','月','火','水','木','金','土'][date('w', $time)];
+        return date("Y/m/d($week) H:i:s", $time);
     }
 
 
@@ -199,7 +184,7 @@ class res{
             file_put_contents(thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
             array_splice($contents, $k, 1);
-    	    array_unshift($contents, $v);
+            array_unshift($contents, $v);
 
             return $contents;
         });
@@ -242,7 +227,7 @@ class res{
         $str = str_replace("\n", $br, $str);
         $str = preg_replace('/[[:cntrl:]]/', '', $str);
 
-    	return $str;
+        return $str;
     }
 }
 
@@ -250,7 +235,7 @@ class res{
 
 class maintenance{
     static function 削除($bbs_path, $message, $key = null){
-    	foreach(explode("\n", $message) as $v){
+        foreach(explode("\n", $message) as $v){
             if(preg_match("/>>(\d+)-?(\d+)?/", $v, $m)){
                 if($m[1] == 1){
                     return '1番目のレスは削除できません';
@@ -275,14 +260,14 @@ class maintenance{
             }
             arsort($list);
 
-        	foreach(array_keys($list) as $v){
-        		$filename = basename($v);
-        		$dat      = file($v);
-        		$subject  = explode("<>", $dat[0])[4];
-        		$subject  = rtrim($subject);
-        		$count    = count($dat);
-        		$result[] = "$filename<>$subject ($count)\n";
-        	}
+            foreach(array_keys($list) as $v){
+                $filename = basename($v);
+                $dat      = file($v);
+                $subject  = explode("<>", $dat[0])[4];
+                $subject  = rtrim($subject);
+                $count    = count($dat);
+                $result[] = "$filename<>$subject ($count)\n";
+            }
 
             return $result;
         });
@@ -292,15 +277,20 @@ class maintenance{
 
 
     static function 倉庫($bbs_path, $message){
-    	foreach(explode("\n", $message) as $v){
-    		if(preg_match("|/(\d+)/$|", $v, $m)){
-    		    thread::move($bbs_path, $m[1]);
+        foreach(explode("\n", $message) as $v){
+            if(preg_match("|/(\d+)/$|", $v, $m)){
+                thread::move($bbs_path, $m[1]);
             }
         }
         return '倉庫へ移動しました';
     }
 }
 
+
+
+function post($name){
+    return $_POST[$name] ?? '';
+}
 
 
 function is_utf8($str){
@@ -340,7 +330,6 @@ function file_edit(string $file, callable $fn, ...$args){
 }
 
 
-
 function success($bbs, $key){
     header('Cache-Control: no-cache');
     header('Content-type: text/html; charset=shift_jis');
@@ -351,7 +340,6 @@ function success($bbs, $key){
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
 }
-
 
 
 function error($str){
