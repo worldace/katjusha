@@ -201,13 +201,13 @@
     }
 
     let html = ''
-    let i    = 1
+    let i    = 0
     for(const v of サブジェクト一覧.parse(text, url)){
+        i++
         if (v.num == v.既得) {
             v.新着 = 0
         }
         html += サブジェクト一覧.render(v, i)
-        i++
     }
 
     サブジェクト一覧.innerHTML = html
@@ -217,7 +217,7 @@
     change_selected(掲示板, 掲示板[url].el)
 
     サブジェクト.scrollTop = 0
-    ステータス.textContent = `${サブジェクト一覧.childElementCount}件のスレッドを受信 (${get_date()})`
+    ステータス.textContent = `${i}件のスレッドを受信 (${get_date()})`
 }
 
 
