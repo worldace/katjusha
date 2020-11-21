@@ -240,10 +240,11 @@ body{
     grid-area: サブジェクト;
     overflow-y: scroll;
 }
-#サブジェクト表{
+#サブジェクト > table{
     border-collapse: collapse;
     width: 100%;
     margin: 1px 0 3px 0;
+    /*table-layout: fixed;*/
 }
 #サブジェクトヘッダ th{
     background-color: #f0f0f0;
