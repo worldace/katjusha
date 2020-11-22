@@ -202,11 +202,7 @@
 
     let html = ''
     let i    = 0
-    for(const str of text.trim().split('\n')){
-        if(!str){
-            break
-        }
-
+    for(const str of text.split('\n').slice(0, -1)){
         i++
         const [, key, subject, num] = str.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url = スレッド.URL作成(bbsurl, key)
