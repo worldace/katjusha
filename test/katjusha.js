@@ -203,6 +203,10 @@
     let html = ''
     let i    = 0
     for(const str of text.trim().split('\n')){
+        if(!str){
+            break
+        }
+
         i++
         const [, key, subject, num] = str.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url = スレッド.URL作成(bbsurl, key)
@@ -211,7 +215,7 @@
         if (thread.num == thread.既得) {
             thread.新着 = 0
         }
-        html += サブジェクト一覧.render(thread, i)
+        html += サブジェクト一覧.html(thread, i)
     }
 
     サブジェクト一覧.innerHTML = html
@@ -226,7 +230,7 @@
 
 
 
-サブジェクト一覧.render = function (thread, i){
+サブジェクト一覧.html = function (thread, i){
     return `<tr data-url="${thread.url}">
               <td>${i}</td>
               <td><a href="${thread.url}">${thread.subject}</a></td>
