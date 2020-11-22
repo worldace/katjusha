@@ -200,11 +200,10 @@
         return
     }
 
+    const list = サブジェクト一覧.parse(text)
+
     let html = ''
-    let i    = 0
-    for(const str of text.split('\n').slice(0, -1)){
-        i++
-        const [, key, subject, num] = str.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+    for(const {i, key, subject, num} of list){
         const url = スレッド.URL作成(bbsurl, key)
         const thread = スレッド[url] || {url, subject}
         thread.num = num
@@ -221,7 +220,22 @@
     change_selected(掲示板, 掲示板[bbsurl].el)
 
     サブジェクト.scrollTop = 0
-    ステータス.textContent = `${i}件のスレッドを受信 (${get_date()})`
+    ステータス.textContent = `${list.length}件のスレッドを受信 (${get_date()})`
+}
+
+
+
+サブジェクト一覧.parse = function (text) {
+    const result = []
+    const list   = text.split('\n')
+    list.pop()
+
+    for(let i = 0; i < list.length; i++){
+        const [, key, subject, num] = list[i].match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+        result.push({i:i+1, key, subject, num})
+    }
+
+    return result
 }
 
 
