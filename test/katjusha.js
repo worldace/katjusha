@@ -226,16 +226,15 @@
 
 
 サブジェクト一覧.parse = function (text) {
-    const result = []
-    const list   = text.split('\n')
+    const list = text.split('\n')
     list.pop()
 
     for(let i = 0; i < list.length; i++){
         const [, key, subject, num] = list[i].match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-        result.push({i:i+1, key, subject, num})
+        list[i] = {i:i+1, key, subject, num}
     }
 
-    return result
+    return list
 }
 
 
