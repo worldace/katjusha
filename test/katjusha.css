@@ -737,7 +737,7 @@ body{
 .menu ul{
     min-width: 160px;
     margin: 0;
-    padding: 2px 0;
+    padding: 3px 0;
     list-style: none;
     background-color: #f0f0f0;
     border: 1px solid #999;
@@ -745,7 +745,7 @@ body{
     box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);
 }
 .menu li{
-    font-family: 'Meiryo', sans-serif;
+    font-family: 'Yu Gothic UI Medium', 'Meiryo', sans-serif;
     font-size: 12px;
 }
 .menu li:empty{
@@ -757,7 +757,7 @@ body{
 
 .menu a{
     display: block;
-    padding: 1px 20px 1px 24px;
+    padding: 2px 20px 2px 24px;
     line-height: 18px;
     color: #333;
     white-space: nowrap;
