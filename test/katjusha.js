@@ -364,6 +364,9 @@
 
 
 中止アイコン.onclick = function (event) {
+    for(const v of ajax.controllers){
+        v.abort()
+    }
 }
 
 
@@ -874,7 +877,8 @@
 
 
 async function ajax(url, body) {
-    const request  = {cache:'no-store', mode:'cors', body}
+    const controller = new AbortController()
+    const request    = {cache:'no-store', mode:'cors', signal:controller.signal, body}
     let   response
     let   callback
 
@@ -907,6 +911,7 @@ async function ajax(url, body) {
         ステータス.textContent = `${new URL(url).hostname}に接続しています`
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) + 1
         タブ.ロード開始(url)
+        ajax.controllers.add(controller)
         response = await fetch(request.url, request)
     }
     catch (error) {
@@ -919,6 +924,7 @@ async function ajax(url, body) {
         ステータス.textContent = request.error || ''
         アニメ.dataset.ajax    = Number(アニメ.dataset.ajax) - 1
         タブ.ロード終了(url)
+        ajax.controllers.delete(controller)
     }
 
     const buffer = await response.arrayBuffer()
@@ -933,6 +939,10 @@ ajax.retry = function (url) {
     delete スレッド[url]
     ajax(url)
 }
+
+
+
+ajax.controllers = new Set
 
 
 
