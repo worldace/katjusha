@@ -3,6 +3,7 @@
 
 function start(){
     mb_substitute_character('entity');
+
     $post = function ($name){ return $_POST[$name] ?? ''; };
 
     if(getenv('REQUEST_METHOD') !== 'POST'){
@@ -15,25 +16,25 @@ function start(){
         mb_convert_variables('utf-8', 'sjis', $_POST);
     }
 
-    define('BBS_IS_THREAD', !$post('key'));
+    define('IS_THREAD', !$post('key'));
 
-    define('BBS_BBS', $post('bbs'));
-    define('BBS_KEY', $post('key') ?: $_SERVER['REQUEST_TIME']);
-    define('BBS_FROM', $post('FROM'));
-    define('BBS_MAIL', $post('mail'));
-    define('BBS_SUBJECT', $post('subject'));
-    define('BBS_MESSAGE', $post('MESSAGE'));
+    define('BBS', $post('bbs'));
+    define('KEY', $post('key') ?: $_SERVER['REQUEST_TIME']);
+    define('FROM', $post('FROM'));
+    define('MAIL', $post('mail'));
+    define('SUBJECT', $post('subject'));
+    define('MESSAGE', $post('MESSAGE'));
 
-    define('BBS_PATH', sprintf('%s/../%s', __DIR__, BBS_BBS));
+    define('PATH', sprintf('%s/../%s', __DIR__, BBS));
 
-    define('BBS_SET', (function(){
+    define('SET', (function(){
         include __DIR__.'/set.php';
         return get_defined_vars();
     })());
 
-    define('BBS_ADMIN', (function (){
-        $index = array_search(BBS_MAIL, array_column(BBS_SET['admin'], 'password'));
-        return ($index !== false) ? BBS_SET['admin'][$index] : null;
+    define('ADMIN', (function (){
+        $i = array_search(MAIL, array_column(SET['admin'], 'password'));
+        return is_int($i) ? SET['admin'][$i] : [];
     })());
 }
 
@@ -123,11 +124,11 @@ class thread{
 
 class res{
     static function from($from){
-        if(BBS_ADMIN){
-            return BBS_ADMIN['name'] . ' ★';
+        if(ADMIN){
+            return ADMIN['name'] . ' ★';
         }
         if($from === ''){
-            return BBS_SET['nanashi'];
+            return SET['nanashi'];
         }
         $from = res::escape($from);
         $from = str_replace('★', '☆', $from);

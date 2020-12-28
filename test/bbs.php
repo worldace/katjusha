@@ -9,69 +9,74 @@ start();
 
 
 
-if(BBS_ADMIN and method_exists('maintenance', BBS_FROM)){
-    error(maintenance::{BBS_FROM}(BBS_PATH, BBS_MESSAGE, BBS_KEY));
+if(ADMIN and method_exists('maintenance', FROM)){
+    error(maintenance::{FROM}(PATH, MESSAGE, KEY));
 }
 
 
-if(!BBS_BBS){
+if(!BBS){
     error('bbsが存在しません');
 }
-if(preg_match('/[\W]/', BBS_BBS)){
+if(preg_match('/[\W]/', BBS)){
     error('bbsが不正です');
 }
-if(!subject::exists(BBS_PATH)){
+if(!subject::exists(PATH)){
     error('板が存在しません');
 }
 
-if(!BBS_IS_THREAD and preg_match('/[\D]/', BBS_KEY)){
+if(!IS_THREAD and preg_match('/[\D]/', KEY)){
     error('keyが不正です');
 }
-if(!BBS_IS_THREAD and !thread::exists(BBS_PATH, BBS_KEY)){
-    thread::is_kako(BBS_PATH, BBS_KEY) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
+if(!IS_THREAD and !thread::exists(PATH, KEY)){
+    thread::is_kako(PATH, KEY) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
 }
 
-if(BBS_IS_THREAD and !BBS_SUBJECT){
+if(IS_THREAD and !SUBJECT){
     error('タイトルを入力してください');
 }
-if(BBS_IS_THREAD and !is_utf8(BBS_SUBJECT)){
+if(IS_THREAD and !is_utf8(SUBJECT)){
     error('文字コードが不正です');
 }
-if(BBS_IS_THREAD and strlen(BBS_SUBJECT) > 96){
+if(IS_THREAD and strlen(SUBJECT) > 96){
     error('タイトルが長すぎます');
 }
 
-if(strlen(BBS_FROM) > 32){
+if(strlen(FROM) > 32){
     error('名前が長すぎます');
 }
-if(!is_utf8(BBS_FROM)){
+if(!is_utf8(FROM)){
     error('文字コードが不正です');
 }
 
-if(strlen(BBS_MAIL) > 64){
+if(strlen(MAIL) > 64){
     error('メールが長すぎます');
 }
-if(!is_utf8(BBS_MAIL)){
+if(!is_utf8(MAIL)){
     error('文字コードが不正です');
 }
 
-if(!BBS_MESSAGE){
+if(!MESSAGE){
     error('本文を入力してください');
 }
-if(strlen(BBS_MESSAGE) > 4096){
+if(strlen(MESSAGE) > 4096){
     error('本文が長すぎます');
 }
 
 
 
-$from    = res::from(BBS_FROM);
-$mail    = res::mail(BBS_MAIL);
-$message = res::message(BBS_MESSAGE);
 
-if(BBS_IS_THREAD){
-    $subject = res::subject(BBS_SUBJECT);
-    thread::create(BBS_PATH, BBS_KEY, $from, $mail, $message, $subject) ? success(BBS_BBS, BBS_KEY) : error('スレッド書き込みエラー');
+if(IS_THREAD){
+    $from    = res::from(FROM);
+    $mail    = res::mail(MAIL);
+    $message = res::message(MESSAGE);
+    $subject = res::subject(SUBJECT);
+
+    thread::create(PATH, KEY, $from, $mail, $message, $subject) ? success(BBS, KEY) : error('スレッド書き込みエラー');
 }
 else{
-    res::create(BBS_PATH, BBS_KEY, $from, $mail, $message) ? success(BBS_BBS, BBS_KEY) : error('レス書き込みエラー');
+    $from    = res::from(FROM);
+    $mail    = res::mail(MAIL);
+    $message = res::message(MESSAGE);
+
+    res::create(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
 }
