@@ -3,7 +3,39 @@
 二重書き込み
 */
 
-start();
+mb_substitute_character('entity');
+
+if(getenv('REQUEST_METHOD') !== 'POST'){
+    exit;
+}
+if(!$_POST){
+    parse_str(file_get_contents('php://input'), $_POST);
+}
+if(post('submit') !== '書き込む'){
+    mb_convert_variables('utf-8', 'sjis', $_POST);
+}
+
+define('IS_THREAD', !post('key'));
+
+define('BBS', post('bbs'));
+define('KEY', post('key') ?: $_SERVER['REQUEST_TIME']);
+define('FROM', post('FROM'));
+define('MAIL', post('mail'));
+define('SUBJECT', post('subject'));
+define('MESSAGE', post('MESSAGE'));
+
+define('PATH', sprintf('%s/../%s', __DIR__, BBS));
+
+define('SET', (function(){
+    include __DIR__.'/set.php';
+    return get_defined_vars();
+})());
+
+define('ADMIN', (function (){
+    $i = array_search(MAIL, array_column(SET['admin'], 'password'));
+    return is_int($i) ? SET['admin'][$i] : [];
+})());
+
 
 
 
@@ -76,46 +108,6 @@ else{
     $message = res::message(MESSAGE);
 
     res::create(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
-}
-
-
-
-
-function start(){
-    mb_substitute_character('entity');
-
-    $post = function ($name){ return $_POST[$name] ?? ''; };
-
-    if(getenv('REQUEST_METHOD') !== 'POST'){
-        exit;
-    }
-    if(!$_POST){
-        parse_str(file_get_contents('php://input'), $_POST);
-    }
-    if($post('submit') !== '書き込む'){
-        mb_convert_variables('utf-8', 'sjis', $_POST);
-    }
-
-    define('IS_THREAD', !$post('key'));
-
-    define('BBS', $post('bbs'));
-    define('KEY', $post('key') ?: $_SERVER['REQUEST_TIME']);
-    define('FROM', $post('FROM'));
-    define('MAIL', $post('mail'));
-    define('SUBJECT', $post('subject'));
-    define('MESSAGE', $post('MESSAGE'));
-
-    define('PATH', sprintf('%s/../%s', __DIR__, BBS));
-
-    define('SET', (function(){
-        include __DIR__.'/set.php';
-        return get_defined_vars();
-    })());
-
-    define('ADMIN', (function (){
-        $i = array_search(MAIL, array_column(SET['admin'], 'password'));
-        return is_int($i) ? SET['admin'][$i] : [];
-    })());
 }
 
 
@@ -369,6 +361,10 @@ class maintenance{
 }
 
 
+function post($name){
+    return $_POST[$name] ?? '';
+}
+
 
 function is_utf8($str){
     return preg_match('//u', $str);
@@ -429,6 +425,4 @@ function error($str){
     print mb_convert_encoding($html, 'sjis', 'utf-8');
     exit;
 }
-
-
 
