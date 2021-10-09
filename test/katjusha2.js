@@ -1,7 +1,4 @@
 const スレッド = {}
-const 掲示板   = {}
-
-
 
 
 $katjusha.start = function () {
@@ -1103,7 +1100,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    add(url, title, html) {
+    appendHTML(html, url, title) {
         const tab         = $tab.search(url) || $tab.selected
         tab.innerHTML     = title
         tab.el.innerHTML += html
@@ -1202,7 +1199,7 @@ class KatjushaThread extends HTMLElement{
             thread.最終取得= date()
 
             this.clear(thread.url)
-            this.add(thread.url, thread.subject, thread.html)
+            this.appendHTML(thread.html, thread.url, thread.subject)
             $subject.update(thread)
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
@@ -1219,7 +1216,7 @@ class KatjushaThread extends HTMLElement{
             thread.新着    = dat.num
             thread.最終取得= date()
 
-            this.add(thread.url, thread.subject, dat.html)
+            this.appendHTML(dat.html, thread.url, thread.subject)
             $subject.update(thread)
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
@@ -2015,7 +2012,7 @@ function dndwindow(el, event) {
     const limitY = innerHeight - height
 
     document.addEventListener('mousemove', move)
-    document.addEventListener('mouseup',   up,   {once:true})
+    document.addEventListener('mouseup', up, {once:true})
 
     function move(event) {
         el.style.left = Math.min(Math.max(0, startX+event.pageX), limitX) + 'px'
@@ -2039,5 +2036,6 @@ customElements.define('katjusha-status', KatjushaStatus)
 customElements.define('katjusha-form', KatjushaForm)
 customElements.define('katjusha-context', KatjushaContext)
 customElements.define('katjusha-popup', KatjushaPopup)
+
 
 $katjusha.start()
