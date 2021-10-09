@@ -1103,7 +1103,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    追記(url, title, html) {
+    add(url, title, html) {
         const tab         = $tab.search(url) || $tab.selected
         tab.innerHTML     = title
         tab.el.innerHTML += html
@@ -1112,7 +1112,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    クリア(url) {
+    clear(url) {
         const el = Array.from(this.children).find(v => v.url === url)
 
         if(el){
@@ -1121,7 +1121,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    アンカー移動(n) {
+    goto(n) {
         this.selected.children[n--]?.scrollIntoView()
     }
 
@@ -1147,7 +1147,7 @@ class KatjushaThread extends HTMLElement{
             }
 
             //datファイルにaタグが含まれる場合: message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="スレッド.アンカー移動($1)" onmouseenter="$popup.open($1)" onmouseleave="$popup.close()">&gt;&gt;$1</span>')
+            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="$thread.goto($1)" onmouseenter="$popup.open($1)" onmouseleave="$popup.close()">&gt;&gt;$1</span>')
             message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             message = message.replace(/^ /, '')
 
@@ -1186,8 +1186,8 @@ class KatjushaThread extends HTMLElement{
             thread.新着    = dat.num
             thread.最終取得= date()
 
-            this.クリア(thread.url)
-            this.追記(thread.url, thread.subject, thread.html)
+            this.clear(thread.url)
+            this.add(thread.url, thread.subject, thread.html)
             $subject.update(thread)
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
@@ -1204,7 +1204,7 @@ class KatjushaThread extends HTMLElement{
             thread.新着    = dat.num
             thread.最終取得= date()
 
-            this.追記(thread.url, thread.subject, dat.html)
+            this.add(thread.url, thread.subject, dat.html)
             $subject.update(thread)
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
