@@ -19,7 +19,7 @@ $katjusha.start = function () {
 $katjusha.onclick = function(event){
     const url = event.path[0].href
 
-    if (!url) {/* || !掲示板.ホスト一覧.has( new URL(url).hostname ) */
+    if (!url) { // || !掲示板.ホスト一覧.has( new URL(url).hostname )
         return
     }
 
@@ -1079,7 +1079,7 @@ class KatjushaThread extends HTMLElement{
 
         const context = `
           <ul class="menu">
-            <li><a onclick="これにレス(${event.target.textContent})">これにレス</a></li>
+            <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
           </ul>
         `
 
@@ -1126,9 +1126,9 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    これにレス(n) {
-        //レス投稿アイコン.click()
-        //insert_text(投稿フォーム_本文欄, `>>${n}\n`)
+    responseTo(n) {
+        $headline.$レス投稿アイコン.click()
+        $form.insert(`>>${n}\n`)
     }
 
 
@@ -1366,6 +1366,15 @@ class KatjushaForm extends HTMLElement{
         const {width, height} = this.getBoundingClientRect()
         this.style.left = `${innerWidth/2 - width/2}px`
         this.style.top  = `${innerHeight/2 - height/2}px`
+    }
+
+
+    insert(text){
+        const cursor = this.$message.selectionStart
+        const before = this.$message.value.substr(0, cursor)
+        const after  = this.$message.value.substr(cursor, this.$message.value.length)
+
+        this.$message.value = before + text + after
     }
 
 
