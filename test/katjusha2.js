@@ -48,7 +48,7 @@ class KatjushaToolbar extends HTMLElement{
 
 
     $スレッド投稿アイコン_click(event) {
-        new KatjushaForm().show($subject.bbsurl)
+        new KatjushaForm().open($subject.bbsurl)
     }
 
 
@@ -923,7 +923,7 @@ class KatjushaHeadline extends HTMLElement{
 
 
     $レス投稿アイコン_click(event) {
-        new KatjushaForm().show($tab.selected.url)
+        new KatjushaForm().open($tab.selected.url)
     }
 
 
@@ -1122,13 +1122,28 @@ class KatjushaThread extends HTMLElement{
 
 
     goto(n) {
-        this.selected.children[n--]?.scrollIntoView()
+        this.selected.children[n-1]?.scrollIntoView()
     }
 
 
     responseTo(n) {
         $headline.$レス投稿アイコン.click()
         $form.insert(`>>${n}\n`)
+    }
+
+
+    popup(event, n){
+        const el = this.selected.children[n-1]
+
+        if (!el) {
+            return
+        }
+
+        const {left, width, top} = event.target.getBoundingClientRect()
+        const x = left + width / 2
+        const y = innerHeight - top + 6
+
+        new KatjushaPopup(el.outerHTML, x, y).show()
     }
 
 
@@ -1147,7 +1162,7 @@ class KatjushaThread extends HTMLElement{
             }
 
             //datファイルにaタグが含まれる場合: message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="$thread.goto($1)" onmouseenter="$popup.open($1)" onmouseleave="$popup.close()">&gt;&gt;$1</span>')
+            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="$thread.goto($1)" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             message = message.replace(/^ /, '')
 
@@ -1331,7 +1346,7 @@ class KatjushaForm extends HTMLElement{
     }
 
 
-    show(url){
+    open(url){
         if(!url || window['$form']){
             return
         }
@@ -1660,10 +1675,6 @@ class KatjushaForm extends HTMLElement{
 
 
 
-
-
-
-
 class KatjushaContext extends HTMLElement{
 
     constructor(html, x, y){
@@ -1769,6 +1780,100 @@ class KatjushaContext extends HTMLElement{
     }
 }
 
+
+
+class KatjushaPopup extends HTMLElement{
+
+    constructor(html, x, y){
+        super()
+        this.content      = html
+        this.style.left   = `${x}px`
+        this.style.bottom = `${y}px`
+        this.id           = '$popup'
+
+        benry(this)
+    }
+
+
+    show(){
+        document.body.append(this)
+    }
+
+
+    get html(){
+        return `
+        ${this.content}
+        <style>
+        :host{
+            font-size: 14px;
+            color: #000;
+            background-color: #ffffe1;
+            position: absolute;
+            border-right: 1px solid #7f7f7f;
+            border-bottom: 1px solid #7f7f7f;
+            border-left: 1px solid #e4e4e4;
+            border-top: 1px solid #e4e4e4;
+            box-shadow: 0 1px 0 #f7f7f7;
+            z-index: 8;
+            padding: 6px 4px;
+            cursor: default;
+        }
+
+        .レス p{
+            margin: 3px 0 0 12px !important;
+        }
+
+        /* 以下はKatjushaThreadのコピペ */
+        .レス i{
+            color: blue;
+            font-style: normal;
+            cursor: pointer;
+        }
+        .レス i:hover{
+            text-decoration: underline;
+        }
+        .レス .from{
+            color: forestgreen;
+        }
+        .レス .from::before{
+            content: '名前：';
+            color: #000;
+            margin: 0 0.1rem 0 0.7rem;
+            user-select: text;
+        }
+        .レス time{
+        }
+        .レス time::before{
+            content: '投稿日：';
+            margin: 0 0.1rem 0 0.7rem;
+            user-select: text;
+        }
+        .レス address{
+            display: inline;
+            font-style: normal;
+            color: red;
+            margin-left: 8px;
+        }
+        .レス p{
+            margin-top: 2px;
+            margin-left: 36px;
+            white-space: pre-wrap;
+        }
+        .レス a{
+            text-decoration: none;
+        }
+        .レス a:hover{
+            text-decoration: underline;
+        }
+        .レス .anker{
+            position: relative;
+            cursor: pointer;
+            color: blue;
+        }
+        </style>
+        `
+    }
+}
 
 
 
@@ -1933,5 +2038,6 @@ customElements.define('katjusha-tab', KatjushaTab)
 customElements.define('katjusha-status', KatjushaStatus)
 customElements.define('katjusha-form', KatjushaForm)
 customElements.define('katjusha-context', KatjushaContext)
+customElements.define('katjusha-popup', KatjushaPopup)
 
 $katjusha.start()
