@@ -1,47 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja" id="$katjusha">
 <head>
+  <base id="$base" href="http://127.0.0.1/katjusha/index2.html">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title id="$title">かちゅぼ～ど</title>
-  <base id="$base" href="http://127.0.0.1/katjusha/index2.html">
   <script src="test/katjusha2.js" async></script>
   <link rel="stylesheet" href="test/katjusha2.css">
-  <link rel="icon" href="test/favicon.ico">
+  <link rel="icon" href="test/favicon.png" type="image/png">
 </head>
 <body>
 
 
+<katjusha-toolbar id="$toolbar"></katjusha-toolbar>
 
-<header id="ヘッダ">
-  <div id="ナビアイコン">
-    <span id="オンラインアイコン" class="icon"></span>
-    <span id="セーブアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="検索アイコン" class="icon"></span>
-    <span id="巡回アイコン" class="icon"></span>
-    <span id="スレッド投稿アイコン" class="icon" title="新規スレッド書き込み"></span>
-    <span class="icon-separate"></span>
-    <span id="ペインアイコン" class="icon"></span>
-    <span id="グリッド1アイコン" class="icon"></span>
-    <span id="グリッド2アイコン" class="icon"></span>
-    <span id="グリッド3アイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="設定アイコン" class="icon"></span>
-    <span id="ヘルプアイコン" class="icon" title="ヘルプ"></span>
-    <span class="icon-separate"></span>
-  </div>
-  <div id="板ボタン">
-    <span class="icon-text" id="全板ボタン">▽</span>
-  </div>
-  <div id="アニメ" data-ajax="0"></div>
-</header>
-
-
-
-<div id="枠線"></div>
-
-
+<katjusha-border id="$border"></katjusha-border>
 
 <katjusha-bbs id="$bbs"><!--[
 {"name":"掲示板a", "url":"http://127.0.0.1/katjusha/a/", "category":"カテゴリ1"},
@@ -49,55 +22,15 @@
 {"name":"掲示板c", "url":"http://127.0.0.1/katjusha/c/", "category":"カテゴリ2"}
 ]--></katjusha-bbs>
 
-
-
 <katjusha-subject id="$subject"></katjusha-subject>
-
-
 
 <katjusha-headline id="$headline"></katjusha-headline>
 
-
 <katjusha-tab id="$tab"></katjusha-tab>
+
 <katjusha-thread id="$thread"></katjusha-thread>
 
-
-
-<footer id="$status"></footer>
-
-
-<div id="投稿フォーム">
-  <header id="投稿フォーム_ヘッダ">
-    <h1 id="投稿フォーム_タイトル"></h1>
-    <span id="投稿フォーム_閉じるボタン"></span>
-  </header>
-  <ul id="投稿フォーム_タブ">
-    <li class="選択">書き込み</li>
-    <li>ローカルルール</li>
-  </ul>
-  <form method="POST" action="test/bbs.cgi" id="投稿フォーム_form" spellcheck="false">
-    <div id="投稿フォーム_タイトルライン">
-      <label id="投稿フォーム_タイトルラベル">タイトル</label>
-      <input type="text" name="subject" id="投稿フォーム_タイトル欄">
-    </div>
-    <div id="投稿フォーム_名前ライン">
-      <label id="投稿フォーム_名前ラベル">名前</label>
-      <input type="text" name="FROM" id="投稿フォーム_名前欄">
-      <label id="投稿フォーム_メールラベル">メール</label><input type="text" name="mail" id="投稿フォーム_メール欄">
-      <input type="checkbox" id="投稿フォーム_sage">
-      <label for="投稿フォーム_sage" id="投稿フォーム_sageラベル">sage</label>
-    </div>
-    <textarea id="投稿フォーム_本文欄" name="MESSAGE"></textarea>
-    <div id="投稿フォーム_ボタンライン">
-      <input type="submit" value="書き込む" id="投稿フォーム_投稿ボタン">
-      <input type="reset" value="キャンセル">
-    </div>
-    <input type="hidden" name="bbs">
-    <input type="hidden" name="key">
-    <input type="hidden" name="submit" value="書き込む">
-  </form>
-</div>
-
+<katjusha-status id="$status"></katjusha-status>
 
 
 <div id="レスポップアップ"></div>
