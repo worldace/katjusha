@@ -1,8 +1,6 @@
 const スレッド = {}
 
-/*
-受信後(特にformが消えてる場合)
-*/
+
 
 
 $katjusha.start = function () {
@@ -25,7 +23,10 @@ $katjusha.link = function (url, target){
 $katjusha.onclick = function(event){
     const url = event.path[0].href ?? ''
 
-    if (url === $base.href) {
+    if(!url){
+        return
+    }
+    else if (url === $base.href) {
         event.preventDefault()
         history.replaceState(null, null, url)
     }
@@ -1784,7 +1785,6 @@ class KatjushaPopup extends HTMLElement{
 
 async function ajax(url, formdata) {
     const abort   = new AbortController()
-
     const request = {cache:'no-store', mode:'cors', signal:abort.signal}
 
     if (url.includes('bbs.cgi')) {
@@ -1843,7 +1843,7 @@ async function ajax(url, formdata) {
 ajax.abort = new Set
 
 
-ajax.subject = function (response){
+ajax.subject = function(response){
     history.replaceState(null, null, response.URL)
 
     if(response.status === 200){
@@ -1862,7 +1862,7 @@ ajax.subject = function (response){
 }
 
 
-ajax.thread = function (response){
+ajax.thread = function(response){
     history.replaceState(null, null, response.URL)
 
     if (response.status === 200) {
@@ -1919,7 +1919,7 @@ ajax.thread = function (response){
 }
 
 
-ajax.form = function (response){
+ajax.form = function(response){
     if(response.status === 200){
         if (response.content.includes('<title>ＥＲＲＯＲ！')) {
             if(window['$form']){
