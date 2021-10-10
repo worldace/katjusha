@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja" id="かちゅぼーど">
+<html lang="ja" id="$katjusha">
 <head>
+  <base id="$base" href="http://127.0.0.1/katjusha/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>かちゅぼ～ど</title>
-  <base href="http://127.0.0.1/katjusha/" id="base">
+  <title id="$title">かちゅぼ～ど</title>
   <script src="test/katjusha.js" async></script>
   <link rel="stylesheet" href="test/katjusha.css">
   <link rel="icon" href="test/favicon.png" type="image/png">
@@ -12,131 +12,26 @@
 <body>
 
 
+<katjusha-toolbar id="$toolbar"></katjusha-toolbar>
 
-<header id="ヘッダ">
-  <div id="ナビアイコン">
-    <span id="オンラインアイコン" class="icon"></span>
-    <span id="セーブアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="検索アイコン" class="icon"></span>
-    <span id="巡回アイコン" class="icon"></span>
-    <span id="スレッド投稿アイコン" class="icon" title="新規スレッド書き込み"></span>
-    <span class="icon-separate"></span>
-    <span id="ペインアイコン" class="icon"></span>
-    <span id="グリッド1アイコン" class="icon"></span>
-    <span id="グリッド2アイコン" class="icon"></span>
-    <span id="グリッド3アイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="設定アイコン" class="icon"></span>
-    <span id="ヘルプアイコン" class="icon" title="ヘルプ"></span>
-    <span class="icon-separate"></span>
-  </div>
-  <div id="板ボタン">
-    <span class="icon-text" id="全板ボタン">▽</span>
-  </div>
-  <div id="アニメ" data-ajax="0"></div>
-</header>
+<katjusha-border id="$border"></katjusha-border>
 
+<katjusha-bbs id="$bbs"><!--[
+{"name":"掲示板a", "url":"http://127.0.0.1/katjusha/a/", "category":"カテゴリ1"},
+{"name":"掲示板b", "url":"http://127.0.0.1/katjusha/b/", "category":"カテゴリ1"},
+{"name":"掲示板c", "url":"http://127.0.0.1/katjusha/c/", "category":"カテゴリ2"}
+]--></katjusha-bbs>
 
+<katjusha-subject id="$subject"></katjusha-subject>
 
-<div id="枠線"></div>
+<katjusha-headline id="$headline"></katjusha-headline>
 
+<katjusha-tab id="$tab"></katjusha-tab>
 
+<katjusha-thread id="$thread"></katjusha-thread>
 
-<nav id="掲示板">
-  <details open>
-    <summary>カテゴリ1</summary>
-    <a href="http://127.0.0.1/katjusha/a/">掲示板a</a>
-    <a href="http://127.0.0.1/katjusha/b/">掲示板b</a>
-  </details>
-  <details open>
-    <summary>カテゴリ2</summary>
-    <a href="http://127.0.0.1/katjusha/c/">掲示板c</a>
-    <a href="http://127.0.0.1/katjusha/d/">掲示板d</a>
-  </details>
-</nav>
+<katjusha-status id="$status"></katjusha-status>
 
-
-
-<nav id="サブジェクト">
-  <table>
-    <thead id="サブジェクトヘッダ">
-      <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
-    </thead>
-    <tbody id="サブジェクト一覧"></tbody>
-  </table>
-</nav>
-
-
-
-<header id="スレッドヘッダ">
-  <div>
-    <span id="スレッドヘッダ_掲示板名"></span>
-    <span id="スレッドヘッダ_タイトル"></span>
-  </div>
-  <div id="スレッドヘッダ_アイコン">
-    <span id="リストアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="レス更新アイコン" class="icon" title="レスを取得"></span>
-    <span id="中止アイコン" class="icon" title="レス受信中止"></span>
-    <span class="icon-separate"></span>
-    <span id="レス投稿アイコン" class="icon" title="レス書き込み"></span>
-    <span id="お気に入りアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="ごみ箱アイコン" class="icon" title="ログ削除"></span>
-    <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
-  </div>
-</header>
-
-
-
-<ul id="タブ"></ul>
-
-
-
-<main id="スレッド"></main>
-
-
-
-<footer id="ステータス"></footer>
-
-
-<div id="投稿フォーム">
-  <header id="投稿フォーム_ヘッダ">
-    <h1 id="投稿フォーム_タイトル"></h1>
-    <span id="投稿フォーム_閉じるボタン"></span>
-  </header>
-  <ul id="投稿フォーム_タブ">
-    <li class="選択">書き込み</li>
-    <li>ローカルルール</li>
-  </ul>
-  <form method="POST" action="test/bbs.cgi" id="投稿フォーム_form" spellcheck="false">
-    <div id="投稿フォーム_タイトルライン">
-      <label id="投稿フォーム_タイトルラベル">タイトル</label>
-      <input type="text" name="subject" id="投稿フォーム_タイトル欄">
-    </div>
-    <div id="投稿フォーム_名前ライン">
-      <label id="投稿フォーム_名前ラベル">名前</label>
-      <input type="text" name="FROM" id="投稿フォーム_名前欄">
-      <label id="投稿フォーム_メールラベル">メール</label><input type="text" name="mail" id="投稿フォーム_メール欄">
-      <input type="checkbox" id="投稿フォーム_sage">
-      <label for="投稿フォーム_sage" id="投稿フォーム_sageラベル">sage</label>
-    </div>
-    <textarea id="投稿フォーム_本文欄" name="MESSAGE"></textarea>
-    <div id="投稿フォーム_ボタンライン">
-      <input type="submit" value="書き込む" id="投稿フォーム_投稿ボタン">
-      <input type="reset" value="キャンセル">
-    </div>
-    <input type="hidden" name="bbs">
-    <input type="hidden" name="key">
-    <input type="hidden" name="submit" value="書き込む">
-  </form>
-</div>
-
-
-<nav id="コンテキスト"></nav>
-
-<div id="レスポップアップ"></div>
 
 
 </body>
