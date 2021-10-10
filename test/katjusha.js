@@ -4,7 +4,7 @@ const スレッド = {}
 
 
 $katjusha.start = function () {
-    $base.title    = document.title
+    $base.title = document.title
     //全板ボタン.textContent = `▽${base.title}`
 
     if (document.URL !== $base.href) {
@@ -1341,7 +1341,7 @@ class KatjushaForm extends HTMLElement{
 
 
     $header_mousedown(event) {
-        dndwindow(this, event)
+        dndwindow(this, event.pageX, event.pageY)
     }
 
 
@@ -2014,11 +2014,11 @@ function datURL作成(url){
 }
 
 
-function dndwindow(el, event) {
+function dndwindow(el, pageX, pageY) {
     const {left, top, width, height} = el.getBoundingClientRect()
 
-    const startX = left - event.pageX
-    const startY = top  - event.pageY
+    const startX = left - pageX
+    const startY = top  - pageY
     const limitX = innerWidth  - width
     const limitY = innerHeight - height
 
