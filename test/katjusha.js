@@ -1,9 +1,7 @@
-const スレッド = {}
-
-
 
 
 $katjusha.start = function () {
+    window.スレッド = {}
     $base.title = document.title
     //全板ボタン.textContent = `▽${base.title}`
 
