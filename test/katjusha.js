@@ -1821,7 +1821,7 @@ async function ajax(url, formdata) {
         if(error.name !== 'AbortError'){
             request.error = `${new URL(url).hostname}に接続できませんでした`
         }
-        return // finally後にreturnされる。undefinedが返る(responseはundefined)
+        return error // finally後にreturnされる。(responseはundefined)
     }
     finally {
         $status.textContent = request.error || ''
@@ -1844,7 +1844,6 @@ ajax.abort = new Set
 
 
 ajax.subject = function(response){
-    history.replaceState(null, null, response.URL)
 
     if(response.status === 200){
         $subject.bbsurl = response.URL
@@ -1858,12 +1857,14 @@ ajax.subject = function(response){
     }
     else{
         $subject.$tbody.textContent = ''
+        return
     }
+
+    history.replaceState(null, null, response.URL)
 }
 
 
 ajax.thread = function(response){
-    history.replaceState(null, null, response.URL)
 
     if (response.status === 200) {
         const thread        = スレッド[response.URL] = {}
@@ -1916,6 +1917,11 @@ ajax.thread = function(response){
     else if (response.status === 404) {
         $status.textContent = `スレッドが見つかりません (${date()})`
     }
+    else{
+        return
+    }
+
+    history.replaceState(null, null, response.URL)
 }
 
 
@@ -1934,7 +1940,6 @@ ajax.form = function(response){
 
         window['$form']?.remove()
         $katjusha.link(response.URL)
-    
     }
     else{
         if(window['$form']){
