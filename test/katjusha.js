@@ -223,7 +223,8 @@ class KatjushaBorder extends HTMLElement{
 class KatjushaBBS extends HTMLElement{
     constructor(){
         super()
-        this.list = JSON.parse(this.firstChild.textContent)
+        this.list    = JSON.parse(this.firstChild.textContent)
+        this.content = this.render(this.list)
         benry(this)
     }
 
@@ -248,7 +249,7 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
-    toHTML(list){
+    render(list){
         let html = ''
         let category
 
@@ -290,7 +291,7 @@ class KatjushaBBS extends HTMLElement{
 
     get html(){
         return `
-        ${this.toHTML(this.list)}
+        ${this.content}
         <style>
         :host{
             padding-top: 3px;
