@@ -282,10 +282,10 @@ class KatjushaBBS extends HTMLElement{
                 return
             }
         }
-        
+
+        this.selected?.removeAttribute('selected')
         this.selected = el
-        this.$.querySelector('[selected]')?.removeAttribute('selected')
-        el.setAttribute('selected', 'selected')
+        el.setAttribute('selected', true)
     }
 
 
