@@ -490,9 +490,9 @@ class KatjushaSubject extends HTMLElement{
 
 
     active(el){
+        this.selected?.removeAttribute('selected')
         this.selected = el
-        this.$.querySelector('[selected]')?.removeAttribute('selected')
-        el.setAttribute('selected', 'selected')
+        el.setAttribute('selected', true)
     }
 
 
@@ -773,9 +773,9 @@ class KatjushaTab extends HTMLElement{
 
 
     select(tab) {
+        this.selected?.removeAttribute('selected')
         this.selected = tab
-        this.$tab.querySelector('[selected]')?.removeAttribute('selected')
-        tab.setAttribute('selected', 'selected')
+        tab.setAttribute('selected', true)
 
         $thread.active(tab.el)
 
@@ -1077,9 +1077,9 @@ class KatjushaThread extends HTMLElement{
 
 
     active(el){
+        this.selected?.removeAttribute('selected')
         this.selected = el
-        this.$.querySelector('[selected]')?.removeAttribute('selected')
-        el.setAttribute('selected', 'selected')
+        el.setAttribute('selected', true)
     }
 
 
@@ -1274,7 +1274,7 @@ class KatjushaForm extends HTMLElement{
             return
         }
 
-        document.body.append(this)
+        $body.append(this)
         this.centering()
 
         if( url.includes('read.cgi') ){
@@ -1596,7 +1596,7 @@ class KatjushaContext extends HTMLElement{
 
 
     show(){
-        document.body.append(this)
+        $body.append(this)
     }
 
 
@@ -1701,7 +1701,7 @@ class KatjushaPopup extends HTMLElement{
 
 
     show(){
-        document.body.append(this)
+        $body.append(this)
     }
 
 
