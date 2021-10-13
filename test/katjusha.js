@@ -1308,9 +1308,8 @@ class KatjushaForm extends HTMLElement{
 
 
     insert(text){
-        const cursor = this.$message.selectionStart
-        const before = this.$message.value.substr(0, cursor)
-        const after  = this.$message.value.substr(cursor, this.$message.value.length)
+        const before = this.$message.value.substr(0, this.$message.selectionStart)
+        const after  = this.$message.value.substr(this.$message.selectionStart)
 
         this.$message.value = before + text + after
     }
