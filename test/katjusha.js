@@ -650,219 +650,6 @@ class KatjushaSubject extends HTMLElement{
 
 
 
-class KatjushaTab extends HTMLElement{
-
-    constructor(){
-        super()
-        benry(this)
-        this.openNew()
-    }
-
-
-    $_click(event) {
-        if (event.target.tagName === 'LI' && event.target !== this.selected) {
-            this.select(event.target)
-        }
-    }
-
-
-    $_dblclick(event) {
-        $headline.$レス更新アイコン.click()
-    }
-
-
-    $_contextmenu(event) {
-        event.preventDefault()
-        event.stopPropagation()
-
-        if (event.target.tagName !== 'LI') {
-            return
-        }
-
-        const context = `
-            <ul class="menu context-tab">
-              <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
-              <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-              <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
-              <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
-            </ul>
-        `
-        new KatjushaContext(context, event.pageX, event.pageY).show()
-    }
-
-
-
-    open(url, thread = {}){
-        if (!this.$tab.childElementCount) {
-            return this.openNew(url, thread)
-        }
-
-        let tab = this.search(url)
-
-        if (tab) {
-            return this.select(tab)
-        }
-        else{
-            tab = this.selected
-        }
-
-        tab.url          = url
-        tab.innerHTML    = thread.subject || ''
-        tab.el.url       = url
-        tab.el.innerHTML = thread.html || ''
-
-        return this.select(tab)
-    }
-
-
-
-    openNew(url, thread = {}) {
-        const tab = this.search(url)
-
-        if (this.$tab.childElementCount === 1 && !this.$tab.firstElementChild.url) {
-            return this.open(url, thread)
-        }
-        if (tab) {
-            return this.select(tab)
-        }
-
-        const newtab        = document.createElement('li')
-        newtab.url          = url
-        newtab.innerHTML    = thread.subject || ''
-
-        newtab.el           = document.createElement('div')
-        newtab.el.url       = url
-        newtab.el.className = 'スレッド'
-        newtab.el.innerHTML = thread.html || ''
-
-        this.$tab.append(newtab)
-        $thread.$.append(newtab.el)
-
-        return this.select(newtab)
-    }
-
-
-
-    close(tab) {
-        if(typeof tab == 'string'){
-            tab = this.search(tab)
-        }
-
-        if (!tab || !tab.url) {
-            return
-        }
-
-        this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
-
-        tab.el.remove()
-        tab.remove()
-    }
-
-
-    closeAll(url) {
-        for (const tab of Array.from(this.$tab.children).filter(v => v.url !== url)) {
-            this.close(tab)
-        }
-    }
-
-
-    search(url) {
-        return Array.from(this.$tab.children).find(v => v.url === url)
-    }
-
-
-
-    select(tab) {
-        this.selected?.removeAttribute('selected')
-        this.selected = tab
-        tab.setAttribute('selected', true)
-
-        $thread.active(tab.el)
-
-        if(tab.url){
-            $headline.render(tab.url)
-            history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
-        }
-
-        return tab
-    }
-
-
-    loadStart(url) {
-        const tab = this.search(url)
-
-        if (tab) {
-            tab.dataset.loading = true
-        }
-    }
-
-
-    loadEnd(url) {
-        const tab = this.search(url)
-
-        if (tab) {
-            delete tab.dataset.loading
-        }
-    }
-
-
-    get html(){
-        return `
-        <ul id="tab"></ul>
-        <style>
-        ul{
-            list-style: none;
-            cursor: default;
-            display: flex;
-            align-items: flex-end;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding-left: 10px;
-            border-bottom: 1px solid #c0c0c0;
-        }
-        li{
-            text-align: left;
-            border-top: 1px solid #e3e3e3;
-            border-left: 1px solid #e3e3e3;
-            border-right: 1px solid #e3e3e3;
-            background-color: #f0f0f0;
-            color: #909090;
-            background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            width: 100px;
-            margin: 0 -5px;
-            padding-left: 10px;
-            height: 20px;
-            white-space: nowrap;
-            overflow: hidden;
-            line-height: 20px;
-            box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
-        }
-        [selected]{
-            color: #000;
-            z-index: 2;
-            height: 22px;
-            line-height: 22px;
-        }
-        [selected]::before{
-            box-shadow: 2px 2px 0 #fff;
-        }
-        [selected]::after{
-            box-shadow: -2px 2px 0 #fff;
-        }
-        [data-loading]{
-            background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+');
-            background-repeat: no-repeat;
-            background-size: 12px;
-            background-position: 4px center;
-        }
-        </style>
-        `
-    }
-}
-
-
 class KatjushaHeadline extends HTMLElement{
 
     constructor(){
@@ -1039,6 +826,227 @@ class KatjushaHeadline extends HTMLElement{
         `
     }
 }
+
+
+
+class KatjushaTab extends HTMLElement{
+
+    constructor(){
+        super()
+        benry(this)
+        this.openNew()
+    }
+
+
+    $_click(event) {
+        if (event.target.tagName === 'LI' && event.target !== this.selected) {
+            this.select(event.target)
+        }
+    }
+
+
+    $_dblclick(event) {
+        $headline.$レス更新アイコン.click()
+    }
+
+
+    $_contextmenu(event) {
+        event.preventDefault()
+        event.stopPropagation()
+
+        if (event.target.tagName !== 'LI') {
+            return
+        }
+
+        const context = `
+            <ul class="menu context-tab">
+              <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
+              <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
+              <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
+              <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+            </ul>
+        `
+        new KatjushaContext(context, event.pageX, event.pageY).show()
+    }
+
+
+
+    open(url, thread = {}){
+        if (!this.$tab.childElementCount) {
+            return this.openNew(url, thread)
+        }
+
+        let tab = this.search(url)
+
+        if (tab) {
+            return this.select(tab)
+        }
+        else{
+            tab = this.selected
+        }
+
+        tab.url          = url
+        tab.innerHTML    = thread.subject || ''
+        tab.el.url       = url
+        tab.el.innerHTML = thread.html || ''
+
+        return this.select(tab)
+    }
+
+
+
+    openNew(url, thread = {}) {
+        const tab = this.search(url)
+
+        if (this.$tab.childElementCount === 1 && !this.$tab.firstElementChild.url) {
+            return this.open(url, thread)
+        }
+        if (tab) {
+            return this.select(tab)
+        }
+
+        return this.select( this.newtab(url, thread.subejct, thread.html) )
+    }
+
+
+
+    close(tab) {
+        if(typeof tab == 'string'){
+            tab = this.search(tab)
+        }
+
+        if (!tab || !tab.url) {
+            return
+        }
+
+        this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
+
+        tab.el.remove()
+        tab.remove()
+    }
+
+
+    closeAll(url) {
+        for (const tab of Array.from(this.$tab.children).filter(v => v.url !== url)) {
+            this.close(tab)
+        }
+    }
+
+
+    newtab(url, subject='', html=''){
+        const thread     = document.createElement('div')
+        thread.className = 'スレッド'
+        thread.url       = url
+        thread.innerHTML = html
+
+        const tab        = document.createElement('li')
+        tab.url          = url
+        tab.innerHTML    = subject
+        tab.el           = thread
+
+        this.$tab.append(tab)
+        $thread.$.append(thread)
+
+        return tab
+    }
+
+
+    search(url) {
+        return Array.from(this.$tab.children).find(v => v.url === url)
+    }
+
+
+
+    select(tab) {
+        this.selected?.removeAttribute('selected')
+        this.selected = tab
+        tab.setAttribute('selected', true)
+
+        $thread.active(tab.el)
+
+        if(tab.url){
+            $headline.render(tab.url)
+            history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
+        }
+
+        return tab
+    }
+
+
+    loadStart(url) {
+        const tab = this.search(url)
+
+        if (tab) {
+            tab.dataset.loading = true
+        }
+    }
+
+
+    loadEnd(url) {
+        const tab = this.search(url)
+
+        if (tab) {
+            delete tab.dataset.loading
+        }
+    }
+
+
+    get html(){
+        return `
+        <ul id="tab"></ul>
+        <style>
+        ul{
+            list-style: none;
+            cursor: default;
+            display: flex;
+            align-items: flex-end;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding-left: 10px;
+            border-bottom: 1px solid #c0c0c0;
+        }
+        li{
+            text-align: left;
+            border-top: 1px solid #e3e3e3;
+            border-left: 1px solid #e3e3e3;
+            border-right: 1px solid #e3e3e3;
+            background-color: #f0f0f0;
+            color: #909090;
+            background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            width: 100px;
+            margin: 0 -5px;
+            padding-left: 10px;
+            height: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            line-height: 20px;
+            box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
+        }
+        [selected]{
+            color: #000;
+            z-index: 2;
+            height: 22px;
+            line-height: 22px;
+        }
+        [selected]::before{
+            box-shadow: 2px 2px 0 #fff;
+        }
+        [selected]::after{
+            box-shadow: -2px 2px 0 #fff;
+        }
+        [data-loading]{
+            background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+');
+            background-repeat: no-repeat;
+            background-size: 12px;
+            background-position: 4px center;
+        }
+        </style>
+        `
+    }
+}
+
 
 
 class KatjushaThread extends HTMLElement{
