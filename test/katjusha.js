@@ -1791,7 +1791,7 @@ async function ajax(url, formdata) {
         request.body   = formdata
 
         const bbsurl = url.replace('test/bbs.cgi', `${formdata.get('bbs')}/`)
-        url          = formdata.has('key') ? スレッドURL作成(bbsurl, formdata.get('key')) : bbsurl
+        url          = formdata.get('key') ? スレッドURL作成(bbsurl, formdata.get('key')) : bbsurl
     }
     else if (url.includes('read.cgi')) {
         request.url = datURL作成(url)
