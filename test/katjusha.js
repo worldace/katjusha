@@ -905,7 +905,7 @@ class KatjushaTab extends HTMLElement{
             return this.select(tab)
         }
 
-        return this.select( this.newtab(url, thread.subejct, thread.html) )
+        return this.select( this.newtab(url, thread.subject, thread.html) )
     }
 
 
