@@ -19,7 +19,7 @@ $katjusha.link = function (url, target){
 
 
 $katjusha.onclick = function(event){
-    const url = event.path[0].href ?? ''
+    const url = event.composedPath()[0].href
 
     if(!url){
         return
