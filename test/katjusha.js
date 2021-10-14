@@ -19,24 +19,24 @@ $katjusha.link = function (url, target){
 
 
 $katjusha.onclick = function(event){
-    const url = event.composedPath()[0].href
+    const {href, target} = event.composedPath()[0]
 
-    if(!url){
+    if(!href){
         return
     }
-    else if (url === $base.href) {
+    else if (href === $base.href) {
         event.preventDefault()
-        history.replaceState(null, null, url)
+        history.replaceState(null, null, href)
     }
-    else if ($bbs.has(url)) {
+    else if ($bbs.has(href)) {
         event.preventDefault()
-        $bbs.active(url)
-        ajax(url).then(response => ajax.subject(response))
+        $bbs.active(href)
+        ajax(href).then(response => ajax.subject(response))
     }
-    else if (url.includes('read.cgi') && $bbs.has(スレッドURL分解(url).bbsurl)){
+    else if (href.includes('read.cgi') && $bbs.has(スレッドURL分解(href).bbsurl)){
         event.preventDefault()
-        event.path[0].target ? $tab.openNew(url, スレッド[url]) : $tab.open(url, スレッド[url])
-        ajax(url).then(response => ajax.thread(response))
+        target ? $tab.openNew(href, スレッド[href]) : $tab.open(href, スレッド[href])
+        ajax(href).then(response => ajax.thread(response))
     }
 }
 
