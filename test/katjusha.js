@@ -1051,19 +1051,21 @@ class KatjushaThread extends HTMLElement{
 
 
     $_click(event) {
-        if (event.target.tagName !== 'I') {
-            return
+        if (event.target.tagName === 'I') {
+            event.stopPropagation()
+
+            const context = `
+              <ul class="menu">
+                <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
+              </ul>
+            `
+
+            new KatjushaContext(context, event.pageX, event.pageY).show()
         }
-
-        event.stopPropagation()
-
-        const context = `
-          <ul class="menu">
-            <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
-          </ul>
-        `
-
-        new KatjushaContext(context, event.pageX, event.pageY).show()
+        else if(event.target.className === 'anker'){
+            event.stopPropagation()
+            this.goto(event.target.dataset.n)
+        }
     }
 
 
@@ -1142,7 +1144,7 @@ class KatjushaThread extends HTMLElement{
             }
 
             //datファイルにaタグが含まれる場合: message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" onclick="$thread.goto($1)" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
+            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             message = message.replace(/^ /, '')
 
