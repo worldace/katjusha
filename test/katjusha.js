@@ -1129,13 +1129,13 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    parse(text, no = 0) {
+    parse(text, n = 0) {
         const dat  = text.trim().split('\n')
         let broken = false
         let html   = ''
 
         for (const v of dat) {
-            no++
+            n++
             let [from, mail, date, message, subject] = v.split('<>')
 
             if (subject === undefined) {
@@ -1149,8 +1149,8 @@ class KatjushaThread extends HTMLElement{
             message = message.replace(/^ /, '')
 
             html += `
-              <article class="レス" data-no="${no}">
-                <header><i>${no}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
+              <article class="レス" data-n="${n}">
+                <header><i>${n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
                 <p>${message}</p>
               </article>
             `
@@ -1702,7 +1702,7 @@ class KatjushaPopup extends HTMLElement{
 
 
     show(){
-        $body.append(this)
+        $body.prepend(this)
     }
 
 
