@@ -1826,9 +1826,6 @@ async function ajax(url, formdata) {
 }
 
 
-ajax.abort = new Set
-
-
 ajax.subject = function(response, url){
 
     if(response.status === 200){
@@ -1930,6 +1927,9 @@ ajax.form = function(response, url){
 }
 
 
+ajax.abort = new Set
+
+
 
 function benry(self, attr = []){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
     self.$ = self.attachShadow({mode:'open'})
@@ -2012,7 +2012,7 @@ function dndwindow(el, pageX, pageY) {
 
 
 const スレッド = new Proxy({}, {get:function(target, url){
-    if(!target[url]){
+    if(!(url in target)){
         const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
 
         target[url] = {
