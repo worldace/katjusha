@@ -2,7 +2,7 @@
 
 $katjusha.start = function () {
     $base.title = document.title
-    //全板ボタン.textContent = `▽${base.title}`
+    $toolbar.$全板ボタン.textContent = `▽${document.title}`
 
     if ($base.href !== document.URL) {
         $katjusha.link(document.URL)
@@ -511,7 +511,7 @@ class KatjushaSubject extends HTMLElement{
         let html = ''
 
         for(const {i, key, subject, num} of list){
-            const url    = スレッドURL作成(bbsurl, key)
+            const url    = bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
             const thread = スレッド[url]
             thread.subject = subject
 
@@ -1289,13 +1289,11 @@ class KatjushaForm extends HTMLElement{
 
 
     open(){
-        if(!this.url || window['$form']){
-            return
+        if(this.url && !window['$form']){
+            $body.append(this)
+            this.centering()
+            this.url.includes('read.cgi') ? this.$message.focus() : this.$subject.focus()
         }
-
-        $body.append(this)
-        this.centering()
-        this.url.includes('read.cgi') ? this.$message.focus() : this.$subject.focus()
     }
 
 
@@ -1835,12 +1833,12 @@ ajax.subject = function(response, url){
 
     if(response.status === 200){
         $subject.bbsurl = url
+        $subject.scrollTop = 0
         $subject.$tbody.innerHTML = $subject.render($subject.parse(response.content), url)
 
         $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
         $bbs.active(url)
 
-        $subject.scrollTop = 0
         $status.textContent = `${$subject.$tbody.rows.length}件のスレッドを受信 (${date()})`
     }
     else{
@@ -1979,11 +1977,6 @@ function date() {
 
 function KB(byte = 0) {
     return `${Math.ceil(byte/1024)}KB`
-}
-
-
-function スレッドURL作成(bbsurl, key) {
-    return bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
 }
 
 
