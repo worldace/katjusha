@@ -30,12 +30,12 @@ $katjusha.onclick = function(event){
     else if ($bbs.has(href)) {
         event.preventDefault()
         $bbs.active(href)
-        ajax(href).then(response => ajax.subject(response))
+        ajax(href).then(response => ajax.subject(response, href))
     }
     else if (href.includes('read.cgi') && $bbs.has(スレッドURL分解(href).bbsurl)){
         event.preventDefault()
         target ? $tab.openNew(href, スレッド[href]) : $tab.open(href, スレッド[href])
-        ajax(href).then(response => ajax.thread(response))
+        ajax(href).then(response => ajax.thread(response, href))
     }
 }
 
@@ -48,7 +48,7 @@ class KatjushaToolbar extends HTMLElement{
 
 
     $スレッド投稿アイコン_click(event) {
-        new KatjushaForm().open($subject.bbsurl)
+        new KatjushaForm($subject.bbsurl).open()
     }
 
 
@@ -511,7 +511,7 @@ class KatjushaSubject extends HTMLElement{
         let html = ''
 
         for(const {i, key, subject, num} of list){
-            const url = スレッドURL作成(bbsurl, key)
+            const url    = スレッドURL作成(bbsurl, key)
             const thread = スレッド[url]
             thread.subject = subject
 
@@ -690,7 +690,7 @@ class KatjushaHeadline extends HTMLElement{
 
 
     $レス投稿アイコン_click(event) {
-        new KatjushaForm().open($tab.selected.url)
+        new KatjushaForm($tab.selected.url).open()
     }
 
 
@@ -1261,20 +1261,12 @@ class KatjushaStatus extends HTMLElement{
 
 class KatjushaForm extends HTMLElement{
 
-    constructor(){
+    constructor(url){
         super()
         benry(this)
-        this.id = '$form'
-    }
 
-
-    open(url){
-        if(!url || window['$form']){
-            return
-        }
-
-        $body.append(this)
-        this.centering()
+        this.url = url
+        this.id  = '$form'
 
         if( url.includes('read.cgi') ){
             const thread = スレッド[url]
@@ -1285,7 +1277,6 @@ class KatjushaForm extends HTMLElement{
             this.$subject.value = thread.subject
             this.$subject.disabled = true
             this.$title.textContent = `「${thread.subject}」にレス`
-            this.$message.focus()
         }
         else{
             const [,bbshome, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
@@ -1293,8 +1284,18 @@ class KatjushaForm extends HTMLElement{
             this.$form.action = `${bbshome}test/bbs.cgi`
             this.$bbs.value = bbs
             this.$title.textContent = `『${$bbs.name(url)}』に新規スレッド`
-            this.$subject.focus()
         }
+    }
+
+
+    open(){
+        if(!this.url || window['$form']){
+            return
+        }
+
+        $body.append(this)
+        this.centering()
+        this.url.includes('read.cgi') ? this.$message.focus() : this.$subject.focus()
     }
 
 
@@ -1344,7 +1345,7 @@ class KatjushaForm extends HTMLElement{
     $form_submit(event) {
         event.preventDefault()
         this.$submit.disabled = true
-        ajax(this.$form.action, new FormData(this.$form)).then(response => ajax.form(response))
+        ajax(this.$form.action, new FormData(this.$form)).then(response => ajax.form(response, this.url))
     }
 
 
@@ -1787,9 +1788,6 @@ async function ajax(url, formdata) {
         request.url    = url
         request.method = 'POST'
         request.body   = formdata
-
-        const bbsurl = url.replace('test/bbs.cgi', `${formdata.get('bbs')}/`)
-        url          = formdata.get('key') ? スレッドURL作成(bbsurl, formdata.get('key')) : bbsurl
     }
     else if (url.includes('read.cgi')) {
         request.url = スレッド[url].daturl
@@ -1824,9 +1822,8 @@ async function ajax(url, formdata) {
 
     const buffer = await response.arrayBuffer()
 
-    response.URL     = url
-    response.byte    = buffer.byteLength
     response.content = new TextDecoder('shift-jis').decode(buffer)
+    response.byte    = buffer.byteLength
 
     return response
 }
@@ -1835,14 +1832,14 @@ async function ajax(url, formdata) {
 ajax.abort = new Set
 
 
-ajax.subject = function(response){
+ajax.subject = function(response, url){
 
     if(response.status === 200){
-        $subject.bbsurl = response.URL
-        $subject.$tbody.innerHTML = $subject.render($subject.parse(response.content), response.URL)
+        $subject.bbsurl = url
+        $subject.$tbody.innerHTML = $subject.render($subject.parse(response.content), url)
 
-        $title.textContent = `${$base.title} [ ${$bbs.name(response.URL)} ]`
-        $bbs.active(response.URL)
+        $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
+        $bbs.active(url)
 
         $subject.scrollTop = 0
         $status.textContent = `${$subject.$tbody.rows.length}件のスレッドを受信 (${date()})`
@@ -1852,14 +1849,14 @@ ajax.subject = function(response){
         return
     }
 
-    history.replaceState(null, null, response.URL)
+    history.replaceState(null, null, url)
 }
 
 
-ajax.thread = function(response){
+ajax.thread = function(response, url){
 
     if (response.status === 200) {
-        const thread = スレッド[response.URL]
+        const thread = スレッド[url]
         const dat    = $thread.parse(response.content)
 
         thread.subject = dat.subject
@@ -1878,7 +1875,7 @@ ajax.thread = function(response){
         $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
     }
     else if (response.status === 206) {
-        const thread = スレッド[response.URL]
+        const thread = スレッド[url]
         const dat    = $thread.parse(response.content, thread.num)
 
         thread.html   += dat.html
@@ -1895,7 +1892,7 @@ ajax.thread = function(response){
         $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
     }
     else if (response.status === 304) {
-        const thread = スレッド[response.URL]
+        const thread = スレッド[url]
         thread.新着 = 0
         $subject.update(thread)
         $status.textContent = `新着なし (${date()}) ${KB(thread.byte)}`
@@ -1907,11 +1904,11 @@ ajax.thread = function(response){
         return
     }
 
-    history.replaceState(null, null, response.URL)
+    history.replaceState(null, null, url)
 }
 
 
-ajax.form = function(response){
+ajax.form = function(response, url){
     if(response.status === 200){
         if (response.content.includes('<title>ＥＲＲＯＲ！')) {
             if(window['$form']){
@@ -1920,12 +1917,12 @@ ajax.form = function(response){
             alert( response.content.match(/<b>(.+?)</i)[1] )
             return
         }
-        if (response.URL.includes('read.cgi')) {
-            スレッド[response.URL].最終書き込み = date()
+        if (url.includes('read.cgi')) {
+            スレッド[url].最終書き込み = date()
         }
 
         window['$form']?.remove()
-        $katjusha.link(response.URL)
+        $katjusha.link(url)
     }
     else{
         if(window['$form']){
