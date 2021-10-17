@@ -659,8 +659,9 @@ class KatjushaHeadline extends HTMLElement{
 
 
     render(url) {
-        if (スレッド[url]) {
-            const thread = スレッド[url]
+        const thread = スレッド[url]
+
+        if (thread) {
             this.$thread.innerHTML = `${thread.subject} (${thread.num})`
             this.$bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
             $title.textContent     = thread.subject
@@ -698,8 +699,8 @@ class KatjushaHeadline extends HTMLElement{
         const url = $tab.selected.url
 
         if (スレッド[url]) {
+            // delete スレッド[url]
             $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
-            delete スレッド[url]
         }
     }
 
@@ -2007,9 +2008,10 @@ function スレッドURL作成(bbsurl, key) {
 
 function スレッドURL分解(url) {
     const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
-    const bbsurl = url.replace(/\/test\/.+/, `/${bbs}/`)
+    const baseurl    = url.replace(/\/test\/.+/, `/`)
+    const bbsurl     = `${baseurl}${bbs}/`
 
-    return {bbsurl, bbs, key}
+    return {bbs, key, bbsurl, baseurl}
 }
 
 
@@ -2038,6 +2040,33 @@ function dndwindow(el, pageX, pageY) {
     function up(event) {
         document.removeEventListener('mousemove', move)
     }
+}
+
+
+function Thread(url){
+    if(!Thread[url]){
+        const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
+
+        Thread[url] = {
+            url     : url,
+            key     : key,
+            bbs     : bbs,
+            bbsurl  : bbsurl,
+            bbsname : $bbs.name(bbsurl),
+            baseurl : baseurl,
+            daturl  : `${bbsurl}dat/${key}.dat`,
+            subject : '',
+            html    : '',
+            num     : 0,
+            byte    : 0,
+            etag    : '',
+            scroll  : 0,
+            既得    : 0,
+            新着    : 0,
+            最終取得: '',
+        }
+    }
+    return Thread[url]
 }
 
 
