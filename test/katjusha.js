@@ -1785,18 +1785,17 @@ async function ajax(url, formdata) {
     const request = {cache:'no-store', mode:'cors', signal:abort.signal}
 
     if (url.includes('bbs.cgi')) {
-        request.url    = url
         request.method = 'POST'
         request.body   = formdata
     }
     else if (url.includes('read.cgi')) {
-        request.url = スレッド[url].daturl
         if(スレッド[url].byte){
             request.headers = {'Range':`bytes=${スレッド[url].byte}-`, 'If-None-Match': スレッド[url].etag}
         }
+        url = スレッド[url].daturl
     }
     else {
-        request.url = `${url}subject.txt`
+        url = `${url}subject.txt`
     }
 
 
@@ -1805,7 +1804,7 @@ async function ajax(url, formdata) {
         $toolbar.$anime.dataset.ajax++
         $tab.loadStart(url)
         ajax.abort.add(abort)
-        var response = await fetch(request.url, request)
+        var response = await fetch(url, request)
     }
     catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
         if(error.name !== 'AbortError'){
