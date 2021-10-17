@@ -1,7 +1,6 @@
 
 
 $katjusha.start = function () {
-    window.スレッド = {}
     $base.title = document.title
     //全板ボタン.textContent = `▽${base.title}`
 
@@ -501,7 +500,7 @@ class KatjushaSubject extends HTMLElement{
 
         for(let i = 0; i < list.length; i++){
             const [, key, subject, num] = list[i].match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-            list[i] = {i:i+1, key, subject, num}
+            list[i] = {i:i+1, key, subject, num:Number(num)}
         }
 
         return list
@@ -513,15 +512,15 @@ class KatjushaSubject extends HTMLElement{
 
         for(const {i, key, subject, num} of list){
             const url = スレッドURL作成(bbsurl, key)
-            const thread = スレッド[url] || {url, subject}
-            thread.num = num //ここでthreadをいじるのは悪手
+            const thread = スレッド[url]
+            thread.subject = subject
 
             if (thread.num == thread.既得) {
                 thread.新着 = 0
             }
 
-            html += `<tr data-url="${thread.url}"><td>${i}</td><td><a href="${thread.url}">${thread.subject}</a></td><td>${thread.num}</td>
-                     <td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得 || ''}</td><td>${thread.最終書き込み || ''}</td><td></td></tr>`
+            html += `<tr data-url="${url}"><td>${i}</td><td><a href="${url}">${subject}</a></td><td>${num}</td>
+                     <td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得}</td><td>${thread.最終書き込み}</td><td></td></tr>`
         }
     
         return html
@@ -659,9 +658,9 @@ class KatjushaHeadline extends HTMLElement{
 
 
     render(url) {
-        const thread = スレッド[url]
+        if (url in スレッド) {
+            const thread = スレッド[url]
 
-        if (thread) {
             this.$thread.innerHTML = `${thread.subject} (${thread.num})`
             this.$bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
             $title.textContent     = thread.subject
@@ -698,7 +697,7 @@ class KatjushaHeadline extends HTMLElement{
     $ごみ箱アイコン_click(event) {
         const url = $tab.selected.url
 
-        if (スレッド[url]) {
+        if (url in スレッド) {
             // delete スレッド[url]
             $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
         }
@@ -1072,10 +1071,7 @@ class KatjushaThread extends HTMLElement{
 
     scroll(event) {
         const url = this.selected.url
-
-        if (スレッド[url]) {
-            スレッド[url].scroll = this.scrollTop
-        }
+        スレッド[url].scroll = this.scrollTop
     }
 
 
@@ -1086,9 +1082,9 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    appendHTML(html, url, title) {
+    appendHTML(html, url, subject) {
         const tab         = $tab.search(url) || $tab.selected
-        tab.innerHTML     = title
+        tab.innerHTML     = subject
         tab.el.innerHTML += html
 
         $headline.render(url)
@@ -1282,10 +1278,9 @@ class KatjushaForm extends HTMLElement{
 
         if( url.includes('read.cgi') ){
             const thread = スレッド[url]
-            const [,bbshome, bbskey] = thread.bbsurl.match(/(.+\/)([^\/]+)\/$/)
 
-            this.$form.action = `${bbshome}test/bbs.cgi`
-            this.$bbs.value = bbskey
+            this.$form.action = `${thread.baseurl}test/bbs.cgi`
+            this.$bbs.value = thread.bbs
             this.$key.value = thread.key
             this.$subject.value = thread.subject
             this.$subject.disabled = true
@@ -1293,10 +1288,10 @@ class KatjushaForm extends HTMLElement{
             this.$message.focus()
         }
         else{
-            const [,bbshome, bbskey] = url.match(/(.+\/)([^\/]+)\/$/)
+            const [,bbshome, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
 
             this.$form.action = `${bbshome}test/bbs.cgi`
-            this.$bbs.value = bbskey
+            this.$bbs.value = bbs
             this.$title.textContent = `『${$bbs.name(url)}』に新規スレッド`
             this.$subject.focus()
         }
@@ -1797,13 +1792,9 @@ async function ajax(url, formdata) {
         url          = formdata.get('key') ? スレッドURL作成(bbsurl, formdata.get('key')) : bbsurl
     }
     else if (url.includes('read.cgi')) {
-        request.url = datURL作成(url)
-
-        if (スレッド[url]) {
-            request.headers = {
-                'Range'        : `bytes=${スレッド[url].byte || 0}-`,
-                'If-None-Match': スレッド[url].etag
-            }
+        request.url = スレッド[url].daturl
+        if(スレッド[url].byte){
+            request.headers = {'Range':`bytes=${スレッド[url].byte}-`, 'If-None-Match': スレッド[url].etag}
         }
     }
     else {
@@ -1868,15 +1859,9 @@ ajax.subject = function(response){
 ajax.thread = function(response){
 
     if (response.status === 200) {
-        const thread        = スレッド[response.URL] = {}
-        const dat           = $thread.parse(response.content)
-        const {bbsurl, key} = スレッドURL分解(response.URL)
+        const thread = スレッド[response.URL]
+        const dat    = $thread.parse(response.content)
 
-        thread.bbsurl  = bbsurl
-        thread.bbsname = $bbs.name(bbsurl)
-        thread.key     = key
-        thread.url     = response.URL
-        thread.scroll  = 0
         thread.subject = dat.subject
         thread.html    = dat.html
         thread.num     = dat.num
@@ -2015,12 +2000,6 @@ function スレッドURL分解(url) {
 }
 
 
-function datURL作成(url){
-    const {bbsurl, key} = スレッドURL分解(url)
-    return `${bbsurl}dat/${key}.dat`
-}
-
-
 function dndwindow(el, pageX, pageY) {
     const {left, top, width, height} = el.getBoundingClientRect()
 
@@ -2043,11 +2022,11 @@ function dndwindow(el, pageX, pageY) {
 }
 
 
-function Thread(url){
-    if(!Thread[url]){
+const スレッド = new Proxy({}, {get:function(target, url){
+    if(!target[url]){
         const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
 
-        Thread[url] = {
+        target[url] = {
             url     : url,
             key     : key,
             bbs     : bbs,
@@ -2064,10 +2043,12 @@ function Thread(url){
             既得    : 0,
             新着    : 0,
             最終取得: '',
+            最終書き込み: '',
         }
     }
-    return Thread[url]
-}
+
+    return target[url]
+}})
 
 
 customElements.define('katjusha-toolbar', KatjushaToolbar)
