@@ -27,7 +27,7 @@ define('MESSAGE', post('MESSAGE'));
 define('PATH', sprintf('%s/../%s', __DIR__, BBS));
 
 define('SET', (function(){
-    include __DIR__.'/set.php';
+    include __DIR__.'/setting.php';
     return get_defined_vars();
 })());
 

@@ -1778,13 +1778,13 @@ class KatjushaPopup extends HTMLElement{
 
 
 
-async function ajax(url, formdata) {
+async function ajax(url, body) {
     const abort   = new AbortController()
     const request = {cache:'no-store', mode:'cors', signal:abort.signal}
 
     if (url.includes('bbs.cgi')) {
         request.method = 'POST'
-        request.body   = formdata
+        request.body   = body
     }
     else if (url.includes('read.cgi')) {
         if(スレッド[url].byte){
