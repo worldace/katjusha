@@ -1046,7 +1046,7 @@ class KatjushaThread extends HTMLElement{
     constructor(){
         super()
         benry(this)
-        this.onscroll = this.scroll
+        this.addEventListener('scroll', this.scroll, {passive:true})
     }
 
 
@@ -1997,7 +1997,7 @@ function dndwindow(el, pageX, pageY) {
     const limitX = innerWidth  - width
     const limitY = innerHeight - height
 
-    document.addEventListener('mousemove', move)
+    document.addEventListener('mousemove', move, {passive:true})
     document.addEventListener('mouseup', up, {once:true})
 
     function move(event) {
@@ -2011,33 +2011,35 @@ function dndwindow(el, pageX, pageY) {
 }
 
 
-const スレッド = new Proxy({}, {get:function(target, url){
-    if(!(url in target)){
-        const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
+const スレッド = new Proxy({}, {
+    get(target, url){
+        if(!(url in target)){
+            const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
 
-        target[url] = {
-            url     : url,
-            key     : key,
-            bbs     : bbs,
-            bbsurl  : bbsurl,
-            bbsname : $bbs.name(bbsurl),
-            baseurl : baseurl,
-            daturl  : `${bbsurl}dat/${key}.dat`,
-            subject : '',
-            html    : '',
-            num     : 0,
-            byte    : 0,
-            etag    : '',
-            scroll  : 0,
-            既得    : 0,
-            新着    : 0,
-            最終取得: '',
-            最終書き込み: '',
+            target[url] = {
+                url     : url,
+                key     : key,
+                bbs     : bbs,
+                bbsurl  : bbsurl,
+                bbsname : $bbs.name(bbsurl),
+                baseurl : baseurl,
+                daturl  : `${bbsurl}dat/${key}.dat`,
+                subject : '',
+                html    : '',
+                num     : 0,
+                byte    : 0,
+                etag    : '',
+                scroll  : 0,
+                既得    : 0,
+                新着    : 0,
+                最終取得: '',
+                最終書き込み: '',
+            }
         }
-    }
 
-    return target[url]
-}})
+        return target[url]
+    }
+})
 
 
 customElements.define('katjusha-toolbar', KatjushaToolbar)
