@@ -27,15 +27,18 @@ $katjusha.onclick = function(event){
         event.preventDefault()
         history.replaceState(null, null, href)
     }
+    else if (href.includes('read.cgi')){
+        if(!$bbs.has(スレッドURL分解(href).bbsurl)){
+            return
+        }
+        event.preventDefault()
+        target ? $tab.openNew(href, スレッド[href]) : $tab.open(href, スレッド[href])
+        ajax(href).then(response => ajax.thread(response, href))
+    }
     else if ($bbs.has(href)) {
         event.preventDefault()
         $bbs.active(href)
         ajax(href).then(response => ajax.subject(response, href))
-    }
-    else if (href.includes('read.cgi') && $bbs.has(スレッドURL分解(href).bbsurl)){
-        event.preventDefault()
-        target ? $tab.openNew(href, スレッド[href]) : $tab.open(href, スレッド[href])
-        ajax(href).then(response => ajax.thread(response, href))
     }
 }
 
