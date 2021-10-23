@@ -230,7 +230,8 @@ class KatjushaBBS extends HTMLElement{
     constructor(){
         super()
         const text   = this.firstChild.textContent.trim().slice(1)
-        this.content = this.toHTML( text.split('\n#').map(v => v.split('\n')) )
+        const list   = text.split('\n#').map(v => v.split('\n'))
+        this.content = this.toHTML(list)
         benry(this)
     }
 
@@ -265,7 +266,7 @@ class KatjushaBBS extends HTMLElement{
 
             for(const bbs of categories){
                 const [name,url] = bbs.split(' ')
-                this.list[url]   = {name, category}
+                this.list[url]   = {url, name, category}
                 html += `<a href="${url}">${name}</a>`
             }
 
