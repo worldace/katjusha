@@ -29,7 +29,7 @@ $katjusha.onclick = function(event){
     }
     else if (href.includes('read.cgi')){
         const thread = スレッド[href]
-        if(!$bbs.has(thread.bbsurl)){
+        if(!(thread.bbsurl in $bbs.list)){
             return
         }
 
@@ -39,7 +39,7 @@ $katjusha.onclick = function(event){
         const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
         ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
-    else if ($bbs.has(href)) {
+    else if (href in $bbs.list) {
         event.preventDefault()
         $bbs.active(href)
         ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
@@ -271,11 +271,6 @@ class KatjushaBBS extends HTMLElement{
 
             this.content += `</details>`
         }
-    }
-
-
-    has(url){
-        return url in this.list
     }
 
 
