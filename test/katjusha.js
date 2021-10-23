@@ -229,8 +229,8 @@ class KatjushaBorder extends HTMLElement{
 class KatjushaBBS extends HTMLElement{
     constructor(){
         super()
-        this.list    = JSON.parse(this.firstChild.textContent)
-        this.content = this.render(this.list)
+        const text   = this.firstChild.textContent.trim().slice(1)
+        this.content = this.toHTML( text.split('\n#').map(v => v.split('\n')) )
         benry(this)
     }
 
@@ -255,29 +255,34 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
-    render(list){
-        let html = ''
-        let category
+    toHTML(list){
+        this.list = {}
+        let html  = ''
 
-        for(const v of list){
-            if(v.category !== category){
-                category = v.category
-                html += `</details><details open><summary>${v.category}</summary>`
+        for(const categories of list){
+            const category = categories.shift()
+            html += `<details open><summary>${category}</summary>`
+
+            for(const bbs of categories){
+                const [name,url] = bbs.split(' ')
+                this.list[url]   = {name, category}
+                html += `<a href="${url}">${name}</a>`
             }
-            html += `<a href="${v.url}">${v.name}</a>`
+
+            html += `</details>`
         }
 
-        return html.slice(10) + '</details>'
+        return html
     }
 
 
     has(url){
-        return this.list.some(v => v.url === url)
+        return url in this.list
     }
 
 
     name(url){
-        return this.list.find(v => v.url === url)?.name
+        return this.list[url]?.name
     }
 
 
@@ -514,7 +519,7 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
-    render(list, bbsurl){
+    toHTML(list, bbsurl){
         let html = ''
 
         for(const {i, key, subject, num} of list){
@@ -1823,7 +1828,7 @@ ajax.subject = function(response, url){
     if(response.status === 200){
         $subject.bbsurl = url
         $subject.scrollTop = 0
-        $subject.$tbody.innerHTML = $subject.render($subject.parse(response.content), url)
+        $subject.$tbody.innerHTML = $subject.toHTML($subject.parse(response.content), url)
 
         $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
         $bbs.active(url)
