@@ -263,9 +263,11 @@ class KatjushaBBS extends HTMLElement{
             const category = categories.shift()
             this.content += `<details open><summary>${category}</summary>`
 
-            for(const bbs of categories){
-                const [name,url] = bbs.split(' ')
-                this.list[url]  = {url, name, category}
+            for(const v of categories){
+                const [name,url]      = v.split(' ')
+                const [,baseurl, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
+
+                this.list[url]  = {url, baseurl, bbs, name, category}
                 this.content   += `<a href="${url}">${name}</a>`
             }
 
@@ -1284,11 +1286,11 @@ class KatjushaForm extends HTMLElement{
             this.$title.textContent = `「${thread.subject}」にレス`
         }
         else{
-            const [,bbshome, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
+            const bbs = $bbs.list[url]
 
-            this.$form.action = `${bbshome}test/bbs.cgi`
-            this.$bbs.value = bbs
-            this.$title.textContent = `『${$bbs.name(url)}』に新規スレッド`
+            this.$form.action = `${bbs.baseurl}test/bbs.cgi`
+            this.$bbs.value = bbs.bbs
+            this.$title.textContent = `『${bbs.name}』に新規スレッド`
         }
     }
 
