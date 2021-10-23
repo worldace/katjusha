@@ -36,8 +36,8 @@ $katjusha.onclick = function(event){
         event.preventDefault()
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
 
-        const option = thread.byte && {headers:{'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag}}
-        ajax(thread.daturl, option).then(response => ajax.thread(response, href))
+        const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
+        ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
     else if ($bbs.has(href)) {
         event.preventDefault()
