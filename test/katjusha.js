@@ -229,8 +229,7 @@ class KatjushaBorder extends HTMLElement{
 class KatjushaBBS extends HTMLElement{
     constructor(){
         super()
-        const array  = this.parse( this.firstChild.textContent.trim().slice(1) )
-        this.content = this.toHTML(array)
+        this.parse( this.firstChild.textContent.trim() )
         benry(this)
     }
 
@@ -256,28 +255,22 @@ class KatjushaBBS extends HTMLElement{
 
 
     parse(text){
-        return text.split('\n#').map(v => v.split('\n'))
-    }
-
-
-    toHTML(array){
-        this.list = {}
-        let html  = ''
+        const array  = text.slice(1).split('\n#').map(v => v.split('\n'))
+        this.content = ''
+        this.list    = {}
 
         for(const categories of array){
             const category = categories.shift()
-            html += `<details open><summary>${category}</summary>`
+            this.content += `<details open><summary>${category}</summary>`
 
             for(const bbs of categories){
                 const [name,url] = bbs.split(' ')
-                this.list[url]   = {url, name, category}
-                html += `<a href="${url}">${name}</a>`
+                this.list[url]  = {url, name, category}
+                this.content   += `<a href="${url}">${name}</a>`
             }
 
-            html += `</details>`
+            this.content += `</details>`
         }
-
-        return html
     }
 
 
