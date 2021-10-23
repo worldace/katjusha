@@ -28,17 +28,21 @@ $katjusha.onclick = function(event){
         history.replaceState(null, null, href)
     }
     else if (href.includes('read.cgi')){
-        if(!$bbs.has(スレッドURL分解(href).bbsurl)){
+        const thread = スレッド[href]
+        if(!$bbs.has(thread.bbsurl)){
             return
         }
+
         event.preventDefault()
-        target ? $tab.openNew(href, スレッド[href]) : $tab.open(href, スレッド[href])
-        ajax(href).then(response => ajax.thread(response, href))
+        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
+
+        const option = thread.byte && {headers:{'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag}}
+        ajax(thread.daturl, option).then(response => ajax.thread(response, href))
     }
     else if ($bbs.has(href)) {
         event.preventDefault()
         $bbs.active(href)
-        ajax(href).then(response => ajax.subject(response, href))
+        ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
     }
 }
 
@@ -879,7 +883,7 @@ class KatjushaTab extends HTMLElement{
             return this.openNew(url, thread)
         }
 
-        let tab = this.search(url)
+        let tab = this.find(url)
 
         if (tab) {
             return this.select(tab)
@@ -899,7 +903,7 @@ class KatjushaTab extends HTMLElement{
 
 
     openNew(url, thread = {}) {
-        const tab = this.search(url)
+        const tab = this.find(url)
 
         if (this.$tab.childElementCount === 1 && !this.$tab.firstElementChild.url) {
             return this.open(url, thread)
@@ -915,7 +919,7 @@ class KatjushaTab extends HTMLElement{
 
     close(tab) {
         if(typeof tab == 'string'){
-            tab = this.search(tab)
+            tab = this.find(tab)
         }
 
         if (!tab || !tab.url) {
@@ -954,7 +958,7 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    search(url) {
+    find(url) {
         return Array.from(this.$tab.children).find(v => v.url === url)
     }
 
@@ -977,12 +981,12 @@ class KatjushaTab extends HTMLElement{
 
 
     loadStart(url) {
-        this.search(url)?.setAttribute('loading', true)
+        this.find(url)?.setAttribute('loading', true)
     }
 
 
     loadEnd(url) {
-        this.search(url)?.removeAttribute('loading')
+        this.find(url)?.removeAttribute('loading')
     }
 
 
@@ -1086,7 +1090,7 @@ class KatjushaThread extends HTMLElement{
 
 
     appendHTML(html, url, subject) {
-        const tab         = $tab.search(url) || $tab.selected
+        const tab         = $tab.find(url) || $tab.selected
         tab.innerHTML     = subject
         tab.el.innerHTML += html
 
@@ -1346,7 +1350,7 @@ class KatjushaForm extends HTMLElement{
     $form_submit(event) {
         event.preventDefault()
         this.$submit.disabled = true
-        ajax(this.$form.action, new FormData(this.$form)).then(response => ajax.form(response, this.url))
+        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(response => ajax.form(response, this.url))
     }
 
 
@@ -1781,24 +1785,9 @@ class KatjushaPopup extends HTMLElement{
 
 
 
-async function ajax(url, body) {
+async function ajax(url, option) {
     const abort   = new AbortController()
-    const request = {cache:'no-store', mode:'cors', signal:abort.signal}
-
-    if (url.includes('bbs.cgi')) {
-        request.method = 'POST'
-        request.body   = body
-    }
-    else if (url.includes('read.cgi')) {
-        if(スレッド[url].byte){
-            request.headers = {'Range':`bytes=${スレッド[url].byte}-`, 'If-None-Match': スレッド[url].etag}
-        }
-        url = スレッド[url].daturl
-    }
-    else {
-        url = `${url}subject.txt`
-    }
-
+    const request = Object.assign({cache:'no-store', mode:'cors', signal:abort.signal}, option)
 
     try {
         $status.textContent = `${new URL(url).hostname}に接続しています`
