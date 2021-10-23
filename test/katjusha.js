@@ -255,13 +255,13 @@ class KatjushaBBS extends HTMLElement{
 
 
     parse(text){
-        const array  = text.slice(1).split('\n#').map(v => v.split('\n'))
+        const parsed = text.slice(1).split('\n#').map(v => v.split('\n'))
         this.content = ''
         this.list    = {}
 
-        for(const categories of array){
+        for(const categories of parsed){
             const category = categories.shift()
-            this.content += `<details open><summary>${category}</summary>`
+            this.content  += `<details open><summary>${category}</summary>`
 
             for(const v of categories){
                 const [name,url]      = v.split(' ')
@@ -1278,19 +1278,19 @@ class KatjushaForm extends HTMLElement{
         if( url.includes('read.cgi') ){
             const thread = スレッド[url]
 
-            this.$form.action = `${thread.baseurl}test/bbs.cgi`
-            this.$bbs.value = thread.bbs
-            this.$key.value = thread.key
-            this.$subject.value = thread.subject
-            this.$subject.disabled = true
             this.$title.textContent = `「${thread.subject}」にレス`
+            this.$form.action       = `${thread.baseurl}test/bbs.cgi`
+            this.$bbs.value         = thread.bbs
+            this.$key.value         = thread.key
+            this.$subject.value     = thread.subject
+            this.$subject.disabled  = true
         }
         else{
             const bbs = $bbs.list[url]
 
-            this.$form.action = `${bbs.baseurl}test/bbs.cgi`
-            this.$bbs.value = bbs.bbs
             this.$title.textContent = `『${bbs.name}』に新規スレッド`
+            this.$form.action       = `${bbs.baseurl}test/bbs.cgi`
+            this.$bbs.value         = bbs.bbs
         }
     }
 
