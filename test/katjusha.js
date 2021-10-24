@@ -20,29 +20,21 @@ $katjusha.link = function (url, target){
 $katjusha.onclick = function(event){
     const {href, target} = event.composedPath()[0]
 
-    if(!href){
-        return
-    }
-    else if (href === $base.href) {
+    if (href === $base.href) {
         event.preventDefault()
         history.replaceState(null, null, href)
-    }
-    else if (href.includes('read.cgi')){
-        const thread = スレッド[href]
-        if(!(thread.bbsurl in $bbs.list)){
-            return
-        }
-
-        event.preventDefault()
-        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
-
-        const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
-        ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
     else if (href in $bbs.list) {
         event.preventDefault()
         $bbs.active(href)
-        ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
+        ajax(`${href}subject.txt`).then(r => ajax.subject(r, href))
+    }
+    else if ( href?.includes('read.cgi') && スレッドURL分解(href).bbsurl in $bbs.list){
+        event.preventDefault()
+        const thread  = スレッド[href]
+        const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
+        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
+        ajax(thread.daturl, {headers}).then(r => ajax.thread(r, href))
     }
 }
 
@@ -227,6 +219,7 @@ class KatjushaBorder extends HTMLElement{
 
 
 class KatjushaBBS extends HTMLElement{
+
     constructor(){
         super()
         this.parse( this.firstChild.textContent.trim() )
@@ -264,10 +257,10 @@ class KatjushaBBS extends HTMLElement{
             this.content  += `<details open><summary>${category}</summary>`
 
             for(const v of categories){
-                const [name,url]      = v.split(' ')
-                const [,baseurl, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
+                const [name,url]     = v.split(' ')
+                const [,baseurl,bbs] = url.match(/(.+\/)([^\/]+)\/$/)
 
-                this.list[url]  = {url, baseurl, bbs, name, category}
+                this.list[url]  = {category, name, url, baseurl, bbs}
                 this.content   += `<a href="${url}">${name}</a>`
             }
 
@@ -1350,7 +1343,7 @@ class KatjushaForm extends HTMLElement{
     $form_submit(event) {
         event.preventDefault()
         this.$submit.disabled = true
-        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(response => ajax.form(response, this.url))
+        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(r => ajax.form(r, this.url))
     }
 
 
@@ -1923,31 +1916,6 @@ ajax.abort = new Set
 
 
 
-function benry(self, attr = []){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
-    self.$ = self.attachShadow({mode:'open'})
-    self.$.innerHTML = self.html || ''
-
-    for(const el of self.$.querySelectorAll('[id]')){
-        self[`$${el.id}`] = el
-    }
-
-    for(const name of Object.getOwnPropertyNames(self.constructor.prototype)){
-        if(typeof self[name] !== 'function'){
-            continue
-        }
-        self[name]  = self[name].bind(self)
-        const match = name.match(/^(\$.*?)_([^_]+)$/)
-        if(match && self[match[1]]){
-            self[match[1]].addEventListener(match[2], self[name])
-        }
-    }
-
-    for(const name of attr){
-        self[name] = self.getAttribute(name)
-    }
-}
-
-
 function toClipboard(text){
     navigator.clipboard.writeText(text)
 }
@@ -2032,6 +2000,33 @@ const スレッド = new Proxy({}, {
         return target[url]
     }
 })
+
+
+
+function benry(self, attr = []){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
+    self.$ = self.attachShadow({mode:'open'})
+    self.$.innerHTML = self.html || ''
+
+    for(const el of self.$.querySelectorAll('[id]')){
+        self[`$${el.id}`] = el
+    }
+
+    for(const name of Object.getOwnPropertyNames(self.constructor.prototype)){
+        if(typeof self[name] !== 'function'){
+            continue
+        }
+        self[name]  = self[name].bind(self)
+        const match = name.match(/^(\$.*?)_([^_]+)$/)
+        if(match && self[match[1]]){
+            self[match[1]].addEventListener(match[2], self[name])
+        }
+    }
+
+    for(const name of attr){
+        self[name] = self.getAttribute(name)
+    }
+}
+
 
 
 customElements.define('katjusha-toolbar', KatjushaToolbar)
