@@ -692,8 +692,8 @@ class KatjushaHeadline extends HTMLElement{
         const url = $tab.selected.url
 
         if (url in スレッド) {
-            // delete スレッド[url]
             $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
+            delete スレッド[url]
         }
     }
 
@@ -857,7 +857,7 @@ class KatjushaTab extends HTMLElement{
             <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
             <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
             <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
-        `).show( event.pageX, event.pageY)
+        `).show(event.pageX, event.pageY)
     }
 
 
@@ -1079,7 +1079,7 @@ class KatjushaThread extends HTMLElement{
 
 
     clear(url) {
-        const el = Array.from(this.children).find(v => v.url === url)
+        const el = Array.from(this.children).find(v => v.url === url) || this.selected
 
         if(el){
             el.textContent = ''
