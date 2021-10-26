@@ -1109,7 +1109,7 @@ class KatjushaThread extends HTMLElement{
         const x = left + width / 2
         const y = innerHeight - top + 6
 
-        new KatjushaPopup(el.outerHTML, x, y).show()
+        new KatjushaPopup(el.outerHTML).show(x, y)
     }
 
 
@@ -1674,18 +1674,18 @@ class KatjushaContext extends HTMLElement{
 
 class KatjushaPopup extends HTMLElement{
 
-    constructor(html, x, y){
+    constructor(html){
         super()
-        this.content      = html
-        this.style.left   = `${x}px`
-        this.style.bottom = `${y}px`
-        this.id           = '$popup'
+        this.content = html
+        this.id      = '$popup'
 
         benry(this)
     }
 
 
-    show(){
+    show(x, y){
+        this.style.left   = `${x}px`
+        this.style.bottom = `${y}px`
         $body.prepend(this)
     }
 
