@@ -27,14 +27,14 @@ $katjusha.onclick = function(event){
     else if (href in $bbs.list) {
         event.preventDefault()
         $bbs.active(href)
-        ajax(`${href}subject.txt`).then(r => ajax.subject(r, href))
+        ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
     }
-    else if ( href?.includes('read.cgi') && スレッドURL分解(href).bbsurl in $bbs.list){
+    else if (href?.includes('read.cgi') && スレッドURL分解(href).bbsurl in $bbs.list){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
-        ajax(thread.daturl, {headers}).then(r => ajax.thread(r, href))
+        ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
 }
 
@@ -237,13 +237,10 @@ class KatjushaBBS extends HTMLElement{
 
         this.active(event.target)
 
-        const context = `
-          <ul class="menu">
+        new KatjushaContext(`
             <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
             <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
-          </ul>
-        `
-        new KatjushaContext(context, event.pageX, event.pageY).show()
+        `).show(event.pageX, event.pageY)
     }
 
 
@@ -461,16 +458,13 @@ class KatjushaSubject extends HTMLElement{
         }
 
         this.active(tr)
-
         const a = tr.querySelector('a')
-        const context = `
-        <ul class="menu context-subject">
-          <li><a onclick="$katjusha.link('${a.href}', '_blank')">新しいタブで開く</a></li>
-          <li><a onclick="toClipboard('${a.href}')">URLをコピー</a></li>
-          <li><a onclick="toClipboard('${a.textContent}\\n${a.href}\\n')">タイトルとURLをコピー</a></li>
-        </ul>
-        `
-        new KatjushaContext(context, event.pageX, event.pageY).show()
+
+        new KatjushaContext(`
+            <li><a onclick="$katjusha.link('${a.href}', '_blank')">新しいタブで開く</a></li>
+            <li><a onclick="toClipboard('${a.href}')">URLをコピー</a></li>
+            <li><a onclick="toClipboard('${a.textContent}\\n${a.href}\\n')">タイトルとURLをコピー</a></li>
+        `).show(event.pageX, event.pageY)
     }
 
 
@@ -858,15 +852,12 @@ class KatjushaTab extends HTMLElement{
             return
         }
 
-        const context = `
-            <ul class="menu context-tab">
-              <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
-              <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-              <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
-              <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
-            </ul>
-        `
-        new KatjushaContext(context, event.pageX, event.pageY).show()
+        new KatjushaContext(`
+            <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
+            <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
+            <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
+            <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+        `).show( event.pageX, event.pageY)
     }
 
 
@@ -1054,13 +1045,9 @@ class KatjushaThread extends HTMLElement{
         if (event.target.tagName === 'I') {
             event.stopPropagation()
 
-            const context = `
-              <ul class="menu">
+            new KatjushaContext(`
                 <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
-              </ul>
-            `
-
-            new KatjushaContext(context, event.pageX, event.pageY).show()
+            `).show(event.pageX, event.pageY)
         }
         else if(event.target.className === 'anker'){
             event.stopPropagation()
@@ -1343,7 +1330,7 @@ class KatjushaForm extends HTMLElement{
     $form_submit(event) {
         event.preventDefault()
         this.$submit.disabled = true
-        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(r => ajax.form(r, this.url))
+        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(response => ajax.form(response, this.url))
     }
 
 
@@ -1578,20 +1565,20 @@ class KatjushaForm extends HTMLElement{
 
 class KatjushaContext extends HTMLElement{
 
-    constructor(html, x, y){
+    constructor(html){
         super()
-        this.content    = html
-        this.style.left = `${x}px`
-        this.style.top  = `${y}px`
-        this.id         = '$context'
+        this.content = html
+        this.id      = '$context'
 
+        benry(this)
         window.$context?.remove()
         document.addEventListener('click', () => this.remove(), {once:true})
-        benry(this)
     }
 
 
-    show(){
+    show(x, y){
+        this.style.left = `${x}px`
+        this.style.top  = `${y}px`
         $body.append(this)
     }
 
@@ -1610,7 +1597,9 @@ class KatjushaContext extends HTMLElement{
 
     get html(){
         return `
-        ${this.content}
+        <ul class="menu">
+          ${this.content}
+        </ul>
         <style>
         :host{
             display: block;
