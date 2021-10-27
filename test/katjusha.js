@@ -1768,21 +1768,19 @@ class KatjushaPopup extends HTMLElement{
 
 
 async function ajax(url, option = {}) {
-    const host    = new URL(url).hostname
-    const abort   = new AbortController()
+    const host  = new URL(url).hostname
+    const abort = new AbortController()
 
     try {
+        $status.textContent = `${host}に接続しています`
         $toolbar.$anime.dataset.ajax++
         $tab.loadStart(url)
         ajax.abort.add(abort)
-        $status.textContent = `${host}に接続しています`
-        var response = await fetch(url, {cache:'no-store', mode:'cors', signal:abort.signal, ...option})
+        var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
         $status.textContent = `${host}に接続しました`
     }
     catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
-        if(error.name !== 'AbortError'){
-            $status.textContent = `${host}に接続できませんでした`
-        }
+        $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
         return error // finally後にreturnされる。(responseはundefined)
     }
     finally {
