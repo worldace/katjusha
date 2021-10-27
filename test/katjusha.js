@@ -1767,25 +1767,25 @@ class KatjushaPopup extends HTMLElement{
 
 
 
-async function ajax(url, option) {
+async function ajax(url, option = {}) {
+    const host    = new URL(url).hostname
     const abort   = new AbortController()
-    const request = Object.assign({cache:'no-store', mode:'cors', signal:abort.signal}, option)
 
     try {
-        $status.textContent = `${new URL(url).hostname}に接続しています`
         $toolbar.$anime.dataset.ajax++
         $tab.loadStart(url)
         ajax.abort.add(abort)
-        var response = await fetch(url, request)
+        $status.textContent = `${host}に接続しています`
+        var response = await fetch(url, {cache:'no-store', mode:'cors', signal:abort.signal, ...option})
+        $status.textContent = `${host}に接続しました`
     }
     catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
         if(error.name !== 'AbortError'){
-            request.error = `${new URL(url).hostname}に接続できませんでした`
+            $status.textContent = `${host}に接続できませんでした`
         }
         return error // finally後にreturnされる。(responseはundefined)
     }
     finally {
-        $status.textContent = request.error || ''
         $toolbar.$anime.dataset.ajax--
         $tab.loadEnd(url)
         ajax.abort.delete(abort)
@@ -1929,15 +1929,6 @@ function KB(byte = 0) {
 }
 
 
-function スレッドURL分解(url) {
-    const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
-    const baseurl    = url.replace(/\/test\/.+/, `/`)
-    const bbsurl     = `${baseurl}${bbs}/`
-
-    return {bbs, key, bbsurl, baseurl}
-}
-
-
 function dndwindow(el, pageX, pageY) {
     const {left, top, width, height} = el.getBoundingClientRect()
 
@@ -1957,6 +1948,15 @@ function dndwindow(el, pageX, pageY) {
     function up(event) {
         document.removeEventListener('mousemove', move)
     }
+}
+
+
+function スレッドURL分解(url) {
+    const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
+    const baseurl    = url.replace(/\/test\/.+/, `/`)
+    const bbsurl     = `${baseurl}${bbs}/`
+
+    return {bbs, key, bbsurl, baseurl}
 }
 
 
@@ -1992,7 +1992,7 @@ const スレッド = new Proxy({}, {
 
 
 
-function benry(self, attr = []){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
+function benry(self){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
     self.$ = self.attachShadow({mode:'open'})
     self.$.innerHTML = self.html || ''
 
@@ -2009,10 +2009,6 @@ function benry(self, attr = []){ // https://qiita.com/economist/items/6c923c255f
         if(match && self[match[1]]){
             self[match[1]].addEventListener(match[2], self[name])
         }
-    }
-
-    for(const name of attr){
-        self[name] = self.getAttribute(name)
     }
 }
 
