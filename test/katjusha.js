@@ -227,7 +227,7 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
-    $_contextmenu(event){
+    $shadow_contextmenu(event){
         event.preventDefault()
         event.stopPropagation()
 
@@ -273,7 +273,7 @@ class KatjushaBBS extends HTMLElement{
 
     active(el){
         if(typeof el === 'string'){
-            el = this.$.querySelector(`a[href="${el}"]`)
+            el = this.$shadow.querySelector(`a[href="${el}"]`)
             if(!el){
                 return
             }
@@ -425,7 +425,7 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
-    $_contextmenu(event){
+    $shadow_contextmenu(event){
         event.preventDefault()
     }
 
@@ -663,7 +663,7 @@ class KatjushaHeadline extends HTMLElement{
     }
 
 
-    $_contextmenu (event) {
+    $shadow_contextmenu (event) {
         event.preventDefault()
     }
 
@@ -832,19 +832,19 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    $_click(event) {
+    $shadow_click(event) {
         if (event.target.tagName === 'LI' && event.target !== this.selected) {
             this.select(event.target)
         }
     }
 
 
-    $_dblclick(event) {
+    $shadow_dblclick(event) {
         $headline.$レス更新アイコン.click()
     }
 
 
-    $_contextmenu(event) {
+    $shadow_contextmenu(event) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -936,7 +936,7 @@ class KatjushaTab extends HTMLElement{
         tab.el           = thread
 
         this.$tab.append(tab)
-        $thread.$.append(thread)
+        $thread.$shadow.append(thread)
 
         return tab
     }
@@ -1037,11 +1037,10 @@ class KatjushaThread extends HTMLElement{
     constructor(){
         super()
         benry(this)
-        this.addEventListener('scroll', this.scroll, {passive:true})
     }
 
 
-    $_click(event) {
+    $shadow_click(event) {
         if (event.target.tagName === 'I') {
             event.stopPropagation()
 
@@ -1056,7 +1055,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    scroll(event) {
+    $host_scroll(event) {
         const url = this.selected.url
         スレッド[url].scroll = this.scrollTop
     }
@@ -1299,7 +1298,7 @@ class KatjushaForm extends HTMLElement{
     }
 
 
-    $_contextmenu(event) {
+    $shadow_contextmenu(event) {
         if (!['text','textarea'].includes(event.target.type)) {
             event.preventDefault()
         }
@@ -1583,14 +1582,14 @@ class KatjushaContext extends HTMLElement{
     }
 
 
-    $_click(event){
+    $shadow_click(event){
         if (!event.target.onclick && !event.target.href) {
             event.stopPropagation()
         }
     }
 
 
-    $_contextmenu(event){
+    $shadow_contextmenu(event){
         event.preventDefault()
     }
 
@@ -1991,10 +1990,17 @@ const スレッド = new Proxy({}, {
 
 
 function benry(self){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
-    self.$ = self.attachShadow({mode:'open'})
-    self.$.innerHTML = self.html || ''
+    self.$host   = self
+    self.$shadow = self.attachShadow({mode:'open'})
 
-    for(const el of self.$.querySelectorAll('[id]')){
+    if(self.html instanceof Node){
+        self.$shadow.appned(self.html)
+    }
+    else{
+        self.$shadow.innerHTML = self.html || ''
+    }
+
+    for(const el of self.$shadow.querySelectorAll('[id]')){
         self[`$${el.id}`] = el
     }
 
