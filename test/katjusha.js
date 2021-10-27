@@ -1792,6 +1792,7 @@ async function ajax(url, option = {}) {
 
     response.content = new TextDecoder('shift-jis').decode(buffer)
     response.byte    = buffer.byteLength
+    response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
 
     return response
 }
@@ -1808,28 +1809,25 @@ ajax.subject = function(response, url){
         $bbs.active(url)
 
         $status.textContent = `${$subject.$tbody.rows.length}件のスレッドを受信 (${date()})`
+        history.replaceState(null, null, url)
     }
     else{
         $subject.$tbody.textContent = ''
-        return
     }
-
-    history.replaceState(null, null, url)
 }
 
 
 ajax.thread = function(response, url){
 
     if (response.status === 200) {
-        const thread = スレッド[url]
-        const dat    = $thread.parse(response.content)
+        const thread   = スレッド[url]
+        const dat      = $thread.parse(response.content)
 
         thread.subject = dat.subject
         thread.html    = dat.html
         thread.num     = dat.num
         thread.byte    = response.byte
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '').replace('-gzip', '')
-
+        thread.etag    = response.etag
         thread.既得    = dat.num
         thread.新着    = dat.num
         thread.最終取得= date()
@@ -1840,14 +1838,13 @@ ajax.thread = function(response, url){
         $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
     }
     else if (response.status === 206) {
-        const thread = スレッド[url]
-        const dat    = $thread.parse(response.content, thread.num)
+        const thread   = スレッド[url]
+        const dat      = $thread.parse(response.content, thread.num)
 
         thread.html   += dat.html
         thread.num    += dat.num
-        thread.byte   += response.byte || 0
-        thread.etag    = String(response.headers.get('ETag')).replace('W/', '').replace('-gzip', '')
-
+        thread.byte   += response.byte
+        thread.etag    = response.etag
         thread.既得    = thread.num
         thread.新着    = dat.num
         thread.最終取得= date()
@@ -1997,21 +1994,20 @@ function benry(self){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
         self.$shadow.appned(self.html)
     }
     else{
-        self.$shadow.innerHTML = self.html || ''
+        self.$shadow.innerHTML = self.html ?? ''
     }
 
     for(const el of self.$shadow.querySelectorAll('[id]')){
         self[`$${el.id}`] = el
     }
 
-    for(const name of Object.getOwnPropertyNames(self.constructor.prototype)){
-        if(typeof self[name] !== 'function'){
-            continue
-        }
-        self[name]  = self[name].bind(self)
-        const match = name.match(/^(\$.*?)_([^_]+)$/)
-        if(match && self[match[1]]){
-            self[match[1]].addEventListener(match[2], self[name])
+    const methods = Object.getOwnPropertyNames(self.constructor.prototype).filter(v => typeof self[v] === 'function')
+
+    for(const method of methods){
+        self[method] = self[method].bind(self)
+        const match  = method.match(/^(\$.*?)_([^_]+)$/)
+        if(match){
+            self[match[1]]?.addEventListener(match[2], self[method])
         }
     }
 }
