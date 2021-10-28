@@ -1789,7 +1789,6 @@ async function ajax(url, option = {}) {
         return error // finally後にreturnされる。(responseはundefined)
     }
     finally {
-await new Promise(ok => setTimeout(ok, 2000))
         $toolbar.$anime.dataset.ajax--
         $tab.loading(url, false)
         ajax.abort.delete(abort)
