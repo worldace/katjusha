@@ -34,6 +34,7 @@ $katjusha.onclick = function(event){
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
+        $tab.loading(href, true)
         ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
 }
@@ -969,7 +970,6 @@ class KatjushaTab extends HTMLElement{
 
 
     loading(url, bool) {
-        url = url.replace(/([^\/]+)\/dat\/(\d+)\.dat$/, 'test/read.cgi/$1/$2/')
         this.find(url)?.toggleAttribute('loading', bool)
     }
 
@@ -1779,7 +1779,6 @@ async function ajax(url, option = {}) {
     try {
         $status.textContent = `${host}に接続しています`
         $toolbar.$anime.dataset.ajax++
-        $tab.loading(url, true)
         ajax.abort.add(abort)
         var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
         $status.textContent = `${host}に接続しました`
@@ -1790,7 +1789,6 @@ async function ajax(url, option = {}) {
     }
     finally {
         $toolbar.$anime.dataset.ajax--
-        $tab.loading(url, false)
         ajax.abort.delete(abort)
     }
 
@@ -1823,6 +1821,8 @@ ajax.subject = function(response, url){
 
 
 ajax.thread = function(response, url){
+
+    $tab.loading(url, false)
 
     if (response.status === 200) {
         const thread   = スレッド[url]
