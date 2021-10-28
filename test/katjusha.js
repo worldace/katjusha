@@ -32,7 +32,7 @@ $katjusha.onclick = function(event){
     else if (href?.includes('read.cgi') && スレッドURL分解(href).bbsurl in $bbs.list){
         event.preventDefault()
         const thread  = スレッド[href]
-        const headers = thread.byte ? {'Range':`bytes=${thread.byte}-`, 'If-None-Match':thread.etag} : {}
+        const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
         ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
@@ -227,29 +227,33 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
+    $shadow_click(event){
+        if (event.target.tagName === 'A') {
+            this.active(event.target)
+        }
+    }
+
     $shadow_contextmenu(event){
         event.preventDefault()
         event.stopPropagation()
 
-        if (event.target.tagName !== 'A') {
-            return
+        if (event.target.tagName === 'A') {
+            this.active(event.target)
+
+            new KatjushaContext(`
+                <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
         }
-
-        this.active(event.target)
-
-        new KatjushaContext(`
-            <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
-            <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
-        `).show(event.pageX, event.pageY)
     }
 
 
     parse(text){
-        const parsed = text.slice(1).split('\n#').map(v => v.split('\n'))
+        const bbslist = text.slice(1).split('\n#').map(v => v.split('\n'))
         this.content = ''
         this.list    = {}
 
-        for(const categories of parsed){
+        for(const categories of bbslist){
             const category = categories.shift()
             this.content  += `<details open><summary>${category}</summary>`
 
@@ -1788,8 +1792,7 @@ async function ajax(url, option = {}) {
         ajax.abort.delete(abort)
     }
 
-    const buffer = await response.arrayBuffer()
-
+    const buffer     = await response.arrayBuffer()
     response.content = new TextDecoder('shift-jis').decode(buffer)
     response.byte    = buffer.byteLength
     response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
@@ -1855,7 +1858,8 @@ ajax.thread = function(response, url){
     }
     else if (response.status === 304) {
         const thread = スレッド[url]
-        thread.新着 = 0
+        thread.新着  = 0
+
         $subject.update(thread)
         $status.textContent = `新着なし (${date()}) ${KB(thread.byte)}`
     }
@@ -1871,26 +1875,24 @@ ajax.thread = function(response, url){
 
 
 ajax.form = function(response, url){
-    if(response.status === 200){
-        if (response.content.includes('<title>ＥＲＲＯＲ！')) {
-            if(window['$form']){
-                $form.$submit.disabled = false
-            }
-            alert( response.content.match(/<b>(.+?)</i)[1] )
-            return
-        }
+
+    if(window['$form']){
+        $form.$submit.disabled = false
+    }
+
+    if(response.status !== 200){
+        alert('エラーが発生して投稿できませんでした')
+    }
+    else if(response.content.includes('ＥＲＲＯＲ！')){
+        alert( response.content.match(/<b>(.+?)</i)[1] )
+    }
+    else{
         if (url.includes('read.cgi')) {
             スレッド[url].最終書き込み = date()
         }
 
         window['$form']?.remove()
         $katjusha.link(url)
-    }
-    else{
-        if(window['$form']){
-            $form.$submit.disabled = false
-        }
-        alert('エラーが発生して投稿できませんでした')
     }
 }
 
