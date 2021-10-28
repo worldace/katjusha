@@ -968,14 +968,11 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    loadStart(url) {
-        this.find(url)?.setAttribute('loading', true)
+    loading(url, bool) {
+        url = url.replace(/([^\/]+)\/dat\/(\d+)\.dat$/, 'test/read.cgi/$1/$2/')
+        this.find(url)?.toggleAttribute('loading', bool)
     }
 
-
-    loadEnd(url) {
-        this.find(url)?.removeAttribute('loading')
-    }
 
 
     get html(){
@@ -1777,7 +1774,7 @@ async function ajax(url, option = {}) {
     try {
         $status.textContent = `${host}に接続しています`
         $toolbar.$anime.dataset.ajax++
-        $tab.loadStart(url)
+        //$tab.loading(url, true)
         ajax.abort.add(abort)
         var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
         $status.textContent = `${host}に接続しました`
@@ -1788,7 +1785,7 @@ async function ajax(url, option = {}) {
     }
     finally {
         $toolbar.$anime.dataset.ajax--
-        $tab.loadEnd(url)
+        //$tab.loading(url, false)
         ajax.abort.delete(abort)
     }
 
