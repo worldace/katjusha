@@ -1299,6 +1299,11 @@ class KatjushaForm extends HTMLElement{
     }
 
 
+    disable(bool){
+        this.$submit.toggleAttribute('disabled', bool)
+    }
+
+
     $shadow_contextmenu(event) {
         if (!['text','textarea'].includes(event.target.type)) {
             event.preventDefault()
@@ -1329,7 +1334,7 @@ class KatjushaForm extends HTMLElement{
 
     $form_submit(event) {
         event.preventDefault()
-        this.$submit.disabled = true
+        this.disable(true)
         ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(response => ajax.form(response, this.url))
     }
 
@@ -1873,9 +1878,7 @@ ajax.thread = function(response, url){
 
 ajax.form = function(response, url){
 
-    if(window['$form']){
-        $form.$submit.disabled = false
-    }
+    window['$form']?.disable(false)
 
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
