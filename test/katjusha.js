@@ -160,6 +160,39 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
+    sort(th) {
+        const index = th.cellIndex
+        const order = Number(th.dataset.order || -1)
+        const tbody = th.closest('table').tBodies[0]
+        const rows  = Array.from(tbody.rows)
+        const compare = new Intl.Collator('ja-JP', {numeric: true}).compare
+
+        rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
+        rows.forEach(tr  => tbody.append(tr))
+
+        th.dataset.order = -order
+    }
+
+
+    recieve(response, url){
+
+        if(response.status === 200){
+            this.bbsurl = url
+            this.scrollTop = 0
+            this.$tbody.innerHTML = this.toHTML(this.parse(response.content), url)
+
+            $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
+            $bbs.active(url)
+
+            $status.textContent = `${this.$tbody.rows.length}件のスレッドを受信 (${date()})`
+            history.replaceState(null, null, url)
+        }
+        else{
+            this.$tbody.textContent = ''
+        }
+    }
+
+
     parse(text) {
         return text.trim().split('\n').map( (v, i) => {
             const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
@@ -198,39 +231,6 @@ class KatjushaSubject extends HTMLElement{
             tr.cells[4].textContent = thread.新着 || ''
             tr.cells[5].textContent = thread.最終取得 || ''
             tr.cells[6].textContent = thread.最終書き込み || ''
-        }
-    }
-
-
-    sort(th) {
-        const index = th.cellIndex
-        const order = Number(th.dataset.order || -1)
-        const tbody = th.closest('table').tBodies[0]
-        const rows  = Array.from(tbody.rows)
-        const compare = new Intl.Collator('ja-JP', {numeric: true}).compare
-
-        rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
-        rows.forEach(tr  => tbody.append(tr))
-
-        th.dataset.order = -order
-    }
-
-
-    recieve(response, url){
-
-        if(response.status === 200){
-            this.bbsurl = url
-            this.scrollTop = 0
-            this.$tbody.innerHTML = this.toHTML(this.parse(response.content), url)
-
-            $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
-            $bbs.active(url)
-
-            $status.textContent = `${this.$tbody.rows.length}件のスレッドを受信 (${date()})`
-            history.replaceState(null, null, url)
-        }
-        else{
-            this.$tbody.textContent = ''
         }
     }
 
@@ -498,24 +498,6 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    appendHTML(html, url, subject) {
-        const tab         = $tab.find(url) || $tab.selected
-        tab.innerHTML     = subject
-        tab.el.innerHTML += html
-
-        $headline.render(url)
-    }
-
-
-    clear(url) {
-        const el = Array.from(this.children).find(v => v.url === url) || this.selected
-
-        if(el){
-            el.textContent = ''
-        }
-    }
-
-
     goto(n) {
         this.selected.children[n-1]?.scrollIntoView()
     }
@@ -537,40 +519,6 @@ class KatjushaThread extends HTMLElement{
 
             new KatjushaPopup(el.outerHTML).show(x, y)
         }
-    }
-
-
-    parse(text, n = 0) {
-        const dat  = text.trim().split('\n')
-        let  html  = ''
-
-        for (const v of dat) {
-            let [from, mail, date, message, subject] = v.split('<>')
-
-            //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message
-            .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
-            .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-            .replace(/^ /, '')
-
-            html += `
-              <article class="レス" data-n="${n}">
-                <header><i>${++n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
-                <p>${message}</p>
-              </article>
-            `
-        }
-
-        return {html, num:dat.length, subject:dat[0].split('<>').pop()}
-    }
-
-
-    URLParse(url) {
-        const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
-        const baseurl    = url.replace(/\/test\/.+/, `/`)
-        const bbsurl     = `${baseurl}${bbs}/`
-
-        return {bbs, key, bbsurl, baseurl}
     }
 
 
@@ -627,6 +575,58 @@ class KatjushaThread extends HTMLElement{
         }
 
         history.replaceState(null, null, url)
+    }
+
+
+    parse(text, n = 0) {
+        const dat  = text.trim().split('\n')
+        let  html  = ''
+
+        for (const v of dat) {
+            let [from, mail, date, message, subject] = v.split('<>')
+
+            //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
+            message = message
+            .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
+            .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+            .replace(/^ /, '')
+
+            html += `
+              <article class="レス" data-n="${n}">
+                <header><i>${++n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
+                <p>${message}</p>
+              </article>
+            `
+        }
+
+        return {html, num:dat.length, subject:dat[0].split('<>').pop()}
+    }
+
+
+    appendHTML(html, url, subject) {
+        const tab         = $tab.find(url) || $tab.selected
+        tab.innerHTML     = subject
+        tab.el.innerHTML += html
+
+        $headline.render(url)
+    }
+
+
+    clear(url) {
+        const el = Array.from(this.children).find(v => v.url === url) || this.selected
+
+        if(el){
+            el.textContent = ''
+        }
+    }
+
+
+    URLParse(url) {
+        const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
+        const baseurl    = url.replace(/\/test\/.+/, `/`)
+        const bbsurl     = `${baseurl}${bbs}/`
+
+        return {bbs, key, bbsurl, baseurl}
     }
 
 
@@ -751,11 +751,11 @@ class KatjushaForm extends HTMLElement{
     }
 
 
-    $form_submit(event) {
+    async $form_submit(event) {
         event.preventDefault()
         this.disable(true)
-        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)})
-        .then(response => KatjushaForm.recieve(response, this.url))
+        const response = await ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)})
+        KatjushaForm.recieve(response, this.url)
     }
 
 
@@ -773,7 +773,6 @@ class KatjushaForm extends HTMLElement{
             if (url.includes('read.cgi')) {
                 スレッド[url].最終書き込み = date()
             }
-
             window.$form?.remove()
             $katjusha.link(url)
         }
