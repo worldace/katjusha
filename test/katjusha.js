@@ -241,20 +241,18 @@ class KatjushaSubject extends HTMLElement{
     $tbody_contextmenu(event){
         event.preventDefault()
         event.stopPropagation()
-        const tr = event.target.closest('tr')
+        const tr  = event.target.closest('tr')
+        const url = tr.dataset.url
 
-        if (!tr) {
-            return
+        if (tr) {
+            this.active(tr)
+
+            new KatjushaContext(`
+                <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
+                <li><a onclick="toClipboard('${url}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
         }
-
-        this.active(tr)
-        const a = tr.querySelector('a')
-
-        new KatjushaContext(`
-            <li><a onclick="$katjusha.link('${a.href}', '_blank')">新しいタブで開く</a></li>
-            <li><a onclick="toClipboard('${a.href}')">URLをコピー</a></li>
-            <li><a onclick="toClipboard('${a.textContent}\\n${a.href}\\n')">タイトルとURLをコピー</a></li>
-        `).show(event.pageX, event.pageY)
     }
 }
 
