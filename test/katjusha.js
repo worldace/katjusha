@@ -233,7 +233,7 @@ class KatjushaSubject extends HTMLElement{
 
         if (tr && event.target.cellIndex < 7) {
             this.active(tr)
-            tr.querySelector('a').click()
+            $katjusha.link(tr.dataset.url)
         }
     }
 
@@ -357,11 +357,12 @@ class KatjushaTab extends HTMLElement{
         if (this.$tab.childElementCount === 1 && !this.$tab.firstElementChild.url) {
             return this.open(url, thread)
         }
-        if (tab) {
+        else if (tab) {
             return this.select(tab)
         }
-
-        return this.select( this.newtab(url, thread.subject, thread.html) )
+        else{
+            return this.select( this.newtab(url, thread.subject, thread.html) )
+        }
     }
 
 
@@ -521,17 +522,10 @@ class KatjushaThread extends HTMLElement{
 
     parse(text, n = 0) {
         const dat  = text.trim().split('\n')
-        let broken = false
-        let html   = ''
+        let  html  = ''
 
         for (const v of dat) {
-            n++
             let [from, mail, date, message, subject] = v.split('<>')
-
-            if (subject === undefined) {
-                from = mail = date = message = subject = 'ここ壊れてます'
-                broken = true
-            }
 
             //datファイルにaタグが含まれる場合: .replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
             message = message
@@ -541,13 +535,13 @@ class KatjushaThread extends HTMLElement{
 
             html += `
               <article class="レス" data-n="${n}">
-                <header><i>${n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
+                <header><i>${++n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
                 <p>${message}</p>
               </article>
             `
         }
 
-        return {html, num:dat.length, subject:dat[0].split('<>').pop(), broken}
+        return {html, num:dat.length, subject:dat[0].split('<>').pop()}
     }
 
 
