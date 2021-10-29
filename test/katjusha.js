@@ -29,7 +29,7 @@ $katjusha.onclick = function(event){
         $bbs.active(href)
         ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
     }
-    else if (href?.includes('read.cgi') && スレッドURL分解(href).bbsurl in $bbs.list){
+    else if (href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
@@ -563,6 +563,15 @@ class KatjushaThread extends HTMLElement{
     }
 
 
+    URLParse(url) {
+        const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
+        const baseurl    = url.replace(/\/test\/.+/, `/`)
+        const bbsurl     = `${baseurl}${bbs}/`
+
+        return {bbs, key, bbsurl, baseurl}
+    }
+
+
     $shadow_click(event) {
         if (event.target.tagName === 'I') {
             event.stopPropagation()
@@ -628,7 +637,7 @@ class KatjushaForm extends HTMLElement{
 
 
     open(){
-        if(this.url && !window['$form']){
+        if(this.url && !window.$form){
             $body.append(this)
             this.centering()
             this.url.includes('read.cgi') ? this.$message.focus() : this.$subject.focus()
@@ -855,7 +864,7 @@ ajax.thread = function(response, url){
 
 ajax.form = function(response, url){
 
-    window['$form']?.disable(false)
+    window.$form?.disable(false)
 
     if(response.status !== 200){
         alert('エラーが発生して投稿できませんでした')
@@ -868,13 +877,44 @@ ajax.form = function(response, url){
             スレッド[url].最終書き込み = date()
         }
 
-        window['$form']?.remove()
+        window.$form?.remove()
         $katjusha.link(url)
     }
 }
 
 
 ajax.abort = new Set
+
+
+const スレッド = new Proxy({}, {
+    get(target, url){
+        if(!(url in target)){
+            const {bbs, key, bbsurl, baseurl} = $thread.URLParse(url)
+
+            target[url] = {
+                url     : url,
+                key     : key,
+                bbs     : bbs,
+                bbsurl  : bbsurl,
+                bbsname : $bbs.name(bbsurl),
+                baseurl : baseurl,
+                daturl  : `${bbsurl}dat/${key}.dat`,
+                subject : '',
+                html    : '',
+                num     : 0,
+                byte    : 0,
+                etag    : '',
+                scroll  : 0,
+                既得    : 0,
+                新着    : 0,
+                最終取得: '',
+                最終書き込み: '',
+            }
+        }
+
+        return target[url]
+    }
+})
 
 
 
@@ -922,47 +962,6 @@ function dndwindow(el, pageX, pageY) {
         document.removeEventListener('mousemove', move)
     }
 }
-
-
-function スレッドURL分解(url) {
-    const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
-    const baseurl    = url.replace(/\/test\/.+/, `/`)
-    const bbsurl     = `${baseurl}${bbs}/`
-
-    return {bbs, key, bbsurl, baseurl}
-}
-
-
-const スレッド = new Proxy({}, {
-    get(target, url){
-        if(!(url in target)){
-            const {bbs, key, bbsurl, baseurl} = スレッドURL分解(url)
-
-            target[url] = {
-                url     : url,
-                key     : key,
-                bbs     : bbs,
-                bbsurl  : bbsurl,
-                bbsname : $bbs.name(bbsurl),
-                baseurl : baseurl,
-                daturl  : `${bbsurl}dat/${key}.dat`,
-                subject : '',
-                html    : '',
-                num     : 0,
-                byte    : 0,
-                etag    : '',
-                scroll  : 0,
-                既得    : 0,
-                新着    : 0,
-                最終取得: '',
-                最終書き込み: '',
-            }
-        }
-
-        return target[url]
-    }
-})
-
 
 
 function benry(self){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
