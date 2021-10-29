@@ -74,30 +74,31 @@ class KatjushaBBS extends HTMLElement{
         this.html = $bbsTemplate.content
         benry(this)
 
-        this.parse( this.firstChild.textContent.trim() )
-        this.$bbs.innerHTML = this.content
+        this.$bbs.innerHTML = this.parse( this.firstChild.textContent.trim() )
     }
 
 
     parse(text){
         const bbslist = text.slice(1).split('\n#').map(v => v.split('\n'))
-        this.content = ''
-        this.list    = {}
+        this.list = {}
+        let html  = ''
 
         for(const categories of bbslist){
             const category = categories.shift()
-            this.content  += `<details open><summary>${category}</summary>`
+            html  += `<details open><summary>${category}</summary>`
 
             for(const v of categories){
                 const [name,url]     = v.split(' ')
                 const [,baseurl,bbs] = url.match(/(.+\/)([^\/]+)\/$/)
 
                 this.list[url]  = {category, name, url, baseurl, bbs}
-                this.content   += `<a href="${url}">${name}</a>`
+                html += `<a href="${url}">${name}</a>`
             }
 
-            this.content += `</details>`
+            html += `</details>`
         }
+
+        return html
     }
 
 
@@ -527,7 +528,7 @@ class KatjushaThread extends HTMLElement{
         for (const v of dat) {
             let [from, mail, date, message, subject] = v.split('<>')
 
-            //datファイルにaタグが含まれる場合: .replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
+            //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
             message = message
             .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
