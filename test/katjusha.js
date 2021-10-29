@@ -26,15 +26,16 @@ $katjusha.onclick = function(event){
     }
     else if (href in $bbs.list) {
         event.preventDefault()
-        $bbs.active(href)
         ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
     }
     else if (href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
+
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
         $tab.loading(href, true)
+
         ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
     }
 }
@@ -284,10 +285,7 @@ class KatjushaHeadline extends HTMLElement{
 
 
     $レス更新アイコン_click(event) {
-        if ($tab.selected.url) {
-            $tab.select($tab.selected)
-            $katjusha.link($tab.selected.url)
-        }
+        $katjusha.link($tab.selected.url)
     }
 
 
