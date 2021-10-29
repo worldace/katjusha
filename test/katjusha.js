@@ -160,14 +160,10 @@ class KatjushaSubject extends HTMLElement{
 
 
     parse(text) {
-        const list = text.trim().split('\n')
-
-        for(let i = 0; i < list.length; i++){
-            const [, key, subject, num] = list[i].match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-            list[i] = {i:i+1, key, subject, num:Number(num)}
-        }
-
-        return list
+        return text.trim().split('\n').map( (v, i) => {
+            const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+            return {i:i+1, key, subject, num:Number(num)}
+        })
     }
 
 
@@ -549,10 +545,11 @@ class KatjushaThread extends HTMLElement{
                 broken = true
             }
 
-            //datファイルにaタグが含まれる場合: message = message.replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message.replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
-            message = message.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-            message = message.replace(/^ /, '')
+            //datファイルにaタグが含まれる場合: .replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
+            message = message
+            .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
+            .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+            .replace(/^ /, '')
 
             html += `
               <article class="レス" data-n="${n}">
