@@ -26,7 +26,7 @@ $katjusha.onclick = function(event){
     }
     else if (href in $bbs.list) {
         event.preventDefault()
-        ajax(`${href}subject.txt`).then(response => ajax.subject(response, href))
+        ajax(`${href}subject.txt`).then(response => $subject.recieve(response, href))
     }
     else if (href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
         event.preventDefault()
@@ -36,7 +36,7 @@ $katjusha.onclick = function(event){
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
         $tab.loading(href, true)
 
-        ajax(thread.daturl, {headers}).then(response => ajax.thread(response, href))
+        ajax(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
     }
 }
 
@@ -85,13 +85,13 @@ class KatjushaBBS extends HTMLElement{
 
         for(const categories of bbslist){
             const category = categories.shift()
-            html  += `<details open><summary>${category}</summary>`
+            html += `<details open><summary>${category}</summary>`
 
             for(const v of categories){
                 const [name,url]     = v.split(' ')
                 const [,baseurl,bbs] = url.match(/(.+\/)([^\/]+)\/$/)
 
-                this.list[url]  = {category, name, url, baseurl, bbs}
+                this.list[url] = {category, name, url, baseurl, bbs}
                 html += `<a href="${url}">${name}</a>`
             }
 
@@ -213,6 +213,25 @@ class KatjushaSubject extends HTMLElement{
         rows.forEach(tr  => tbody.append(tr))
 
         th.dataset.order = -order
+    }
+
+
+    recieve(response, url){
+
+        if(response.status === 200){
+            this.bbsurl = url
+            this.scrollTop = 0
+            this.$tbody.innerHTML = this.toHTML(this.parse(response.content), url)
+
+            $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
+            $bbs.active(url)
+
+            $status.textContent = `${this.$tbody.rows.length}件のスレッドを受信 (${date()})`
+            history.replaceState(null, null, url)
+        }
+        else{
+            this.$tbody.textContent = ''
+        }
     }
 
 
@@ -555,6 +574,62 @@ class KatjushaThread extends HTMLElement{
     }
 
 
+    recieve(response, url){
+
+        $tab.loading(url, false)
+
+        if (response.status === 200) {
+            const thread   = スレッド[url]
+            const dat      = this.parse(response.content)
+
+            thread.subject = dat.subject
+            thread.html    = dat.html
+            thread.num     = dat.num
+            thread.byte    = response.byte
+            thread.etag    = response.etag
+            thread.既得    = dat.num
+            thread.新着    = dat.num
+            thread.最終取得= date()
+
+            this.clear(thread.url)
+            this.appendHTML(thread.html, thread.url, thread.subject)
+            $subject.update(thread)
+            $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
+        }
+        else if (response.status === 206) {
+            const thread   = スレッド[url]
+            const dat      = this.parse(response.content, thread.num)
+
+            thread.html   += dat.html
+            thread.num    += dat.num
+            thread.byte   += response.byte
+            thread.etag    = response.etag
+            thread.既得    = thread.num
+            thread.新着    = dat.num
+            thread.最終取得= date()
+
+            this.appendHTML(dat.html, thread.url, thread.subject)
+            $subject.update(thread)
+            $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
+        }
+        else if (response.status === 304) {
+            const thread = スレッド[url]
+            thread.新着  = 0
+
+            $subject.update(thread)
+            $status.textContent = `新着なし (${date()}) ${KB(thread.byte)}`
+        }
+        else if (response.status === 404) {
+            $status.textContent = `スレッドが見つかりません (${date()})`
+        }
+        else{
+            return
+        }
+
+        history.replaceState(null, null, url)
+    }
+
+
     $shadow_click(event) {
         if (event.target.tagName === 'I') {
             event.stopPropagation()
@@ -679,7 +754,29 @@ class KatjushaForm extends HTMLElement{
     $form_submit(event) {
         event.preventDefault()
         this.disable(true)
-        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)}).then(response => ajax.form(response, this.url))
+        ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)})
+        .then(response => KatjushaForm.recieve(response, this.url))
+    }
+
+
+    static recieve(response, url){
+
+        window.$form?.disable(false)
+
+        if(response.status !== 200){
+            alert('エラーが発生して投稿できませんでした')
+        }
+        else if(response.content.includes('ＥＲＲＯＲ！')){
+            alert( response.content.match(/<b>(.+?)</i)[1] )
+        }
+        else{
+            if (url.includes('read.cgi')) {
+                スレッド[url].最終書き込み = date()
+            }
+
+            window.$form?.remove()
+            $katjusha.link(url)
+        }
     }
 }
 
@@ -767,102 +864,6 @@ async function ajax(url, option = {}) {
     response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
 
     return response
-}
-
-
-ajax.subject = function(response, url){
-
-    if(response.status === 200){
-        $subject.bbsurl = url
-        $subject.scrollTop = 0
-        $subject.$tbody.innerHTML = $subject.toHTML($subject.parse(response.content), url)
-
-        $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
-        $bbs.active(url)
-
-        $status.textContent = `${$subject.$tbody.rows.length}件のスレッドを受信 (${date()})`
-        history.replaceState(null, null, url)
-    }
-    else{
-        $subject.$tbody.textContent = ''
-    }
-}
-
-
-ajax.thread = function(response, url){
-
-    $tab.loading(url, false)
-
-    if (response.status === 200) {
-        const thread   = スレッド[url]
-        const dat      = $thread.parse(response.content)
-
-        thread.subject = dat.subject
-        thread.html    = dat.html
-        thread.num     = dat.num
-        thread.byte    = response.byte
-        thread.etag    = response.etag
-        thread.既得    = dat.num
-        thread.新着    = dat.num
-        thread.最終取得= date()
-
-        $thread.clear(thread.url)
-        $thread.appendHTML(thread.html, thread.url, thread.subject)
-        $subject.update(thread)
-        $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
-    }
-    else if (response.status === 206) {
-        const thread   = スレッド[url]
-        const dat      = $thread.parse(response.content, thread.num)
-
-        thread.html   += dat.html
-        thread.num    += dat.num
-        thread.byte   += response.byte
-        thread.etag    = response.etag
-        thread.既得    = thread.num
-        thread.新着    = dat.num
-        thread.最終取得= date()
-
-        $thread.appendHTML(dat.html, thread.url, thread.subject)
-        $subject.update(thread)
-        $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
-    }
-    else if (response.status === 304) {
-        const thread = スレッド[url]
-        thread.新着  = 0
-
-        $subject.update(thread)
-        $status.textContent = `新着なし (${date()}) ${KB(thread.byte)}`
-    }
-    else if (response.status === 404) {
-        $status.textContent = `スレッドが見つかりません (${date()})`
-    }
-    else{
-        return
-    }
-
-    history.replaceState(null, null, url)
-}
-
-
-ajax.form = function(response, url){
-
-    window.$form?.disable(false)
-
-    if(response.status !== 200){
-        alert('エラーが発生して投稿できませんでした')
-    }
-    else if(response.content.includes('ＥＲＲＯＲ！')){
-        alert( response.content.match(/<b>(.+?)</i)[1] )
-    }
-    else{
-        if (url.includes('read.cgi')) {
-            スレッド[url].最終書き込み = date()
-        }
-
-        window.$form?.remove()
-        $katjusha.link(url)
-    }
 }
 
 
