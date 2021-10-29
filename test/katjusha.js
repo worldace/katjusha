@@ -107,15 +107,14 @@ class KatjushaBBS extends HTMLElement{
 
     active(el){
         if(typeof el === 'string'){
-            el = this.$shadow.querySelector(`a[href="${el}"]`)
-            if(!el){
-                return
-            }
+            el = this.$shadow.querySelector(`[href="${el}"]`)
         }
 
-        this.selected?.removeAttribute('selected')
-        this.selected = el
-        el.setAttribute('selected', true)
+        if(el){
+            this.selected?.removeAttribute('selected')
+            this.selected = el
+            el.setAttribute('selected', true)
+        }
     }
 
 
@@ -188,7 +187,7 @@ class KatjushaSubject extends HTMLElement{
 
 
     update(thread){
-        const tr = this.$tbody.querySelector(`[data-url="${thread.url}"]`)
+        const tr = Array.from(this.$tbody.rows).find(v => v.dataset.url === thread.url)
 
         if (tr) {
             this.active(tr)
@@ -369,18 +368,15 @@ class KatjushaTab extends HTMLElement{
 
 
     close(tab) {
-        if(typeof tab == 'string'){
+        if(typeof tab === 'string'){
             tab = this.find(tab)
         }
 
-        if (!tab || !tab.url) {
-            return
+        if (tab?.url) {
+            this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
+            tab.el.remove()
+            tab.remove()
         }
-
-        this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
-
-        tab.el.remove()
-        tab.remove()
     }
 
 
