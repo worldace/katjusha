@@ -450,16 +450,14 @@ class KatjushaTab extends HTMLElement{
         event.preventDefault()
         event.stopPropagation()
 
-        if (event.target.tagName !== 'LI') {
-            return
+        if (event.target.tagName === 'LI') {
+            new KatjushaContext(`
+                <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
+                <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
+                <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
         }
-
-        new KatjushaContext(`
-            <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
-            <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-            <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
-            <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
-        `).show(event.pageX, event.pageY)
     }
 }
 
@@ -513,15 +511,13 @@ class KatjushaThread extends HTMLElement{
     popup(event, n){
         const el = this.selected.children[n-1]
 
-        if (!el) {
-            return
+        if (el) {
+            const {left, width, top} = event.target.getBoundingClientRect()
+            const x = left + width / 2
+            const y = innerHeight - top + 6
+
+            new KatjushaPopup(el.outerHTML).show(x, y)
         }
-
-        const {left, width, top} = event.target.getBoundingClientRect()
-        const x = left + width / 2
-        const y = innerHeight - top + 6
-
-        new KatjushaPopup(el.outerHTML).show(x, y)
     }
 
 
