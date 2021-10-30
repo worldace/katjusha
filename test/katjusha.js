@@ -3,6 +3,8 @@
 $katjusha.start = function () {
     $base.title = document.title
     $toolbar.$全板ボタン.textContent = `▽${document.title}`
+    $katjusha.aborts = new Set
+
 
     if ($base.href !== document.URL) {
         $katjusha.link(document.URL)
@@ -17,6 +19,35 @@ $katjusha.link = function (url, target){
 }
 
 
+$katjusha.fetch = async function(url, option = {}) {
+    const host  = new URL(url).hostname
+    const abort = new AbortController()
+
+    try {
+        $status.textContent = `${host}に接続しています`
+        $toolbar.$anime.dataset.ajax++
+        $katjusha.aborts.add(abort)
+        var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
+        $status.textContent = `${host}に接続しました`
+    }
+    catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
+        $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
+        return error // finally後にreturnされる。(responseはundefined)
+    }
+    finally {
+        $toolbar.$anime.dataset.ajax--
+        $katjusha.aborts.delete(abort)
+    }
+
+    const buffer     = await response.arrayBuffer()
+    response.content = new TextDecoder('shift-jis').decode(buffer)
+    response.byte    = buffer.byteLength
+    response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
+
+    return response
+}
+
+
 $katjusha.onclick = function(event){
     const {href, target} = event.composedPath()[0]
 
@@ -26,7 +57,7 @@ $katjusha.onclick = function(event){
     }
     else if (href in $bbs.list) {
         event.preventDefault()
-        ajax(`${href}subject.txt`).then(response => $subject.recieve(response, href))
+        $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
     }
     else if (href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
         event.preventDefault()
@@ -36,7 +67,7 @@ $katjusha.onclick = function(event){
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
         $tab.loading(href, true)
 
-        ajax(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
+        $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
     }
 }
 
@@ -310,7 +341,7 @@ class KatjushaHeadline extends HTMLElement{
 
 
     $中止アイコン_click(event) {
-        for(const v of ajax.abort){
+        for(const v of $katjusha.aborts){
             v.abort()
         }
     }
@@ -646,8 +677,7 @@ class KatjushaThread extends HTMLElement{
 
 
     $host_scroll(event) {
-        const url = this.selected.url
-        スレッド[url].scroll = this.scrollTop
+        スレッド[this.selected.url].scroll = this.scrollTop
     }
 }
 
@@ -754,7 +784,7 @@ class KatjushaForm extends HTMLElement{
     async $form_submit(event) {
         event.preventDefault()
         this.disable(true)
-        const response = await ajax(this.$form.action, {method:'POST', body:new FormData(this.$form)})
+        const response = await $katjusha.fetch(this.$form.action, {method:'POST', body:new FormData(this.$form)})
         KatjushaForm.recieve(response, this.url)
     }
 
@@ -834,39 +864,6 @@ class KatjushaPopup extends HTMLElement{
         $body.prepend(this)
     }
 }
-
-
-
-async function ajax(url, option = {}) {
-    const host  = new URL(url).hostname
-    const abort = new AbortController()
-
-    try {
-        $status.textContent = `${host}に接続しています`
-        $toolbar.$anime.dataset.ajax++
-        ajax.abort.add(abort)
-        var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
-        $status.textContent = `${host}に接続しました`
-    }
-    catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
-        $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
-        return error // finally後にreturnされる。(responseはundefined)
-    }
-    finally {
-        $toolbar.$anime.dataset.ajax--
-        ajax.abort.delete(abort)
-    }
-
-    const buffer     = await response.arrayBuffer()
-    response.content = new TextDecoder('shift-jis').decode(buffer)
-    response.byte    = buffer.byteLength
-    response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
-
-    return response
-}
-
-
-ajax.abort = new Set
 
 
 const スレッド = new Proxy({}, {
