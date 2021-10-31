@@ -463,8 +463,8 @@ class KatjushaTab extends HTMLElement{
 
         if(tab.url){
             const thread = スレッド[tab.url]
-            $thread.scrollTop = thread.scroll
             $headline.render(thread)
+            $thread.scrollTop  = thread.scroll
             $title.textContent = thread.subject
             history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
         }
@@ -701,9 +701,19 @@ class KatjushaForm extends HTMLElement{
 
         this.url = url
         this.id  = '$form'
+    }
 
-        if( url.includes('read.cgi') ){
-            const thread = スレッド[url]
+
+    open(){
+        if(!this.url || window.$form){
+            return
+        }
+
+        $body.append(this)
+        this.centering()
+
+        if( this.url.includes('read.cgi') ){
+            const thread = スレッド[this.url]
 
             this.$title.textContent = `「${thread.subject}」にレス`
             this.$form.action       = `${thread.baseurl}test/bbs.cgi`
@@ -711,22 +721,15 @@ class KatjushaForm extends HTMLElement{
             this.$key.value         = thread.key
             this.$subject.value     = thread.subject
             this.$subject.disabled  = true
+            this.$message.focus()
         }
         else{
-            const bbs = $bbs.list[url]
+            const bbs = $bbs.list[this.url]
 
             this.$title.textContent = `『${bbs.name}』に新規スレッド`
             this.$form.action       = `${bbs.baseurl}test/bbs.cgi`
             this.$bbs.value         = bbs.bbs
-        }
-    }
-
-
-    open(){
-        if(this.url && !window.$form){
-            $body.append(this)
-            this.centering()
-            this.url.includes('read.cgi') ? this.$message.focus() : this.$subject.focus()
+            this.$subject.focus()
         }
     }
 
