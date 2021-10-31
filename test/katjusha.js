@@ -81,7 +81,7 @@ class KatjushaToolbar extends HTMLElement{
 
 
     $スレッド投稿アイコン_click(event) {
-        new KatjushaForm($subject.bbsurl).open()
+        new KatjushaForm().open($subject.bbsurl)
     }
 }
 
@@ -341,7 +341,7 @@ class KatjushaHeadline extends HTMLElement{
 
 
     $レス投稿アイコン_click(event) {
-        new KatjushaForm($tab.selected.url).open()
+        new KatjushaForm().open($tab.selected.url)
     }
 
 
@@ -694,26 +694,24 @@ class KatjushaStatus extends HTMLElement{
 
 class KatjushaForm extends HTMLElement{
 
-    constructor(url){
+    constructor(){
         super()
         this.html = $formTemplate.content.cloneNode(true)
         benry(this)
-
-        this.url = url
         this.id  = '$form'
     }
 
 
-    open(){
-        if(!this.url || window.$form){
+    open(url){
+        if(!url || window.$form){
             return
         }
 
         $body.append(this)
         this.centering()
 
-        if( this.url.includes('read.cgi') ){
-            const thread = スレッド[this.url]
+        if( url.includes('read.cgi') ){
+            const thread = スレッド[url]
 
             this.$title.textContent = `「${thread.subject}」にレス`
             this.$form.action       = `${thread.baseurl}test/bbs.cgi`
@@ -724,7 +722,7 @@ class KatjushaForm extends HTMLElement{
             this.$message.focus()
         }
         else{
-            const bbs = $bbs.list[this.url]
+            const bbs = $bbs.list[url]
 
             this.$title.textContent = `『${bbs.name}』に新規スレッド`
             this.$form.action       = `${bbs.baseurl}test/bbs.cgi`
