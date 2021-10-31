@@ -5,7 +5,6 @@ $katjusha.start = function () {
     $toolbar.$全板ボタン.textContent = `▽${document.title}`
     $katjusha.aborts = new Set
 
-
     if ($base.href !== document.URL) {
         $katjusha.link(document.URL)
     }
@@ -318,15 +317,9 @@ class KatjushaHeadline extends HTMLElement{
     }
 
 
-    render(url) {
-        if (url in スレッド) {
-            const thread = スレッド[url]
-
-            this.$thread.innerHTML = `${thread.subject} (${thread.num})`
-            this.$bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
-            $title.textContent     = thread.subject
-            $thread.scrollTop      = thread.scroll //他でやるべき
-        }
+    render(thread) {
+        this.$thread.innerHTML = `${thread.subject} (${thread.num})`
+        this.$bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
     }
 
 
@@ -469,7 +462,10 @@ class KatjushaTab extends HTMLElement{
         $thread.active(tab.el)
 
         if(tab.url){
-            $headline.render(tab.url)
+            const thread = スレッド[tab.url]
+            $thread.scrollTop = thread.scroll
+            $headline.render(thread)
+            $title.textContent = thread.subject
             history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
         }
 
@@ -572,7 +568,9 @@ class KatjushaThread extends HTMLElement{
 
             this.clear(thread.url)
             this.appendHTML(thread.html, thread.url, thread.subject)
+            $headline.render(thread)
             $subject.update(thread)
+            $title.textContent  = thread.subject
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
         else if (response.status === 206) {
@@ -588,7 +586,9 @@ class KatjushaThread extends HTMLElement{
             thread.最終取得= date()
 
             this.appendHTML(dat.html, thread.url, thread.subject)
+            $headline.render(thread)
             $subject.update(thread)
+            $title.textContent  = thread.subject
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
         else if (response.status === 304) {
@@ -638,8 +638,6 @@ class KatjushaThread extends HTMLElement{
         const tab         = $tab.find(url) || $tab.selected
         tab.innerHTML     = subject
         tab.el.innerHTML += html
-
-        $headline.render(url)
     }
 
 
