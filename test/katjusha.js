@@ -23,27 +23,27 @@ $katjusha.fetch = async function(url, option = {}) {
     const abort = new AbortController()
 
     try {
-        $status.textContent = `${host}に接続しています`
         $toolbar.$anime.dataset.ajax++
         $katjusha.aborts.add(abort)
-        var response = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
-        $status.textContent = `${host}に接続しました`
+        $status.textContent = `${host}に接続しています`
+        const response      = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
+        $status.textContent = ``
+
+        const buffer     = await response.arrayBuffer()
+        response.content = new TextDecoder('shift-jis').decode(buffer)
+        response.byte    = buffer.byteLength
+        response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
+
+        return response
     }
     catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
         $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
-        return error // finally後にreturnされる。(responseはundefined)
+        return error
     }
     finally {
         $toolbar.$anime.dataset.ajax--
         $katjusha.aborts.delete(abort)
     }
-
-    const buffer     = await response.arrayBuffer()
-    response.content = new TextDecoder('shift-jis').decode(buffer)
-    response.byte    = buffer.byteLength
-    response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
-
-    return response
 }
 
 
@@ -405,7 +405,7 @@ class KatjushaTab extends HTMLElement{
             return this.select(tab)
         }
         else{
-            return this.select( this.newtab(url, thread.subject, thread.html) )
+            return this.select( this.create(url, thread.subject, thread.html) )
         }
     }
 
@@ -430,7 +430,7 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    newtab(url, subject='', html=''){
+    create(url, subject='', html=''){
         const thread     = document.createElement('div')
         thread.className = 'スレッド'
         thread.url       = url
@@ -446,12 +446,6 @@ class KatjushaTab extends HTMLElement{
 
         return tab
     }
-
-
-    find(url) {
-        return Array.from(this.$tab.children).find(v => v.url === url)
-    }
-
 
 
     select(tab) {
@@ -473,11 +467,14 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    loading(url, bool) {
-        this.find(url)?.toggleAttribute('loading', bool)
+    find(url) {
+        return Array.from(this.$tab.children).find(v => v.url === url)
     }
 
 
+    loading(url, bool) {
+        this.find(url)?.toggleAttribute('loading', bool)
+    }
 
 
     $shadow_click(event) {
@@ -600,6 +597,11 @@ class KatjushaThread extends HTMLElement{
         }
         else if (response.status === 404) {
             $status.textContent = `スレッドが見つかりません (${date()})`
+        }
+        else if (response.status === 416) {
+            delete スレッド[url]
+            $katjusha.link(url)
+            return
         }
         else{
             return
