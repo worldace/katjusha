@@ -27,7 +27,7 @@ $katjusha.fetch = async function(url, option = {}) {
         $katjusha.aborts.add(abort)
         $status.textContent = `${host}に接続しています`
         const response      = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
-        $status.textContent = ``
+        $status.textContent = `${host}に接続しました`
 
         const buffer     = await response.arrayBuffer()
         response.content = new TextDecoder('shift-jis').decode(buffer)
@@ -563,8 +563,7 @@ class KatjushaThread extends HTMLElement{
             thread.新着    = dat.num
             thread.最終取得= date()
 
-            this.clear(thread.url)
-            this.appendHTML(thread.html, thread.url, thread.subject)
+            this.render(thread)
             $headline.render(thread)
             $subject.update(thread)
             $title.textContent  = thread.subject
@@ -582,7 +581,7 @@ class KatjushaThread extends HTMLElement{
             thread.新着    = dat.num
             thread.最終取得= date()
 
-            this.appendHTML(dat.html, thread.url, thread.subject)
+            this.render(thread, dat.html)
             $headline.render(thread)
             $subject.update(thread)
             $title.textContent  = thread.subject
@@ -636,18 +635,14 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    appendHTML(html, url, subject) {
-        const tab         = $tab.find(url) || $tab.selected
-        tab.innerHTML     = subject
-        tab.el.innerHTML += html
-    }
-
-
-    clear(url) {
-        const el = Array.from(this.children).find(v => v.url === url) || this.selected
-
-        if(el){
-            el.textContent = ''
+    render(thread, append){
+        const tab     = $tab.find(thread.url) || $tab.selected
+        tab.innerHTML = thread.subject
+        if(append){
+            tab.el.insertAdjacentHTML('beforeend', append)
+        }
+        else{
+            tab.el.innerHTML = thread.html
         }
     }
 
@@ -794,6 +789,7 @@ class KatjushaForm extends HTMLElement{
     static recieve(response, url){
 
         window.$form?.disable(false)
+        $status.textContent = ``
 
         if(response.status !== 200){
             alert('エラーが発生して投稿できませんでした')
