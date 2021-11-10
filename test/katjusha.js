@@ -386,10 +386,10 @@ class KatjushaTab extends HTMLElement{
             tab = this.selected
         }
 
-        tab.url          = url
-        tab.innerHTML    = thread.subject || ''
-        tab.el.url       = url
-        tab.el.innerHTML = thread.html || ''
+        tab.url             = url
+        tab.innerHTML       = thread.subject || ''
+        tab.panel.url       = url
+        tab.panel.innerHTML = thread.html || ''
 
         return this.select(tab)
     }
@@ -417,7 +417,7 @@ class KatjushaTab extends HTMLElement{
 
         if (tab?.url) {
             this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
-            tab.el.remove()
+            tab.panel.remove()
             tab.remove()
         }
     }
@@ -439,7 +439,7 @@ class KatjushaTab extends HTMLElement{
         const tab        = document.createElement('li')
         tab.url          = url
         tab.innerHTML    = subject
-        tab.el           = thread
+        tab.panel        = thread
 
         this.$tab.append(tab)
         $thread.$shadow.append(thread)
@@ -453,7 +453,7 @@ class KatjushaTab extends HTMLElement{
         this.selected = tab
         tab.setAttribute('selected', true)
 
-        $thread.active(tab.el)
+        $thread.active(tab.panel)
 
         if(tab.url){
             const thread = スレッド[tab.url]
@@ -639,10 +639,10 @@ class KatjushaThread extends HTMLElement{
         const tab     = $tab.find(thread.url) || $tab.selected
         tab.innerHTML = thread.subject
         if(append){
-            tab.el.insertAdjacentHTML('beforeend', append)
+            tab.panel.insertAdjacentHTML('beforeend', append)
         }
         else{
-            tab.el.innerHTML = thread.html
+            tab.panel.innerHTML = thread.html
         }
     }
 

@@ -15,6 +15,8 @@ if(post('submit') !== '書き込む'){
     mb_convert_variables('utf-8', 'sjis', $_POST);
 }
 
+define('REFERER', $_SERVER['HTTP_REFERER'] ?? '');
+
 define('IS_THREAD', !post('key'));
 
 define('BBS', post('bbs'));
@@ -43,6 +45,9 @@ if(ADMIN and method_exists('maintenance', FROM)){
     error(maintenance::{FROM}(PATH, MESSAGE, KEY));
 }
 
+if($_SERVER['HTTP_HOST'] !== parse_url(REFERER, PHP_URL_HOST)){
+    error('リファラーが不正です');
+}
 
 if(!BBS){
     error('bbsが存在しません');
