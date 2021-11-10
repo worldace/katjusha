@@ -5,7 +5,7 @@
 
 mb_substitute_character('entity');
 
-if(getenv('REQUEST_METHOD') !== 'POST'){
+if($_SERVER['REQUEST_METHOD'] !== 'POST'){
     exit;
 }
 if(!$_POST){
@@ -15,24 +15,20 @@ if(post('submit') !== '書き込む'){
     mb_convert_variables('utf-8', 'sjis', $_POST);
 }
 
+
 define('REFERER', $_SERVER['HTTP_REFERER'] ?? '');
-
 define('IS_THREAD', !post('key'));
-
 define('BBS', post('bbs'));
 define('KEY', post('key') ?: $_SERVER['REQUEST_TIME']);
 define('FROM', post('FROM'));
 define('MAIL', post('mail'));
 define('SUBJECT', post('subject'));
 define('MESSAGE', post('MESSAGE'));
-
 define('PATH', sprintf('%s/../%s', __DIR__, BBS));
-
 define('SET', (function(){
     include __DIR__.'/setting.php';
     return get_defined_vars();
 })());
-
 define('ADMIN', (function (){
     $i = array_search(MAIL, array_column(SET['admin'], 'password'));
     return is_int($i) ? SET['admin'][$i] : [];
@@ -40,15 +36,14 @@ define('ADMIN', (function (){
 
 
 
-
 if(ADMIN and method_exists('maintenance', FROM)){
     error(maintenance::{FROM}(PATH, MESSAGE, KEY));
 }
 
-if($_SERVER['HTTP_HOST'] !== parse_url(REFERER, PHP_URL_HOST)){
-    error('リファラーが不正です');
-}
 
+if($_SERVER['HTTP_HOST'] !== parse_url(REFERER, PHP_URL_HOST)){
+    error('リファラが不正です');
+}
 if(!BBS){
     error('bbsが存在しません');
 }
@@ -58,14 +53,15 @@ if(preg_match('/[\W]/', BBS)){
 if(!subject::exists(PATH)){
     error('板が存在しません');
 }
-
 if(!IS_THREAD and preg_match('/[\D]/', KEY)){
     error('keyが不正です');
 }
-if(!IS_THREAD and !thread::exists(PATH, KEY)){
-    thread::is_kako(PATH, KEY) ? error('このスレは過去ログなので書き込めません') : error('このスレは存在しません');
+if(!IS_THREAD and !thread::exists(PATH, KEY) and thread::is_kako(PATH, KEY)){
+    error('このスレは過去ログなので書き込めません');
 }
-
+if(!IS_THREAD and !thread::exists(PATH, KEY) and !thread::is_kako(PATH, KEY)){
+    error('このスレは存在しません');
+}
 if(IS_THREAD and !SUBJECT){
     error('タイトルを入力してください');
 }
@@ -75,21 +71,18 @@ if(IS_THREAD and !is_utf8(SUBJECT)){
 if(IS_THREAD and strlen(SUBJECT) > 96){
     error('タイトルが長すぎます');
 }
-
 if(strlen(FROM) > 32){
     error('名前が長すぎます');
 }
 if(!is_utf8(FROM)){
     error('文字コードが不正です');
 }
-
 if(strlen(MAIL) > 64){
     error('メールが長すぎます');
 }
 if(!is_utf8(MAIL)){
     error('文字コードが不正です');
 }
-
 if(!MESSAGE){
     error('本文を入力してください');
 }
