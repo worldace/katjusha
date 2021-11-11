@@ -5,9 +5,6 @@
 
 mb_substitute_character('entity');
 
-if($_SERVER['REQUEST_METHOD'] !== 'POST'){
-    exit;
-}
 if(!$_POST){
     parse_str(file_get_contents('php://input'), $_POST);
 }
@@ -17,7 +14,7 @@ if(post('submit') !== '書き込む'){
 
 
 define('REFERER', $_SERVER['HTTP_REFERER'] ?? '');
-define('IS_THREAD', !post('key'));
+define('RES', (bool)post('key'));
 define('BBS', post('bbs'));
 define('KEY', post('key') ?: $_SERVER['REQUEST_TIME']);
 define('FROM', post('FROM'));
@@ -53,22 +50,22 @@ if(preg_match('/[\W]/', BBS)){
 if(!subject::exists(PATH)){
     error('板が存在しません');
 }
-if(!IS_THREAD and preg_match('/[\D]/', KEY)){
+if(RES and preg_match('/[\D]/', KEY)){
     error('keyが不正です');
 }
-if(!IS_THREAD and !thread::exists(PATH, KEY) and thread::is_kako(PATH, KEY)){
+if(RES and !thread::exists(PATH, KEY) and thread::is_kako(PATH, KEY)){
     error('このスレは過去ログなので書き込めません');
 }
-if(!IS_THREAD and !thread::exists(PATH, KEY) and !thread::is_kako(PATH, KEY)){
+if(RES and !thread::exists(PATH, KEY) and !thread::is_kako(PATH, KEY)){
     error('このスレは存在しません');
 }
-if(IS_THREAD and !SUBJECT){
+if(!RES and !SUBJECT){
     error('タイトルを入力してください');
 }
-if(IS_THREAD and !is_utf8(SUBJECT)){
+if(!RES and !is_utf8(SUBJECT)){
     error('文字コードが不正です');
 }
-if(IS_THREAD and strlen(SUBJECT) > 96){
+if(!RES and strlen(SUBJECT) > 96){
     error('タイトルが長すぎます');
 }
 if(strlen(FROM) > 32){
@@ -92,20 +89,20 @@ if(strlen(MESSAGE) > 4096){
 
 
 
-if(IS_THREAD){
+if(RES){
+    $from    = res::from(FROM);
+    $mail    = res::mail(MAIL);
+    $message = res::message(MESSAGE);
+
+    res::create(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
+}
+else{
     $from    = res::from(FROM);
     $mail    = res::mail(MAIL);
     $message = res::message(MESSAGE);
     $subject = res::subject(SUBJECT);
 
     thread::create(PATH, KEY, $from, $mail, $message, $subject) ? success(BBS, KEY) : error('スレッド書き込みエラー');
-}
-else{
-    $from    = res::from(FROM);
-    $mail    = res::mail(MAIL);
-    $message = res::message(MESSAGE);
-
-    res::create(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
 }
 
 
