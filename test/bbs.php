@@ -62,7 +62,7 @@ if(RES and !Thread::exists(PATH, KEY) and !Thread::is_kako(PATH, KEY)){
 if(!RES and !SUBJECT){
     error('タイトルを入力してください');
 }
-if(!RES and !is_utf8(SUBJECT)){
+if(!RES and !isUTF8(SUBJECT)){
     error('文字コードが不正です');
 }
 if(!RES and strlen(SUBJECT) > 96){
@@ -71,13 +71,13 @@ if(!RES and strlen(SUBJECT) > 96){
 if(strlen(FROM) > 32){
     error('名前が長すぎます');
 }
-if(!is_utf8(FROM)){
+if(!isUTF8(FROM)){
     error('文字コードが不正です');
 }
 if(strlen(MAIL) > 64){
     error('メールが長すぎます');
 }
-if(!is_utf8(MAIL)){
+if(!isUTF8(MAIL)){
     error('文字コードが不正です');
 }
 if(!MESSAGE){
@@ -109,19 +109,19 @@ else{
 
 
 class Subject{
-    static function path($bbs_path){
-        return "$bbs_path/subject.txt";
+    static function path($path){
+        return "$path/subject.txt";
     }
 
 
-    static function exists($bbs_path){
-        return file_exists(self::path($bbs_path));
+    static function exists($path){
+        return file_exists(self::path($path));
     }
 
 
-    static function delete($bbs_path, $key){
-        file_edit(self::path($bbs_path), function($contents) use($key){
-            return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
+    static function delete($path, $key){
+        file_edit(self::path($path), function($file) use($key){
+            return array_filter($file, function($line) use($key){ return !preg_match("/^$key\./", $line); });
         });
     }
 }
@@ -129,61 +129,60 @@ class Subject{
 
 
 class Thread{
-    static function path($bbs_path, $key){
-        return "$bbs_path/dat/$key.dat";
+    static function path($path, $key){
+        return "$path/dat/$key.dat";
     }
 
 
-    static function kako_path($bbs_path, $key){
-        return sprintf('%s/kako/%s/%s.dat', $bbs_path, substr($key,0,3), $key);
+    static function exists($path, $key){
+        return file_exists(self::path($path, $key));
     }
 
 
-    static function exists($bbs_path, $key){
-        return file_exists(self::path($bbs_path, $key));
+    static function kako_path($path, $key){
+        return sprintf('%s/kako/%s/%s.dat', $path, substr($key,0,3), $key);
     }
 
 
-    static function is_kako($bbs_path, $key){
-        return file_exists(self::kako_path($bbs_path, $key));
+    static function is_kako($path, $key){
+        return file_exists(self::kako_path($path, $key));
     }
 
 
-    static function save($bbs_path, $key, $from, $mail, $message, $subject){
-        $date     = Res::date($key);
-        $dat      = mb_convert_encoding("$from<>$mail<>$date<> $message <>$subject\n", 'sjis', 'utf-8');
-        $txt      = mb_convert_encoding("$key.dat<>$subject (1)\n", 'sjis', 'utf-8');
-        $dat_path = self::path($bbs_path, $key);
+    static function save($path, $key, $from, $mail, $message, $subject){
+        if(self::exists($path, $key)){
+            error('再度スレを立ててください');
+        }
+        $date = Res::date($key);
+        $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>$subject\n", 'sjis', 'utf-8');
+        $txt  = mb_convert_encoding("$key.dat<>$subject (1)\n", 'sjis', 'utf-8');
 
-        return file_edit(Subject::path($bbs_path), function($contents) use($dat_path, $dat, $txt){
-            if(file_exists($dat_path)){
-                error('再度スレを立ててください');
-            }
-            file_put_contents($dat_path, $dat, LOCK_EX);
-            array_unshift($contents, $txt);
-            return $contents;
+        return file_edit(Subject::path($path), function($file) use($path, $key, $dat, $txt){
+            file_put_contents(self::path($path, $key), $dat, LOCK_EX);
+            array_unshift($file, $txt);
+            return $file;
         });
     }
 
 
-    static function delete($bbs_path, $key){
-        if(self::exists($bbs_path, $key)){
-            unlink(self::path($bbs_path, $key));
-            Subject::delete($bbs_path, $key);
+    static function delete($path, $key){
+        if(self::exists($path, $key)){
+            unlink(self::path($path, $key));
+            Subject::delete($path, $key);
         }
         else{
-            unlink(self::kako_path($bbs_path, $key));
+            unlink(self::kako_path($path, $key));
         }
     }
 
 
-    static function move($bbs_path, $key){
-        $kako_dir = dirname(self::kako_path($bbs_path, $key));
+    static function move($path, $key){
+        $kako_dir = dirname(self::kako_path($path, $key));
         if(!is_dir($kako_dir)){
             mkdir($kako_dir, 0777, true);
         }
-        rename(self::path($bbs_path, $key), self::kako_path($bbs_path, $key));
-        Subject::delete($bbs_path, $key);
+        rename(self::path($path, $key), self::kako_path($path, $key));
+        Subject::delete($path, $key);
     }
 }
 
@@ -208,8 +207,7 @@ class Res{
 
     static function mail($mail){
         $mail = preg_replace('/#.*/', '', $mail);
-        $mail = self::escape($mail);
-        return $mail;
+        return self::escape($mail);
     }
 
 
@@ -225,19 +223,17 @@ class Res{
 
 
     static function message($message){
-        $message = rtrim($message);
-        $message = self::escape($message, '<br>');
-        return $message;
+        return self::escape(rtrim($message), '<br>');
     }
 
 
-    static function save($bbs_path, $key, $from, $mail, $message){
+    static function save($path, $key, $from, $mail, $message){
         $date = Res::date($_SERVER['REQUEST_TIME']);
         $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>\n", 'sjis', 'utf-8');
 
-        return file_edit(Subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat){
+        return file_edit(Subject::path($path), function($file) use($path, $key, $dat){
             $num = 0;
-            foreach($contents as $k => $v){
+            foreach($file as $k => $v){
                 if(strpos($v, "$key.") === 0){
                     $v = preg_replace_callback('/\d+(?=\)$)/', function($m) use(&$num){$num=$m[0]; return $num+1;}, $v);
                     break;
@@ -250,21 +246,21 @@ class Res{
                 error('このスレッドにはこれ以上書き込めません');
             }
 
-            file_put_contents(Thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
+            file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
-            array_splice($contents, $k, 1);
-            array_unshift($contents, $v);
+            array_splice($file, $k, 1);
+            array_unshift($file, $v);
 
-            return $contents;
+            return $file;
         });
     }
 
 
-    static function delete($bbs_path, $key, $num){
-        $dat_path = Thread::exists($bbs_path, $key) ? Thread::path($bbs_path, $key) : Thread::kako_path($bbs_path, $key);
-        file_edit($dat_path, function($contents) use($num){
-            $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
-            return $contents;
+    static function delete($path, $key, $num){
+        $dat_path = Thread::exists($path, $key) ? Thread::path($path, $key) : Thread::kako_path($path, $key);
+        file_edit($dat_path, function($file) use($num){
+            $file[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
+            return $file;
         });
     }
 
@@ -303,7 +299,7 @@ class Res{
 
 
 class Maintenance{
-    static function 削除($bbs_path, $message, $key = null){
+    static function 削除($path, $message, $key = null){
         foreach(explode("\n", $message) as $v){
             if(preg_match("/>>(\d+)-?(\d+)?/", $v, $m)){
                 if($m[1] == 1){
@@ -311,20 +307,20 @@ class Maintenance{
                 }
                 $m[2] = $m[2] ?? $m[1];
                 for($i = $m[1]; $i <= $m[2]; $i++){
-                    Res::delete($bbs_path, $key, $i);
+                    Res::delete($path, $key, $i);
                 }
             }
             else if(preg_match("|/(\d+)/$|", $v, $m)){
-                Thread::delete($bbs_path, $m[1]);
+                Thread::delete($path, $m[1]);
             }
         }
         return '削除しました';
     }
 
 
-    static function 復帰($bbs_path){
-        file_edit(Subject::path($bbs_path), function($contents) use($bbs_path){
-            foreach(glob("$bbs_path/dat/*.dat") as $v){
+    static function 復帰($path){
+        file_edit(Subject::path($path), function($file) use($path){
+            foreach(glob("$path/dat/*.dat") as $v){
                 $list[$v] = filemtime($v);
             }
             arsort($list);
@@ -345,10 +341,10 @@ class Maintenance{
 
 
 
-    static function 倉庫($bbs_path, $message){
+    static function 倉庫($path, $message){
         foreach(explode("\n", $message) as $v){
             if(preg_match("|/(\d+)/$|", $v, $m)){
-                Thread::move($bbs_path, $m[1]);
+                Thread::move($path, $m[1]);
             }
         }
         return '倉庫へ移動しました';
@@ -361,7 +357,7 @@ function post($name){
 }
 
 
-function is_utf8($str){
+function isUTF8($str){
     return preg_match('//u', $str);
 }
 
