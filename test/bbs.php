@@ -119,12 +119,12 @@ class Subject{
     }
 
 
-    static function take($file, $key){
+    static function select($file, $key){
         $marker = "$key.";
         foreach($file as $k => $v){
             if(strpos($v, $marker) === 0){
                 preg_match('/<>(.+?) \((\d+)\)$/', $v, $m);
-                return (object)['index'=>$k, 'key'=>$key, 'name'=>$m[1], 'num'=>$m[2]];
+                return (object)['index'=>$k, 'key'=>$key, 'subject'=>$m[1], 'num'=>$m[2]];
             }
         }
     }
@@ -239,21 +239,21 @@ class Res{
 
 
     static function save($path, $key, $from, $mail, $message){
-        $date = Res::date($_SERVER['REQUEST_TIME']);
+        $date = self::date($_SERVER['REQUEST_TIME']);
         $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>\n", 'sjis', 'utf-8');
 
         return file_edit(Subject::path($path), function($file) use($path, $key, $dat){
-            $subject = Subject::take($file, $key);
-            if(!$subject){
+            $selected = Subject::select($file, $key);
+            if(!$selected){
                 error('このスレッドは存在しません');
             }
-            if($subject->num >= 1000){
+            if($selected->num >= 1000){
                 error('このスレッドにはこれ以上書き込めません');
             }
 
-            $subject->num++;
-            array_splice($file, $subject->index, 1);
-            array_unshift($file, "$key.dat<>$subject->name ($subject->num)\n");
+            $selected->num++;
+            array_splice($file, $selected->index, 1);
+            array_unshift($file, "$key.dat<>$selected->subject ($selected->num)\n");
             file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
             return $file;
