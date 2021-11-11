@@ -33,8 +33,8 @@ define('ADMIN', (function (){
 
 
 
-if(ADMIN and method_exists('maintenance', FROM)){
-    error(maintenance::{FROM}(PATH, MESSAGE, KEY));
+if(ADMIN and method_exists('Maintenance', FROM)){
+    error(Maintenance::{FROM}(PATH, MESSAGE, KEY));
 }
 
 
@@ -47,16 +47,16 @@ if(!BBS){
 if(preg_match('/[\W]/', BBS)){
     error('bbsが不正です');
 }
-if(!subject::exists(PATH)){
+if(!Subject::exists(PATH)){
     error('板が存在しません');
 }
 if(RES and preg_match('/[\D]/', KEY)){
     error('keyが不正です');
 }
-if(RES and !thread::exists(PATH, KEY) and thread::is_kako(PATH, KEY)){
+if(RES and !Thread::exists(PATH, KEY) and Thread::is_kako(PATH, KEY)){
     error('このスレは過去ログなので書き込めません');
 }
-if(RES and !thread::exists(PATH, KEY) and !thread::is_kako(PATH, KEY)){
+if(RES and !Thread::exists(PATH, KEY) and !Thread::is_kako(PATH, KEY)){
     error('このスレは存在しません');
 }
 if(!RES and !SUBJECT){
@@ -90,37 +90,37 @@ if(strlen(MESSAGE) > 4096){
 
 
 if(RES){
-    $from    = res::from(FROM);
-    $mail    = res::mail(MAIL);
-    $message = res::message(MESSAGE);
+    $from    = Res::from(FROM);
+    $mail    = Res::mail(MAIL);
+    $message = Res::message(MESSAGE);
 
-    res::create(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
+    Res::save(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
 }
 else{
-    $from    = res::from(FROM);
-    $mail    = res::mail(MAIL);
-    $message = res::message(MESSAGE);
-    $subject = res::subject(SUBJECT);
+    $from    = Res::from(FROM);
+    $mail    = Res::mail(MAIL);
+    $message = Res::message(MESSAGE);
+    $subject = Res::subject(SUBJECT);
 
-    thread::create(PATH, KEY, $from, $mail, $message, $subject) ? success(BBS, KEY) : error('スレッド書き込みエラー');
+    Thread::save(PATH, KEY, $from, $mail, $message, $subject) ? success(BBS, KEY) : error('スレッド書き込みエラー');
 }
 
 
 
 
-class subject{
+class Subject{
     static function path($bbs_path){
         return "$bbs_path/subject.txt";
     }
 
 
     static function exists($bbs_path){
-        return file_exists(subject::path($bbs_path));
+        return file_exists(self::path($bbs_path));
     }
 
 
     static function delete($bbs_path, $key){
-        file_edit(subject::path($bbs_path), function($contents) use($key){
+        file_edit(self::path($bbs_path), function($contents) use($key){
             return array_filter($contents, function($line) use($key){ return !preg_match("/^$key\./", $line); });
         });
     }
@@ -128,7 +128,7 @@ class subject{
 
 
 
-class thread{
+class Thread{
     static function path($bbs_path, $key){
         return "$bbs_path/dat/$key.dat";
     }
@@ -140,22 +140,22 @@ class thread{
 
 
     static function exists($bbs_path, $key){
-        return file_exists(thread::path($bbs_path, $key));
+        return file_exists(self::path($bbs_path, $key));
     }
 
 
     static function is_kako($bbs_path, $key){
-        return file_exists(thread::kako_path($bbs_path, $key));
+        return file_exists(self::kako_path($bbs_path, $key));
     }
 
 
-    static function create($bbs_path, $key, $from, $mail, $message, $subject){
-        $date     = res::date($key);
+    static function save($bbs_path, $key, $from, $mail, $message, $subject){
+        $date     = Res::date($key);
         $dat      = mb_convert_encoding("$from<>$mail<>$date<> $message <>$subject\n", 'sjis', 'utf-8');
         $txt      = mb_convert_encoding("$key.dat<>$subject (1)\n", 'sjis', 'utf-8');
-        $dat_path = thread::path($bbs_path, $key);
+        $dat_path = self::path($bbs_path, $key);
 
-        return file_edit(subject::path($bbs_path), function($contents) use($dat_path, $dat, $txt){
+        return file_edit(Subject::path($bbs_path), function($contents) use($dat_path, $dat, $txt){
             if(file_exists($dat_path)){
                 error('再度スレを立ててください');
             }
@@ -167,29 +167,29 @@ class thread{
 
 
     static function delete($bbs_path, $key){
-        if(thread::exists($bbs_path, $key)){
-            unlink(thread::path($bbs_path, $key));
-            subject::delete($bbs_path, $key);
+        if(self::exists($bbs_path, $key)){
+            unlink(self::path($bbs_path, $key));
+            Subject::delete($bbs_path, $key);
         }
         else{
-            unlink(thread::kako_path($bbs_path, $key));
+            unlink(self::kako_path($bbs_path, $key));
         }
     }
 
 
     static function move($bbs_path, $key){
-        $kako_dir = dirname(thread::kako_path($bbs_path, $key));
+        $kako_dir = dirname(self::kako_path($bbs_path, $key));
         if(!is_dir($kako_dir)){
             mkdir($kako_dir, 0777, true);
         }
-        rename(thread::path($bbs_path, $key), thread::kako_path($bbs_path, $key));
-        subject::delete($bbs_path, $key);
+        rename(self::path($bbs_path, $key), self::kako_path($bbs_path, $key));
+        Subject::delete($bbs_path, $key);
     }
 }
 
 
 
-class res{
+class Res{
     static function from($from){
         if(ADMIN){
             return ADMIN['name'] . ' ★';
@@ -197,10 +197,10 @@ class res{
         if($from === ''){
             return SET['nanashi'];
         }
-        $from = res::escape($from);
+        $from = self::escape($from);
         $from = str_replace('★', '☆', $from);
         $from = str_replace('◆', '◇', $from);
-        $from = preg_replace_callback('/#(.+)/', function($m){ return ' ◆</b>'.res::trip($m[1]).'<b>'; }, $from);
+        $from = preg_replace_callback('/#(.+)/', function($m){ return ' ◆</b>'.self::trip($m[1]).'<b>'; }, $from);
 
         return $from;
     }
@@ -208,7 +208,7 @@ class res{
 
     static function mail($mail){
         $mail = preg_replace('/#.*/', '', $mail);
-        $mail = res::escape($mail);
+        $mail = self::escape($mail);
         return $mail;
     }
 
@@ -220,22 +220,22 @@ class res{
 
 
     static function subject($subject){
-        return res::escape($subject);
+        return self::escape($subject);
     }
 
 
     static function message($message){
         $message = rtrim($message);
-        $message = res::escape($message, '<br>');
+        $message = self::escape($message, '<br>');
         return $message;
     }
 
 
-    static function create($bbs_path, $key, $from, $mail, $message){
-        $date = res::date($_SERVER['REQUEST_TIME']);
+    static function save($bbs_path, $key, $from, $mail, $message){
+        $date = Res::date($_SERVER['REQUEST_TIME']);
         $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>\n", 'sjis', 'utf-8');
 
-        return file_edit(subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat){
+        return file_edit(Subject::path($bbs_path), function($contents) use($bbs_path, $key, $dat){
             $num = 0;
             foreach($contents as $k => $v){
                 if(strpos($v, "$key.") === 0){
@@ -250,7 +250,7 @@ class res{
                 error('このスレッドにはこれ以上書き込めません');
             }
 
-            file_put_contents(thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
+            file_put_contents(Thread::path($bbs_path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
 
             array_splice($contents, $k, 1);
             array_unshift($contents, $v);
@@ -261,7 +261,7 @@ class res{
 
 
     static function delete($bbs_path, $key, $num){
-        $dat_path = thread::exists($bbs_path, $key) ? thread::path($bbs_path, $key) : thread::kako_path($bbs_path, $key);
+        $dat_path = Thread::exists($bbs_path, $key) ? Thread::path($bbs_path, $key) : Thread::kako_path($bbs_path, $key);
         file_edit($dat_path, function($contents) use($num){
             $contents[$num-1] = mb_convert_encoding("あぼーん<>あぼーん<>あぼーん<>あぼーん<>\n", 'sjis', 'utf-8');
             return $contents;
@@ -302,7 +302,7 @@ class res{
 
 
 
-class maintenance{
+class Maintenance{
     static function 削除($bbs_path, $message, $key = null){
         foreach(explode("\n", $message) as $v){
             if(preg_match("/>>(\d+)-?(\d+)?/", $v, $m)){
@@ -311,11 +311,11 @@ class maintenance{
                 }
                 $m[2] = $m[2] ?? $m[1];
                 for($i = $m[1]; $i <= $m[2]; $i++){
-                    res::delete($bbs_path, $key, $i);
+                    Res::delete($bbs_path, $key, $i);
                 }
             }
             else if(preg_match("|/(\d+)/$|", $v, $m)){
-                thread::delete($bbs_path, $m[1]);
+                Thread::delete($bbs_path, $m[1]);
             }
         }
         return '削除しました';
@@ -323,7 +323,7 @@ class maintenance{
 
 
     static function 復帰($bbs_path){
-        file_edit(subject::path($bbs_path), function($contents) use($bbs_path){
+        file_edit(Subject::path($bbs_path), function($contents) use($bbs_path){
             foreach(glob("$bbs_path/dat/*.dat") as $v){
                 $list[$v] = filemtime($v);
             }
@@ -348,7 +348,7 @@ class maintenance{
     static function 倉庫($bbs_path, $message){
         foreach(explode("\n", $message) as $v){
             if(preg_match("|/(\d+)/$|", $v, $m)){
-                thread::move($bbs_path, $m[1]);
+                Thread::move($bbs_path, $m[1]);
             }
         }
         return '倉庫へ移動しました';
