@@ -119,6 +119,17 @@ class Subject{
     }
 
 
+    static function take($file, $key){
+        $marker = "$key.";
+        foreach($file as $k => $v){
+            if(strpos($v, $marker) === 0){
+                preg_match('/<>(.+?) \((\d+)\)$/', $v, $m);
+                return (object)['index'=>$k, 'key'=>$key, 'name'=>$m[1], 'num'=>$m[2]];
+            }
+        }
+    }
+
+
     static function delete($path, $key){
         file_edit(self::path($path), function($file) use($key){
             return array_filter($file, function($line) use($key){ return !preg_match("/^$key\./", $line); });
@@ -232,24 +243,18 @@ class Res{
         $dat  = mb_convert_encoding("$from<>$mail<>$date<> $message <>\n", 'sjis', 'utf-8');
 
         return file_edit(Subject::path($path), function($file) use($path, $key, $dat){
-            $num = 0;
-            foreach($file as $k => $v){
-                if(strpos($v, "$key.") === 0){
-                    $v = preg_replace_callback('/\d+(?=\)$)/', function($m) use(&$num){$num=$m[0]; return $num+1;}, $v);
-                    break;
-                }
-            }
-            if(!$num){
+            $subject = Subject::take($file, $key);
+            if(!$subject){
                 error('このスレッドは存在しません');
             }
-            if($num >= 1000){
+            if($subject->num >= 1000){
                 error('このスレッドにはこれ以上書き込めません');
             }
 
+            $subject->num++;
+            array_splice($file, $subject->index, 1);
+            array_unshift($file, "$key.dat<>$subject->name ($subject->num)\n");
             file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
-
-            array_splice($file, $k, 1);
-            array_unshift($file, $v);
 
             return $file;
         });
@@ -299,6 +304,7 @@ class Res{
 
 
 class Maintenance{
+
     static function 削除($path, $message, $key = null){
         foreach(explode("\n", $message) as $v){
             if(preg_match("/>>(\d+)-?(\d+)?/", $v, $m)){
