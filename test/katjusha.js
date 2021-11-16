@@ -291,10 +291,10 @@ class KatjushaSubject extends HTMLElement{
     $tbody_contextmenu(event){
         event.preventDefault()
         event.stopPropagation()
-        const tr  = event.target.closest('tr')
-        const url = tr.dataset.url
+        const tr = event.target.closest('tr')
 
         if (tr) {
+            const url = tr.dataset.url
             this.active(tr)
 
             new KatjushaContext(`

@@ -94,7 +94,7 @@ if(RES){
     $mail    = Res::mail(MAIL);
     $message = Res::message(MESSAGE);
 
-    Res::save(PATH, KEY, $from, $mail, $message) ? success(BBS, KEY) : error('レス書き込みエラー');
+    Res::save(PATH, KEY, $from, $mail, $message) ? ok(BBS, KEY) : error('レス書き込みエラー');
 }
 else{
     $from    = Res::from(FROM);
@@ -102,7 +102,7 @@ else{
     $message = Res::message(MESSAGE);
     $subject = Res::subject(SUBJECT);
 
-    Thread::save(PATH, KEY, $from, $mail, $message, $subject) ? success(BBS, KEY) : error('スレッド書き込みエラー');
+    Thread::save(PATH, KEY, $from, $mail, $message, $subject) ? ok(BBS, KEY) : error('スレッド書き込みエラー');
 }
 
 
@@ -254,7 +254,7 @@ class Res{
             $selected->num++;
             array_splice($file, $selected->index, 1);
             array_unshift($file, "$key.dat<>$selected->subject ($selected->num)\n");
-            file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND); //重複チェックが
+            file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND);
 
             return $file;
         });
@@ -400,7 +400,7 @@ function file_edit($file, $fn){
 }
 
 
-function success($bbs, $key){
+function ok($bbs, $key){
     header('Cache-Control: no-cache');
     header('Content-type: text/html; charset=shift_jis');
 
