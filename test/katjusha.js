@@ -615,10 +615,10 @@ class KatjushaThread extends HTMLElement{
         let  html  = ''
 
         for (const v of dat) {
-            let [from, mail, date, message, subject] = v.split('<>')
+            const [from, mail, date, message, subject] = v.split('<>')
 
             //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
-            message = message
+            const messageHTML = message
             .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             .replace(/^ /, '')
@@ -626,7 +626,7 @@ class KatjushaThread extends HTMLElement{
             html += `
               <article class="レス" data-n="${n}">
                 <header><i>${++n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
-                <p>${message}</p>
+                <p>${messageHTML}</p>
               </article>
             `
         }
