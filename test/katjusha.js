@@ -103,10 +103,17 @@ class KatjushaBBS extends HTMLElement{
         super()
         this.html = $bbsTemplate.content
         benry(this)
-
-        this.$bbs.innerHTML = this.parse( this.firstChild.textContent.trim() )
     }
 
+    static get observedAttributes(){
+        return ['bbslist']
+    }
+
+    attributeChangedCallback(name, oldValue, newValue){
+        if(name === 'bbslist'){
+            this.$bbs.innerHTML = this.parse( newValue.trim() )
+        }
+    }
 
     parse(text){
         const bbslist = text.slice(1).split('\n#').map(v => v.split('\n'))
@@ -617,11 +624,11 @@ class KatjushaThread extends HTMLElement{
         for (const v of dat) {
             const [from, mail, date, message, subject] = v.split('<>')
 
-            //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
             const messageHTML = message
             .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             .replace(/^ /, '')
+            //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
 
             html += `
               <article class="レス" data-n="${n}">
