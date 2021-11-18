@@ -105,14 +105,14 @@ class KatjushaBBS extends HTMLElement{
         benry(this)
     }
 
-    static get observedAttributes(){
-        return ['bbslist']
-    }
-
     attributeChangedCallback(name, oldValue, newValue){
         if(name === 'bbslist'){
             this.$bbs.innerHTML = this.parse( newValue.trim() )
         }
+    }
+
+    static get observedAttributes(){
+        return ['bbslist']
     }
 
     parse(text){
@@ -492,7 +492,9 @@ class KatjushaTab extends HTMLElement{
 
 
     $shadow_dblclick(event) {
-        $headline.$レス更新アイコン.click()
+        if (event.target.tagName === 'LI' && event.target.url) {
+            $headline.$レス更新アイコン.click()
+        }
     }
 
 
