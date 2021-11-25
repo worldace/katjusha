@@ -681,7 +681,9 @@ class KatjushaThread extends HTMLElement{
 
 
     $host_scroll(event) {
-        スレッド[this.selected.url].scroll = this.scrollTop
+        if(this.selected.url){
+            スレッド[this.selected.url].scroll = this.scrollTop
+        }
     }
 }
 
