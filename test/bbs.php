@@ -251,10 +251,11 @@ class Res{
                 error('このスレッドにはこれ以上書き込めません');
             }
 
+            file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND);
+
             $selected->num++;
             array_splice($file, $selected->index, 1);
             array_unshift($file, "$key.dat<>$selected->subject ($selected->num)\n");
-            file_put_contents(Thread::path($path, $key), $dat, LOCK_EX|FILE_APPEND);
 
             return $file;
         });
@@ -387,7 +388,6 @@ function file_edit($file, $fn){
         ftruncate($fp, 0);
         rewind($fp);
         fwrite($fp, $contents);
-        fflush($fp);
         flock($fp, LOCK_UN);
         fclose($fp);
         return true;
