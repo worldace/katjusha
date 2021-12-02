@@ -131,8 +131,9 @@ class Subject{
 
 
     static function delete($path, $key){
-        file_edit(self::path($path), function($file) use($key){
-            return array_filter($file, function($line) use($key){ return !preg_match("/^$key\./", $line); });
+        $marker = "$key.";
+        file_edit(self::path($path), function($file) use($marker){
+            return array_filter($file, function($line) use($marker){ return strpos($line, $marker) !== 0; });
         });
     }
 }
