@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title id="$title">かちゅぼ～ど</title>
-  <script src="test/katjusha.js" async></script>
+  <script src="test/katjusha.js" type="module"></script>
   <link rel="stylesheet" href="test/katjusha.css">
   <link rel="icon" href="test/favicon.png" type="image/png">
 </head>
@@ -338,7 +338,11 @@ table{
     margin: 1px 0 3px 0;
     /*table-layout: fixed;*/
 }
-th{ /* stickey https://teratail.com/questions/202382 */
+thead{
+    /*position: sticky;
+    top: 0;*/
+}
+th{
     background-color: #f0f0f0;
     border-top: solid 1px #e3e3e3;
     border-left: solid 1px #e3e3e3;

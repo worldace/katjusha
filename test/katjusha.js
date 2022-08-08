@@ -1,8 +1,9 @@
+import kit from 'https://cdn.jsdelivr.net/gh/worldace/kit/kit.js'
 
 
 $katjusha.start = function () {
     $base.title = document.title
-    $toolbar.$全板ボタン.textContent = `▽${document.title}`
+    $toolbar.$.全板ボタン.textContent = `▽${document.title}`
     $katjusha.aborts = new Set
 
     if ($base.href !== document.URL) {
@@ -23,7 +24,7 @@ $katjusha.fetch = async function(url, option = {}) {
     const abort = new AbortController()
 
     try {
-        $toolbar.$anime.dataset.ajax++
+        $toolbar.$.anime.dataset.ajax++
         $katjusha.aborts.add(abort)
         $status.textContent = `${host}に接続しています`
         const response      = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
@@ -41,7 +42,7 @@ $katjusha.fetch = async function(url, option = {}) {
         return error
     }
     finally {
-        $toolbar.$anime.dataset.ajax--
+        $toolbar.$.anime.dataset.ajax--
         $katjusha.aborts.delete(abort)
     }
 }
@@ -75,13 +76,17 @@ class KatjushaToolbar extends HTMLElement{
 
     constructor(){
         super()
-        this.html = $toolbarTemplate.content
-        benry(this)
+        kit(this)
     }
 
 
     $スレッド投稿アイコン_click(event) {
         new KatjushaForm($subject.bbsurl).open()
+    }
+
+
+    html(){
+        return $toolbarTemplate.content
     }
 }
 
@@ -90,8 +95,12 @@ class KatjushaBorder extends HTMLElement{
 
     constructor(){
         super()
-        this.html = $borderTemplate.content
-        benry(this)
+        kit(this)
+    }
+
+
+    html(){
+        return $borderTemplate.content
     }
 }
 
@@ -101,13 +110,12 @@ class KatjushaBBS extends HTMLElement{
 
     constructor(){
         super()
-        this.html = $bbsTemplate.content
-        benry(this)
+        kit(this)
     }
 
     attributeChangedCallback(name, oldValue, newValue){
         if(name === 'bbslist'){
-            this.$bbs.innerHTML = this.parse( newValue.trim() )
+            this.$.bbs.innerHTML = this.parse( newValue.trim() )
         }
     }
 
@@ -146,7 +154,7 @@ class KatjushaBBS extends HTMLElement{
 
     active(el){
         if(typeof el === 'string'){
-            el = this.$shadow.querySelector(`[href="${el}"]`)
+            el = this.$(`[href="${el}"]`)
         }
 
         if(el){
@@ -157,13 +165,18 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
-    $shadow_click(event){
+    html(){
+        return $bbsTemplate.content
+    }
+
+
+    $_click(event){
         if (event.target.tagName === 'A') {
             this.active(event.target)
         }
     }
 
-    $shadow_contextmenu(event){
+    $_contextmenu(event){
         event.preventDefault()
         event.stopPropagation()
 
@@ -185,8 +198,7 @@ class KatjushaSubject extends HTMLElement{
 
     constructor(){
         super()
-        this.html = $subjectTemplate.content
-        benry(this)
+        kit(this)
     }
 
 
@@ -216,16 +228,16 @@ class KatjushaSubject extends HTMLElement{
         if(response.status === 200){
             this.bbsurl = url
             this.scrollTop = 0
-            this.$tbody.innerHTML = this.toHTML(this.parse(response.content), url)
+            this.$.tbody.innerHTML = this.toHTML(this.parse(response.content), url)
 
             $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
             $bbs.active(url)
 
-            $status.textContent = `${this.$tbody.rows.length}件のスレッドを受信 (${date()})`
+            $status.textContent = `${this.$.tbody.rows.length}件のスレッドを受信 (${date()})`
             history.replaceState(null, null, url)
         }
         else{
-            this.$tbody.textContent = ''
+            this.$.tbody.textContent = ''
         }
     }
 
@@ -259,7 +271,7 @@ class KatjushaSubject extends HTMLElement{
 
 
     update(thread){
-        const tr = Array.from(this.$tbody.rows).find(v => v.dataset.url === thread.url)
+        const tr = Array.from(this.$.tbody.rows).find(v => v.dataset.url === thread.url)
 
         if (tr) {
             this.active(tr)
@@ -272,7 +284,12 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
-    $shadow_contextmenu(event){
+    html(){
+        return $subjectTemplate.content
+    }
+
+
+    $_contextmenu(event){
         event.preventDefault()
     }
 
@@ -317,20 +334,25 @@ class KatjushaSubject extends HTMLElement{
 
 class KatjushaHeadline extends HTMLElement{
 
+
+    html(){
+        return $headlineTemplate.content
+    }
+
+
     constructor(){
         super()
-        this.html = $headlineTemplate.content
-        benry(this)
+        kit(this)
     }
 
 
     render(thread) {
-        this.$thread.innerHTML = `${thread.subject} (${thread.num})`
-        this.$bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
+        this.$.thread.innerHTML = `${thread.subject} (${thread.num})`
+        this.$.bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
     }
 
 
-    $shadow_contextmenu (event) {
+    $_contextmenu (event) {
         event.preventDefault()
     }
 
@@ -371,16 +393,20 @@ class KatjushaHeadline extends HTMLElement{
 
 class KatjushaTab extends HTMLElement{
 
+
+    html(){
+        return $tabTemplate.content
+    }
+
     constructor(){
         super()
-        this.html = $tabTemplate.content
-        benry(this)
+        kit(this)
         this.openNew()
     }
 
 
     open(url, thread = {}){
-        if (!this.$tab.childElementCount) {
+        if (!this.$.tab.childElementCount) {
             return this.openNew(url, thread)
         }
 
@@ -405,7 +431,7 @@ class KatjushaTab extends HTMLElement{
     openNew(url, thread = {}) {
         const tab = this.find(url)
 
-        if (this.$tab.childElementCount === 1 && !this.$tab.firstElementChild.url) {
+        if (this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url) {
             return this.open(url, thread)
         }
         else if (tab) {
@@ -431,7 +457,7 @@ class KatjushaTab extends HTMLElement{
 
 
     closeAll(url) {
-        for (const tab of Array.from(this.$tab.children).filter(v => v.url !== url)) {
+        for (const tab of Array.from(this.$.tab.children).filter(v => v.url !== url)) {
             this.close(tab)
         }
     }
@@ -448,8 +474,8 @@ class KatjushaTab extends HTMLElement{
         tab.innerHTML    = subject
         tab.panel        = thread
 
-        this.$tab.append(tab)
-        $thread.$shadow.append(thread)
+        this.$.tab.append(tab)
+        $thread.shadowRoot.append(thread)
 
         return tab
     }
@@ -475,7 +501,7 @@ class KatjushaTab extends HTMLElement{
 
 
     find(url) {
-        return Array.from(this.$tab.children).find(v => v.url === url)
+        return Array.from(this.$.tab.children).find(v => v.url === url)
     }
 
 
@@ -484,21 +510,21 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    $shadow_click(event) {
+    $_click(event) {
         if (event.target.tagName === 'LI' && event.target !== this.selected) {
             this.select(event.target)
         }
     }
 
 
-    $shadow_dblclick(event) {
+    $_dblclick(event) {
         if (event.target.tagName === 'LI' && event.target.url) {
-            $headline.$レス更新アイコン.click()
+            $headline.$.レス更新アイコン.click()
         }
     }
 
 
-    $shadow_contextmenu(event) {
+    $_contextmenu(event) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -517,10 +543,19 @@ class KatjushaTab extends HTMLElement{
 
 class KatjushaThread extends HTMLElement{
 
+    html(){
+        return $threadTemplate.content
+    }
+
+
     constructor(){
         super()
-        this.html = $threadTemplate.content
-        benry(this)
+        kit(this)
+        this.onscroll = event => {
+            if(this.selected.url){
+                スレッド[this.selected.url].scroll = this.scrollTop
+            }
+        }
     }
 
 
@@ -537,7 +572,7 @@ class KatjushaThread extends HTMLElement{
 
 
     responseTo(n) {
-        $headline.$レス投稿アイコン.click()
+        $headline.$.レス投稿アイコン.click()
         $form.insert(`>>${n}\n`)
     }
 
@@ -665,7 +700,7 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    $shadow_click(event) {
+    $_click(event) {
         if (event.target.tagName === 'I') {
             event.stopPropagation()
 
@@ -678,23 +713,20 @@ class KatjushaThread extends HTMLElement{
             this.goto(event.target.dataset.n)
         }
     }
-
-
-    $host_scroll(event) {
-        if(this.selected.url){
-            スレッド[this.selected.url].scroll = this.scrollTop
-        }
-    }
 }
 
 
 
 class KatjushaStatus extends HTMLElement{
 
+    html(){
+        return $statusTemplate.content
+    }
+
+
     constructor(){
         super()
-        this.html = $statusTemplate.content
-        benry(this)
+        kit(this)
     }
 }
 
@@ -702,12 +734,16 @@ class KatjushaStatus extends HTMLElement{
 
 class KatjushaForm extends HTMLElement{
 
+    html(){
+        return $formTemplate.content.cloneNode(true)
+    }
+
+
     constructor(url){
         super()
         this.url  = url
         this.id   = '$form'
-        this.html = $formTemplate.content.cloneNode(true)
-        benry(this)
+        kit(this)
     }
 
 
@@ -722,21 +758,21 @@ class KatjushaForm extends HTMLElement{
         if( this.url.includes('read.cgi') ){
             const thread = スレッド[this.url]
 
-            this.$title.textContent = `「${thread.subject}」にレス`
-            this.$form.action       = `${thread.baseurl}test/bbs.cgi`
-            this.$bbs.value         = thread.bbs
-            this.$key.value         = thread.key
-            this.$subject.value     = thread.subject
-            this.$subject.disabled  = true
-            this.$message.focus()
+            this.$.title.textContent = `「${thread.subject}」にレス`
+            this.$.form.action       = `${thread.baseurl}test/bbs.cgi`
+            this.$.bbs.value         = thread.bbs
+            this.$.key.value         = thread.key
+            this.$.subject.value     = thread.subject
+            this.$.subject.disabled  = true
+            this.$.message.focus()
         }
         else{
             const bbs = $bbs.list[this.url]
 
-            this.$title.textContent = `『${bbs.name}』に新規スレッド`
-            this.$form.action       = `${bbs.baseurl}test/bbs.cgi`
-            this.$bbs.value         = bbs.bbs
-            this.$subject.focus()
+            this.$.title.textContent = `『${bbs.name}』に新規スレッド`
+            this.$.form.action       = `${bbs.baseurl}test/bbs.cgi`
+            this.$.bbs.value         = bbs.bbs
+            this.$.subject.focus()
         }
     }
 
@@ -749,19 +785,19 @@ class KatjushaForm extends HTMLElement{
 
 
     insert(text){
-        const before = this.$message.value.substr(0, this.$message.selectionStart)
-        const after  = this.$message.value.substr(this.$message.selectionStart)
+        const before = this.$.message.value.substr(0, this.$.message.selectionStart)
+        const after  = this.$.message.value.substr(this.$.message.selectionStart)
 
-        this.$message.value = before + text + after
+        this.$.message.value = before + text + after
     }
 
 
     disable(bool){
-        this.$submit.toggleAttribute('disabled', bool)
+        this.$.submit.toggleAttribute('disabled', bool)
     }
 
 
-    $shadow_contextmenu(event) {
+    $_contextmenu(event) {
         if (!['text','textarea'].includes(event.target.type)) {
             event.preventDefault()
         }
@@ -779,8 +815,8 @@ class KatjushaForm extends HTMLElement{
 
 
     $sage_change(event) {
-        this.$mail.readOnly = this.checked
-        this.$mail.value    = this.checked ? 'sage' : ''
+        this.$.mail.readOnly = this.checked
+        this.$.mail.value    = this.checked ? 'sage' : ''
     }
 
 
@@ -792,7 +828,7 @@ class KatjushaForm extends HTMLElement{
     async $form_submit(event) {
         event.preventDefault()
         this.disable(true)
-        const response = await $katjusha.fetch(this.$form.action, {method:'POST', body:new FormData(this.$form)})
+        const response = await $katjusha.fetch(this.$.form.action, {method:'POST', body:new FormData(this.$.form)})
         KatjushaForm.recieve(response, this.url)
     }
 
@@ -822,13 +858,17 @@ class KatjushaForm extends HTMLElement{
 
 class KatjushaContext extends HTMLElement{
 
+    html(){
+        return $contextTemplate.content.cloneNode(true)
+    }
+
+
     constructor(html){
         super()
 
         this.id   = '$context'
-        this.html = $contextTemplate.content.cloneNode(true)
-        benry(this)
-        this.$context.innerHTML = html
+        kit(this)
+        this.$.context.innerHTML = html
 
         window.$context?.remove()
         document.addEventListener('click', () => this.remove(), {once:true})
@@ -842,14 +882,14 @@ class KatjushaContext extends HTMLElement{
     }
 
 
-    $shadow_click(event){
+    $_click(event){
         if (!event.target.onclick && !event.target.href) {
             event.stopPropagation()
         }
     }
 
 
-    $shadow_contextmenu(event){
+    $_contextmenu(event){
         event.preventDefault()
     }
 }
@@ -858,12 +898,16 @@ class KatjushaContext extends HTMLElement{
 
 class KatjushaPopup extends HTMLElement{
 
+    html(){
+        return $popupTemplate.content.cloneNode(true)
+    }
+
+
     constructor(html){
         super()
         this.id   = '$popup'
-        this.html = $popupTemplate.content.cloneNode(true)
-        benry(this)
-        this.$popup.innerHTML = html
+        kit(this)
+        this.$.popup.innerHTML = html
     }
 
 
@@ -949,33 +993,6 @@ function dndwindow(el, pageX, pageY) {
 
     function up(event) {
         document.removeEventListener('mousemove', move)
-    }
-}
-
-
-function benry(self){ // https://qiita.com/economist/items/6c923c255f6b4b7bbf84
-    self.$host   = self
-    self.$shadow = self.attachShadow({mode:'open'})
-
-    if(self.html instanceof Node){
-        self.$shadow.append(self.html)
-    }
-    else{
-        self.$shadow.innerHTML = self.html ?? ''
-    }
-
-    for(const el of self.$shadow.querySelectorAll('[id]')){
-        self[`$${el.id}`] = el
-    }
-
-    const methods = Object.getOwnPropertyNames(self.constructor.prototype).filter(v => typeof self[v] === 'function')
-
-    for(const method of methods){
-        self[method] = self[method].bind(self)
-        const match  = method.match(/^(\$.*?)_([^_]+)$/)
-        if(match){
-            self[match[1]]?.addEventListener(match[2], self[method])
-        }
     }
 }
 

@@ -90,19 +90,10 @@ if(strlen(MESSAGE) > 4096){
 
 
 if(RES){
-    $from    = Res::from(FROM);
-    $mail    = Res::mail(MAIL);
-    $message = Res::message(MESSAGE);
-
-    Res::save(PATH, KEY, $from, $mail, $message) ? ok(BBS, KEY) : error('レス書き込みエラー');
+    Res::save(PATH, KEY, Res::from(FROM), Res::mail(MAIL), Res::message(MESSAGE)) ? ok(BBS, KEY) : error('レス書き込みエラー');
 }
 else{
-    $from    = Res::from(FROM);
-    $mail    = Res::mail(MAIL);
-    $message = Res::message(MESSAGE);
-    $subject = Res::subject(SUBJECT);
-
-    Thread::save(PATH, KEY, $from, $mail, $message, $subject) ? ok(BBS, KEY) : error('スレッド書き込みエラー');
+    Thread::save(PATH, KEY, Res::from(FROM), Res::mail(MAIL), Res::message(MESSAGE), Res::subject(SUBJECT)) ? ok(BBS, KEY) : error('スレッド書き込みエラー');
 }
 
 
