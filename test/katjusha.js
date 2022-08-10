@@ -99,7 +99,7 @@ class KatjushaToolbar extends HTMLElement{
   </div>
   <div id="anime" data-ajax="0"></div>
 </header>
-<style>${this.css}</style>
+<style>${this.css()}</style>
     `}
 
 
@@ -114,7 +114,8 @@ class KatjushaToolbar extends HTMLElement{
     }
 
 
-    css =`
+    css(){
+        return `
 #ヘッダ{
     background-color: #f0f0f0;
     display: flex;
@@ -226,7 +227,7 @@ class KatjushaToolbar extends HTMLElement{
     border-right: solid 1px #fff;
     transform: translate(1px, 1px);
 }
-    `
+    `}
 }
 
 
@@ -234,7 +235,7 @@ class KatjushaToolbar extends HTMLElement{
 class KatjushaBorder extends HTMLElement{
 
     html(){
-        return `<style>${this.css}</style>`
+        return `<style>${this.css()}</style>`
     }
 
 
@@ -244,7 +245,8 @@ class KatjushaBorder extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     height: 7px;
     margin-top: 1px;
@@ -253,7 +255,7 @@ class KatjushaBorder extends HTMLElement{
     border-left: none;
     border-top: none;
 }
-    `
+    `}
 }
 
 
@@ -263,7 +265,7 @@ class KatjushaBBS extends HTMLElement{
 
 
     html(){
-        return `<div id="bbs"></div><style>${this.css}</style>`
+        return `<div id="bbs"></div><style>${this.css()}</style>`
     }
 
 
@@ -342,7 +344,8 @@ class KatjushaBBS extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     padding-top: 3px;
     border-right: solid 1px #a0a0a0;
@@ -464,7 +467,7 @@ details:nth-of-type(33n+32){
 details:nth-of-type(33n+33){
     border-left: 4px solid #000000;
 }
-    `
+    `}
 }
 
 
@@ -480,7 +483,7 @@ class KatjushaSubject extends HTMLElement{
   </thead>
   <tbody id="tbody"></tbody>
 </table>
-<style>${this.css}</style>
+<style>${this.css()}</style>
     `}
 
     constructor(){
@@ -612,7 +615,8 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     overflow-y: scroll;
 }
@@ -707,7 +711,7 @@ tr[selected]{
 tr[selected] a{
     color: #fff;
 }
-`
+    `}
 }
 
 
@@ -735,7 +739,7 @@ class KatjushaHeadline extends HTMLElement{
     <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
   </div>
 </div>
-<style>${this.css}</style>
+<style>${this.css()}</style>
     `}
 
 
@@ -788,7 +792,8 @@ class KatjushaHeadline extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 #headline{
     background-color: #f0f0f0;
     margin: 0;
@@ -881,7 +886,7 @@ class KatjushaHeadline extends HTMLElement{
     border-right: solid 1px #fff;
     transform: translate(1px, 1px);
 }
-    `
+    `}
 }
 
 
@@ -890,7 +895,7 @@ class KatjushaTab extends HTMLElement{
 
 
     html(){
-        return `<ul id="tab"></ul><style>${this.css}</style>`
+        return `<ul id="tab"></ul><style>${this.css()}</style>`
     }
 
 
@@ -1035,7 +1040,8 @@ class KatjushaTab extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 ul{
     list-style: none;
     cursor: default;
@@ -1083,7 +1089,7 @@ li{
     background-size: 12px;
     background-position: 4px center;
 }
-    `
+    `}
 }
 
 
@@ -1091,7 +1097,7 @@ li{
 class KatjushaThread extends HTMLElement{
 
     html(){
-        return `<style>${this.css}</style>`
+        return `<style>${this.css()}</style>`
     }
 
 
@@ -1262,7 +1268,8 @@ class KatjushaThread extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     font-size: 18px;
     user-select: text;
@@ -1327,7 +1334,7 @@ class KatjushaThread extends HTMLElement{
     cursor: pointer;
     color: blue;
 }
-    `
+    `}
 }
 
 
@@ -1335,7 +1342,7 @@ class KatjushaThread extends HTMLElement{
 class KatjushaStatus extends HTMLElement{
 
     html(){
-        return `<slot></slot><style>${this.css}</style>`
+        return `<slot></slot><style>${this.css()}</style>`
     }
 
 
@@ -1345,7 +1352,8 @@ class KatjushaStatus extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     border-top: 1px solid #c0c0c0;
     box-shadow: 0 1px 0 0 #fff inset;
@@ -1354,7 +1362,7 @@ class KatjushaStatus extends HTMLElement{
     font-family: 'Meiryo', sans-serif;
     padding-left: 4px;
 }
-    `
+    `}
 }
 
 
@@ -1395,7 +1403,7 @@ class KatjushaForm extends HTMLElement{
     <input name="submit" value="書き込む" type="hidden">
   </form>
 </div>
-<style>${this.css}</style>
+<style>${this.css()}</style>
     `}
 
 
@@ -1514,7 +1522,8 @@ class KatjushaForm extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     position: absolute;
     z-index: 5;
@@ -1695,7 +1704,7 @@ class KatjushaForm extends HTMLElement{
 #area3 input:active{
     transform: translate(1px, 1px);
 }
-    `
+    `}
 }
 
 
@@ -1703,7 +1712,7 @@ class KatjushaForm extends HTMLElement{
 class KatjushaContext extends HTMLElement{
 
     html(){
-        return `<ul id="context" class="menu"></ul><style>${this.css}</style>`
+        return `<ul id="context" class="menu"></ul><style>${this.css()}</style>`
     }
 
 
@@ -1738,7 +1747,8 @@ class KatjushaContext extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     display: block;
     position: absolute;
@@ -1801,7 +1811,7 @@ class KatjushaContext extends HTMLElement{
 .menu-sub:hover > ul{
     display: block;
 }
-    `
+    `}
 }
 
 
@@ -1809,7 +1819,7 @@ class KatjushaContext extends HTMLElement{
 class KatjushaPopup extends HTMLElement{
 
     html(){
-        return `<div id="popup"></div><style>${this.css}</style>`
+        return `<div id="popup"></div><style>${this.css()}</style>`
     }
 
 
@@ -1828,7 +1838,8 @@ class KatjushaPopup extends HTMLElement{
     }
 
 
-    css = `
+    css(){
+        return `
 :host{
     font-size: 14px;
     color: #000;
@@ -1893,7 +1904,7 @@ class KatjushaPopup extends HTMLElement{
     cursor: pointer;
     color: blue;
 }
-    `
+    `}
 }
 
 
