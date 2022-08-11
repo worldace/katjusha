@@ -99,7 +99,6 @@ class KatjushaToolbar extends HTMLElement{
   </div>
   <div id="anime" data-ajax="0"></div>
 </header>
-<style>${this.css()}</style>
     `}
 
 
@@ -235,7 +234,7 @@ class KatjushaToolbar extends HTMLElement{
 class KatjushaBorder extends HTMLElement{
 
     html(){
-        return `<style>${this.css()}</style>`
+        return ``
     }
 
 
@@ -265,7 +264,7 @@ class KatjushaBBS extends HTMLElement{
 
 
     html(){
-        return `<div id="bbs"></div><style>${this.css()}</style>`
+        return `<div id="bbs"></div>`
     }
 
 
@@ -483,7 +482,6 @@ class KatjushaSubject extends HTMLElement{
   </thead>
   <tbody id="tbody"></tbody>
 </table>
-<style>${this.css()}</style>
     `}
 
     constructor(){
@@ -739,7 +737,6 @@ class KatjushaHeadline extends HTMLElement{
     <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
   </div>
 </div>
-<style>${this.css()}</style>
     `}
 
 
@@ -895,7 +892,7 @@ class KatjushaTab extends HTMLElement{
 
 
     html(){
-        return `<ul id="tab"></ul><style>${this.css()}</style>`
+        return `<ul id="tab"></ul>`
     }
 
 
@@ -1097,7 +1094,7 @@ li{
 class KatjushaThread extends HTMLElement{
 
     html(){
-        return `<style>${this.css()}</style>`
+        return ``
     }
 
 
@@ -1342,7 +1339,7 @@ class KatjushaThread extends HTMLElement{
 class KatjushaStatus extends HTMLElement{
 
     html(){
-        return `<slot></slot><style>${this.css()}</style>`
+        return `<slot></slot>`
     }
 
 
@@ -1403,7 +1400,6 @@ class KatjushaForm extends HTMLElement{
     <input name="submit" value="書き込む" type="hidden">
   </form>
 </div>
-<style>${this.css()}</style>
     `}
 
 
@@ -1712,7 +1708,7 @@ class KatjushaForm extends HTMLElement{
 class KatjushaContext extends HTMLElement{
 
     html(){
-        return `<ul id="context" class="menu"></ul><style>${this.css()}</style>`
+        return `<ul id="context" class="menu"></ul>`
     }
 
 
@@ -1819,7 +1815,7 @@ class KatjushaContext extends HTMLElement{
 class KatjushaPopup extends HTMLElement{
 
     html(){
-        return `<div id="popup"></div><style>${this.css()}</style>`
+        return `<div id="popup"></div>`
     }
 
 
