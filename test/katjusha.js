@@ -1484,8 +1484,14 @@ class KatjushaForm extends HTMLElement{
     }
 
 
-    $header_mousedown(event) {
-        dndwindow(this, event.pageX, event.pageY)
+    $header_pointermove(event) {
+        if(event.buttons){
+            event.target.setPointerCapture(event.pointerId)
+            const {x, y, width, height} = this.getBoundingClientRect()
+
+            this.style.left = clamp(0, x+event.movementX, innerWidth-width)   + 'px'
+            this.style.top  = clamp(0, y+event.movementY, innerHeight-height) + 'px'
+        }
     }
 
 
@@ -1960,25 +1966,8 @@ function KB(byte = 0) {
 }
 
 
-function dndwindow(el, pageX, pageY) {
-    const {left, top, width, height} = el.getBoundingClientRect()
-
-    const startX = left - pageX
-    const startY = top  - pageY
-    const limitX = innerWidth  - width
-    const limitY = innerHeight - height
-
-    document.addEventListener('mousemove', move, {passive:true})
-    document.addEventListener('mouseup', up, {once:true})
-
-    function move(event) {
-        el.style.left = Math.min(Math.max(0, startX+event.pageX), limitX) + 'px'
-        el.style.top  = Math.min(Math.max(0, startY+event.pageY), limitY) + 'px'
-    }
-
-    function up(event) {
-        document.removeEventListener('mousemove', move)
-    }
+function clamp(min, num, max){
+    return Math.min(Math.max(min, num), max)
 }
 
 
