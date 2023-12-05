@@ -673,8 +673,366 @@ li{
 }
 </style>
 </template>
-
 </katjusha-status>
+
+
+<template id="$formTemplate">
+<div>
+  <div id="header">
+    <div id="title"></div>
+    <div id="close"></div>
+  </div>
+  <ul id="tab">
+    <li class="selected">書き込み</li>
+    <li>ローカルルール</li>
+  </ul>
+  <form id="form" action="test/bbs.cgi" method="POST" spellcheck="false">
+    <div id="area1">
+      <label id="subjectlabel">タイトル</label>
+      <input id="subject" name="subject" type="text">
+    </div>
+    <div id="area2">
+      <label id="fromlabel">名前</label>
+      <input id="from" name="FROM" type="text">
+      <label id="maillabel">メール</label>
+      <input id="mail" name="mail" type="text">
+      <input id="sage" type="checkbox">
+      <label id="sagelabel" for="sage">sage</label>
+    </div>
+    <textarea id="message" name="MESSAGE"></textarea>
+    <div id="area3">
+      <input id="submit" type="submit" value="書き込む">
+      <input id="reset" type="reset" value="キャンセル">
+    </div>
+    <input id="bbs" name="bbs" type="hidden">
+    <input id="key" name="key" type="hidden">
+    <input name="submit" value="書き込む" type="hidden">
+  </form>
+</div>
+<style>
+:host{
+    position: absolute;
+    z-index: 5;
+    border: solid 1px #2982cc;
+    background-color: #f0f0f0;
+    font-family: 'MS PGothic', sans-serif;
+    font-size: 13px;
+}
+#header{
+    box-sizing: border-box;
+    background-color: #2982cc;
+    padding: 5px 0 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAKlBMVEUAAAAAAAD//9T/4rH/1I7/xmvckgD/uEj/8NT/qgC5egCWYgD/qiWAAABV6iNkAAAAAXRSTlMAQObYZgAAAHlJREFUCNdjYGBgBCEQkBRgEBMAMUQFQAgIhANBCCgfZC4YbAhiGJWENPkA5aSURCyUJBcyMIgoCTtbiBcC1RoppaWYJALVWChpmLiD9EuYuIZtBNKCQsruaQJAGRcXJdOyhUBGqq2SsTtI7RQhDWN3sBrJ0NBqAQYAQ74Ta8sT5DsAAAAASUVORK5CYII=');
+    background-size: 16px;
+    background-position: 6px center;
+    height: 28px;
+}
+#title{
+    color: #fff;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 20px;
+}
+#close{
+    width: 28px;
+    height: 28px;
+    background-repeat: no-repeat;
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgd2lkdGg9IjE3OTIiIGhlaWdodD0iMTc5MiIgdmlld0JveD0iMCAwIDE3OTIgMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ5MCAxMzIycTAgNDAtMjggNjhsLTEzNiAxMzZxLTI4IDI4LTY4IDI4dC02OC0yOGwtMjk0LTI5NC0yOTQgMjk0cS0yOCAyOC02OCAyOHQtNjgtMjhsLTEzNi0xMzZxLTI4LTI4LTI4LTY4dDI4LTY4bDI5NC0yOTQtMjk0LTI5NHEtMjgtMjgtMjgtNjh0MjgtNjhsMTM2LTEzNnEyOC0yOCA2OC0yOHQ2OCAyOGwyOTQgMjk0IDI5NC0yOTRxMjgtMjggNjgtMjh0NjggMjhsMTM2IDEzNnEyOCAyOCAyOCA2OHQtMjggNjhsLTI5NCAyOTQgMjk0IDI5NHEyOCAyOCAyOCA2OHoiIGZpbGw9IiNmZmYiLz48L3N2Zz4NCg==');
+    background-size: 16px;
+    background-position: center center;
+    cursor: pointer;
+}
+#close:hover{
+    background-color: #e81123;
+}
+#tab{
+    height: 24px;
+    list-style: none;
+    cursor: default;
+    display: flex;
+    align-items: flex-end;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding-left: 6px;
+    border-bottom: 1px solid #c0c0c0;
+    box-shadow: 0 1px 0 #fff;
+}
+#tab > li{
+    text-align: center;
+    border-top: 1px solid #e3e3e3;
+    border-left: 1px solid #e3e3e3;
+    border-right: 1px solid #e3e3e3;
+    background-color: #f0f0f0;
+    color: #909090;
+    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin: 0 -5px;
+    padding: 0 6px;
+    height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 20px;
+    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
+    user-select: none;
+}
+#tab .selected{
+    color: #000;
+    z-index: 2;
+    height: 22px;
+    line-height: 22px;
+}
+#form{
+    padding: 4px 12px 6px 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: max-content;
+    min-height: 280px;
+    resize: both;
+    overflow: hidden;
+}
+#area1{
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+}
+#subjectlabel{
+    min-width: 50px;
+    text-align: right;
+    padding-right: 4px;
+    user-select: none;
+}
+[type="text"]{
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    outline: none;
+    padding-left: 2px;
+    height: 18px;
+    font-family: 'MS PGothic', sans-serif;
+}
+#subject{
+    flex-grow: 1;
+}
+#subject:disabled{
+    color: #6d6d6d;
+    background-color: #fff;
+}
+#area2{
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+#fromlabel{
+    min-width: 50px;
+    text-align: right;
+    padding-right: 4px;
+    user-select: none;
+}
+#from{
+    flex-grow: 1;
+    margin-right: 6px;
+}
+#maillabel{
+    min-width: 50px;
+    padding-right: 3px;
+    text-align: right;
+    user-select: none;
+}
+#mail{
+    flex-grow: 1;
+    margin-right: 6px;
+}
+#mail:read-only{
+    color: #6d6d6d;
+}
+#sagelabel{
+    padding: 2px 0;
+    user-select: none;
+}
+#message{
+    flex-grow: 1;
+    min-height: 160px;
+    font-size: 12px;
+    border-left: solid 1px #696969;
+    border-top: solid 1px #696969;
+    border-right: solid 1px #e3e3e3;
+    border-bottom: solid 1px #e3e3e3;
+    box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
+    overflow: scroll;
+    outline: none;
+    padding-left: 4px;
+    resize: none;
+    margin-top: 10px;
+}
+#area3{
+    text-align: center;
+    margin-top: 6px;
+}
+#area3 input{
+    background-color: transparent;
+    width: 80px;
+    font-size: 12px;
+    font-family: 'MS PGothic', sans-serif;
+    padding: 3px;
+    border-left: solid 1px #e3e3e3;
+    border-top: solid 1px #e3e3e3;
+    border-right: solid 1px #a0a0a0;
+    border-bottom: solid 1px #a0a0a0;
+    box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;
+}
+#area3 input:active{
+    transform: translate(1px, 1px);
+}
+</style>
+</template>
+
+
+<template id="$contextTemplate">
+<ul id="context" class="menu"></ul>
+<style>
+:host{
+    display: block;
+    position: absolute;
+    z-index: 10;
+}
+.menu,
+.menu ul{
+    min-width: 160px;
+    margin: 0;
+    padding: 2px 0;
+    list-style: none;
+    background-color: #f0f0f0;
+    border: 1px solid #999;
+    border-radius: 2px;
+    box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);
+}
+.menu li{
+    font-family: 'Yu Gothic UI Medium', 'Meiryo', sans-serif;
+    font-size: 12px;
+}
+.menu li:empty{
+    height: 2px;
+    margin: 3px 1px;
+    background-color: #e5e5e5;
+    box-shadow: 0 1px 0 #fff;
+}
+.menu a{
+    display: block;
+    padding: 2px 20px 2px 24px;
+    line-height: 18px;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: default;
+}
+.menu a:hover,
+.menu-sub:hover > a{
+    background-color: #91c9f7;
+}
+.menu-sub{
+    position: relative;
+}
+.menu-sub > a::after{
+    position: absolute;
+    right: 5px;
+    width: 0;
+    height: 0;
+    margin-top: 5px;
+    border: solid 5px transparent;
+    border-left: solid 5px #333;
+    content: '';
+}
+.menu-sub > ul{
+    position: absolute;
+    top: -3px;
+    left: 100%;
+    border-radius: 2px;
+    display: none;
+}
+.menu-sub:hover > ul{
+    display: block;
+}
+</style>
+</template>
+
+
+<template id="$popupTemplate">
+<div id="popup"></div>
+<style>
+:host{
+    font-size: 14px;
+    color: #000;
+    background-color: #ffffe1;
+    position: absolute;
+    border-right: 1px solid #7f7f7f;
+    border-bottom: 1px solid #7f7f7f;
+    border-left: 1px solid #e4e4e4;
+    border-top: 1px solid #e4e4e4;
+    box-shadow: 0 1px 0 #f7f7f7;
+    z-index: 8;
+    padding: 6px 4px;
+    cursor: default;
+}
+.レス p{
+    margin: 3px 0 0 12px !important;
+}
+/* 以下はKatjushaThreadのコピペ */
+.レス i{
+    color: blue;
+    font-style: normal;
+    cursor: pointer;
+}
+.レス i:hover{
+    text-decoration: underline;
+}
+.レス .from{
+    color: forestgreen;
+}
+.レス .from::before{
+    content: '名前：';
+    color: #000;
+    margin: 0 0.1rem 0 0.7rem;
+    user-select: text;
+}
+.レス time{
+}
+.レス time::before{
+    content: '投稿日：';
+    margin: 0 0.1rem 0 0.7rem;
+    user-select: text;
+}
+.レス address{
+    display: inline;
+    font-style: normal;
+    color: red;
+    margin-left: 8px;
+}
+.レス p{
+    margin-top: 2px;
+    margin-left: 36px;
+    white-space: pre-wrap;
+}
+.レス a{
+    text-decoration: none;
+}
+.レス a:hover{
+    text-decoration: underline;
+}
+.レス .anker{
+    position: relative;
+    cursor: pointer;
+    color: blue;
+}
+</style>
+</template>
+
 
 
 </body>
