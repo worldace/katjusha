@@ -1,4 +1,3 @@
-// クリップボードエラー
 
 $katjusha.start = function(){
     $base.title = document.title
@@ -15,6 +14,11 @@ $katjusha.link = function(url, target){
     $katjusha.href   = url
     $katjusha.target = target
     $katjusha.click()
+}
+
+
+$katjusha.clipboard = function(text){
+    navigator.clipboard.writeText(text)
 }
 
 
@@ -133,8 +137,8 @@ class KatjushaBBS extends HTMLElement{
             this.active(event.target)
 
             new KatjushaContext(`
-                <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.href}')">URLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
             `).show(event.pageX, event.pageY)
         }
     }
@@ -221,8 +225,8 @@ class KatjushaSubject extends HTMLElement{
 
             new KatjushaContext(`
                 <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
-                <li><a onclick="toClipboard('${url}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${url}')">URLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
             `).show(event.pageX, event.pageY)
         }
     }
@@ -547,8 +551,8 @@ class KatjushaTab extends HTMLElement{
             new KatjushaContext(`
                 <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
                 <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-                <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.url}')">URLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
             `).show(event.pageX, event.pageY)
         }
     }
@@ -869,9 +873,6 @@ const スレッド = new Proxy({}, {
 
 
 
-function toClipboard(text){
-    navigator.clipboard.writeText(text)
-}
 
 
 function date(){
