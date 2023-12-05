@@ -1,29 +1,29 @@
 import kit from 'https://cdn.jsdelivr.net/gh/worldace/kit/kit.js'
 
 
-$katjusha.start = function () {
+$katjusha.start = function(){
     $base.title = document.title
     $toolbar.$.全板ボタン.textContent = `▽${document.title}`
     $katjusha.aborts = new Set
 
-    if ($base.href !== document.URL) {
+    if($base.href !== document.URL){
         $katjusha.link(document.URL)
     }
 }
 
 
-$katjusha.link = function (url, target){
+$katjusha.link = function(url, target){
     $katjusha.href   = url
     $katjusha.target = target
     $katjusha.click()
 }
 
 
-$katjusha.fetch = async function(url, option = {}) {
+$katjusha.fetch = async function(url, option = {}){
     const host  = new URL(url).hostname
     const abort = new AbortController()
 
-    try {
+    try{
         $toolbar.$.anime.dataset.ajax++
         $katjusha.aborts.add(abort)
         $status.textContent = `${host}に接続しています`
@@ -37,11 +37,11 @@ $katjusha.fetch = async function(url, option = {}) {
 
         return response
     }
-    catch (error) { // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
+    catch(error){ // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
         $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
         return error
     }
-    finally {
+    finally{
         $toolbar.$.anime.dataset.ajax--
         $katjusha.aborts.delete(abort)
     }
@@ -51,15 +51,15 @@ $katjusha.fetch = async function(url, option = {}) {
 $katjusha.onclick = function(event){
     const {href, target} = event.composedPath()[0]
 
-    if (href === $base.href) {
+    if(href === $base.href){
         event.preventDefault()
         history.replaceState(null, null, href)
     }
-    else if (href in $bbs.list) {
+    else if(href in $bbs.list){
         event.preventDefault()
         $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
     }
-    else if (href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
+    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
@@ -73,6 +73,18 @@ $katjusha.onclick = function(event){
 
 
 class KatjushaToolbar extends HTMLElement{
+    static{
+        customElements.define('katjusha-toolbar', this)
+    }
+
+    constructor(){
+        super()
+        kit(this)
+    }
+
+    $スレッド投稿アイコン_click(event){
+        new KatjushaForm($subject.bbsurl).open()
+    }
 
     html(){
         return `
@@ -100,18 +112,6 @@ class KatjushaToolbar extends HTMLElement{
   <div id="anime" data-ajax="0"></div>
 </header>
     `}
-
-
-    constructor(){
-        super()
-        kit(this)
-    }
-
-
-    $スレッド投稿アイコン_click(event) {
-        new KatjushaForm($subject.bbsurl).open()
-    }
-
 
     css(){
         return `
@@ -232,17 +232,18 @@ class KatjushaToolbar extends HTMLElement{
 
 
 class KatjushaBorder extends HTMLElement{
-
-    html(){
-        return ``
+    static{
+        customElements.define('katjusha-border', this)
     }
-
 
     constructor(){
         super()
         kit(this)
     }
 
+    html(){
+        return ``
+    }
 
     css(){
         return `
@@ -262,17 +263,14 @@ class KatjushaBorder extends HTMLElement{
 class KatjushaBBS extends HTMLElement{
     static observedAttributes = ['bbslist']
 
-
-    html(){
-        return `<div id="bbs"></div>`
+    static{
+        customElements.define('katjusha-bbs', this)
     }
-
 
     constructor(){
         super()
         kit(this)
     }
-
 
     attributeChangedCallback(name, _, value){
         if(name === 'bbslist'){
@@ -280,6 +278,25 @@ class KatjushaBBS extends HTMLElement{
         }
     }
 
+    $_click(event){
+        if(event.target.tagName === 'A'){
+            this.active(event.target)
+        }
+    }
+
+    $_contextmenu(event){
+        event.preventDefault()
+        event.stopPropagation()
+
+        if(event.target.tagName === 'A'){
+            this.active(event.target)
+
+            new KatjushaContext(`
+                <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
+        }
+    }
 
     parse(text){
         this.list = {}
@@ -303,11 +320,9 @@ class KatjushaBBS extends HTMLElement{
         return html + `</details>`
     }
 
-
     name(url){
         return this.list[url]?.name
     }
-
 
     active(el){
         if(typeof el === 'string'){
@@ -321,27 +336,9 @@ class KatjushaBBS extends HTMLElement{
         }
     }
 
-
-    $_click(event){
-        if (event.target.tagName === 'A') {
-            this.active(event.target)
-        }
+    html(){
+        return `<div id="bbs"></div>`
     }
-
-    $_contextmenu(event){
-        event.preventDefault()
-        event.stopPropagation()
-
-        if (event.target.tagName === 'A') {
-            this.active(event.target)
-
-            new KatjushaContext(`
-                <li><a onclick="toClipboard('${event.target.href}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.href}\\n')">掲示板名とURLをコピー</a></li>
-            `).show(event.pageX, event.pageY)
-        }
-    }
-
 
     css(){
         return `
@@ -470,19 +467,10 @@ details:nth-of-type(33n+33){
 }
 
 
-
-
 class KatjushaSubject extends HTMLElement{
-
-    html(){
-        return `
-<table>
-  <thead id="thead">
-    <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
-    `}
+    static{
+        customElements.define('katjusha-subject', this)
+    }
 
     constructor(){
         super()
@@ -490,14 +478,50 @@ class KatjushaSubject extends HTMLElement{
     }
 
 
+    $_contextmenu(event){
+        event.preventDefault()
+    }
+
+    $thead_dblclick(event){
+        if(event.target.tagName === 'TH'){
+            this.sort(event.target)
+        }
+    }
+
+    $tbody_mousedown(event){
+        event.preventDefault()
+        const tr = event.target.closest('tr')
+
+        if(tr && event.target.cellIndex < 7){
+            this.active(tr)
+            $katjusha.link(tr.dataset.url)
+        }
+    }
+
+    $tbody_contextmenu(event){
+        event.preventDefault()
+        event.stopPropagation()
+        const tr = event.target.closest('tr')
+
+        if(tr){
+            const url = tr.dataset.url
+            this.active(tr)
+
+            new KatjushaContext(`
+                <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
+                <li><a onclick="toClipboard('${url}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
+        }
+    }
+
     active(el){
         this.selected?.removeAttribute('selected')
         this.selected = el
         el.setAttribute('selected', true)
     }
 
-
-    sort(th) {
+    sort(th){
         const index = th.cellIndex
         const order = Number(th.dataset.order || -1)
         const tbody = th.closest('table').tBodies[0]
@@ -510,9 +534,7 @@ class KatjushaSubject extends HTMLElement{
         th.dataset.order = -order
     }
 
-
     recieve(response, url){
-
         if(response.status === 200){
             this.bbsurl = url
             this.scrollTop = 0
@@ -529,14 +551,12 @@ class KatjushaSubject extends HTMLElement{
         }
     }
 
-
-    parse(text) {
+    parse(text){
         return text.trim().split('\n').map( (v, i) => {
             const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
             return {i:i+1, key, subject, num:Number(num)}
         })
     }
-
 
     toHTML(list, bbsurl){
         let html = ''
@@ -546,7 +566,7 @@ class KatjushaSubject extends HTMLElement{
             const thread = スレッド[url]
             thread.subject = subject
 
-            if (thread.num == thread.既得) {
+            if(thread.num == thread.既得){
                 thread.新着 = 0
             }
 
@@ -557,11 +577,10 @@ class KatjushaSubject extends HTMLElement{
         return html
     }
 
-
     update(thread){
         const tr = Array.from(this.$.tbody.rows).find(v => v.dataset.url === thread.url)
 
-        if (tr) {
+        if(tr){
             this.active(tr)
             tr.cells[2].textContent = thread.num || ''
             tr.cells[3].textContent = thread.既得 || ''
@@ -571,47 +590,15 @@ class KatjushaSubject extends HTMLElement{
         }
     }
 
-
-    $_contextmenu(event){
-        event.preventDefault()
-    }
-
-
-    $thead_dblclick(event) {
-        if(event.target.tagName === 'TH'){
-            this.sort(event.target)
-        }
-    }
-
-
-    $tbody_mousedown(event) {
-        event.preventDefault()
-        const tr = event.target.closest('tr')
-
-        if (tr && event.target.cellIndex < 7) {
-            this.active(tr)
-            $katjusha.link(tr.dataset.url)
-        }
-    }
-
-
-    $tbody_contextmenu(event){
-        event.preventDefault()
-        event.stopPropagation()
-        const tr = event.target.closest('tr')
-
-        if (tr) {
-            const url = tr.dataset.url
-            this.active(tr)
-
-            new KatjushaContext(`
-                <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
-                <li><a onclick="toClipboard('${url}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
-            `).show(event.pageX, event.pageY)
-        }
-    }
-
+    html(){
+        return `
+<table>
+  <thead id="thead">
+    <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+    `}
 
     css(){
         return `
@@ -715,7 +702,50 @@ tr[selected] a{
 
 
 class KatjushaHeadline extends HTMLElement{
+    static{
+        customElements.define('katjusha-headline', this)
+    }
 
+    constructor(){
+        super()
+        kit(this)
+    }
+
+    render(thread){
+        this.$.thread.innerHTML = `${thread.subject} (${thread.num})`
+        this.$.bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
+    }
+
+    $_contextmenu(event){
+        event.preventDefault()
+    }
+
+    $レス更新アイコン_click(event){
+        $katjusha.link($tab.selected.url)
+    }
+
+    $中止アイコン_click(event){
+        for(const v of $katjusha.aborts){
+            v.abort()
+        }
+    }
+
+    $レス投稿アイコン_click(event){
+        new KatjushaForm($tab.selected.url).open()
+    }
+
+    $ごみ箱アイコン_click(event){
+        const url = $tab.selected.url
+
+        if(url in スレッド){
+            $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
+            delete スレッド[url]
+        }
+    }
+
+    $タブ閉じるアイコン_click (event){
+        $tab.close($tab.selected)
+    }
 
     html(){
         return `
@@ -738,56 +768,6 @@ class KatjushaHeadline extends HTMLElement{
   </div>
 </div>
     `}
-
-
-    constructor(){
-        super()
-        kit(this)
-    }
-
-
-    render(thread) {
-        this.$.thread.innerHTML = `${thread.subject} (${thread.num})`
-        this.$.bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
-    }
-
-
-    $_contextmenu (event) {
-        event.preventDefault()
-    }
-
-
-    $レス更新アイコン_click(event) {
-        $katjusha.link($tab.selected.url)
-    }
-
-
-    $中止アイコン_click(event) {
-        for(const v of $katjusha.aborts){
-            v.abort()
-        }
-    }
-
-
-    $レス投稿アイコン_click(event) {
-        new KatjushaForm($tab.selected.url).open()
-    }
-
-
-    $ごみ箱アイコン_click(event) {
-        const url = $tab.selected.url
-
-        if (url in スレッド) {
-            $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
-            delete スレッド[url]
-        }
-    }
-
-
-    $タブ閉じるアイコン_click (event) {
-        $tab.close($tab.selected)
-    }
-
 
     css(){
         return `
@@ -887,216 +867,10 @@ class KatjushaHeadline extends HTMLElement{
 }
 
 
-
-class KatjushaTab extends HTMLElement{
-
-
-    html(){
-        return `<ul id="tab"></ul>`
-    }
-
-
-    constructor(){
-        super()
-        kit(this)
-        this.openNew()
-    }
-
-
-    open(url, thread = {}){
-        if (!this.$.tab.childElementCount) {
-            return this.openNew(url, thread)
-        }
-
-        let tab = this.find(url)
-
-        if (tab) {
-            return this.select(tab)
-        }
-        else{
-            tab = this.selected
-        }
-
-        tab.url             = url
-        tab.innerHTML       = thread.subject || ''
-        tab.panel.url       = url
-        tab.panel.innerHTML = thread.html || ''
-
-        return this.select(tab)
-    }
-
-
-    openNew(url, thread = {}) {
-        const tab = this.find(url)
-
-        if (this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url) {
-            return this.open(url, thread)
-        }
-        else if (tab) {
-            return this.select(tab)
-        }
-        else{
-            return this.select( this.create(url, thread.subject, thread.html) )
-        }
-    }
-
-
-    close(tab) {
-        if(typeof tab === 'string'){
-            tab = this.find(tab)
-        }
-
-        if (tab?.url) {
-            this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
-            tab.panel.remove()
-            tab.remove()
-        }
-    }
-
-
-    closeAll(url) {
-        for (const tab of Array.from(this.$.tab.children).filter(v => v.url !== url)) {
-            this.close(tab)
-        }
-    }
-
-
-    create(url, subject='', html=''){
-        const thread     = document.createElement('div')
-        thread.className = 'スレッド'
-        thread.url       = url
-        thread.innerHTML = html
-
-        const tab        = document.createElement('li')
-        tab.url          = url
-        tab.innerHTML    = subject
-        tab.panel        = thread
-
-        this.$.tab.append(tab)
-        $thread.shadowRoot.append(thread)
-
-        return tab
-    }
-
-
-    select(tab) {
-        this.selected?.removeAttribute('selected')
-        this.selected = tab
-        tab.setAttribute('selected', true)
-
-        $thread.active(tab.panel)
-
-        if(tab.url){
-            const thread = スレッド[tab.url]
-            $headline.render(thread)
-            $thread.scrollTop  = thread.scroll
-            $title.textContent = thread.subject
-            history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
-        }
-
-        return tab
-    }
-
-
-    find(url) {
-        return Array.from(this.$.tab.children).find(v => v.url === url)
-    }
-
-
-    loading(url, bool) {
-        this.find(url)?.toggleAttribute('loading', bool)
-    }
-
-
-    $_click(event) {
-        if (event.target.tagName === 'LI' && event.target !== this.selected) {
-            this.select(event.target)
-        }
-    }
-
-
-    $_dblclick(event) {
-        if (event.target.tagName === 'LI' && event.target.url) {
-            $headline.$.レス更新アイコン.click()
-        }
-    }
-
-
-    $_contextmenu(event) {
-        event.preventDefault()
-        event.stopPropagation()
-
-        if (event.target.tagName === 'LI') {
-            new KatjushaContext(`
-                <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
-                <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-                <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
-                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
-            `).show(event.pageX, event.pageY)
-        }
-    }
-
-
-    css(){
-        return `
-ul{
-    list-style: none;
-    cursor: default;
-    display: flex;
-    align-items: flex-end;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding-left: 10px;
-    border-bottom: 1px solid #c0c0c0;
-}
-li{
-    text-align: left;
-    border-top: 1px solid #e3e3e3;
-    border-left: 1px solid #e3e3e3;
-    border-right: 1px solid #e3e3e3;
-    background-color: #f0f0f0;
-    color: #909090;
-    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    width: 100px;
-    margin: 0 -5px;
-    padding-left: 10px;
-    height: 20px;
-    white-space: nowrap;
-    overflow: hidden;
-    line-height: 20px;
-    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
-}
-[selected]{
-    color: #000;
-    z-index: 2;
-    height: 22px;
-    line-height: 22px;
-}
-[selected]::before{
-    box-shadow: 2px 2px 0 #fff;
-}
-[selected]::after{
-    box-shadow: -2px 2px 0 #fff;
-}
-[loading]{
-    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+'), linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-    background-repeat: no-repeat;
-    background-size: 12px;
-    background-position: 4px center;
-}
-    `}
-}
-
-
-
 class KatjushaThread extends HTMLElement{
-
-    html(){
-        return ``
+    static{
+        customElements.define('katjusha-thread', this)
     }
-
 
     constructor(){
         super()
@@ -1108,6 +882,19 @@ class KatjushaThread extends HTMLElement{
         }
     }
 
+    $_click(event){
+        if(event.target.tagName === 'I'){
+            event.stopPropagation()
+
+            new KatjushaContext(`
+                <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
+            `).show(event.pageX, event.pageY)
+        }
+        else if(event.target.className === 'anker'){
+            event.stopPropagation()
+            this.goto(event.target.dataset.n)
+        }
+    }
 
     active(el){
         this.selected?.removeAttribute('selected')
@@ -1115,22 +902,19 @@ class KatjushaThread extends HTMLElement{
         el.setAttribute('selected', true)
     }
 
-
-    goto(n) {
+    goto(n){
         this.selected.children[n-1]?.scrollIntoView()
     }
 
-
-    responseTo(n) {
+    responseTo(n){
         $headline.$.レス投稿アイコン.click()
         $form.insert(`>>${n}\n`)
     }
 
-
     popup(event, n){
         const el = this.selected.children[n-1]
 
-        if (el) {
+        if(el){
             const {left, width, top} = event.target.getBoundingClientRect()
             const x = left + width / 2
             const y = innerHeight - top + 6
@@ -1139,12 +923,10 @@ class KatjushaThread extends HTMLElement{
         }
     }
 
-
     recieve(response, url){
-
         $tab.loading(url, false)
 
-        if (response.status === 200) {
+        if(response.status === 200){
             const thread   = スレッド[url]
             const dat      = this.parse(response.content)
 
@@ -1163,7 +945,7 @@ class KatjushaThread extends HTMLElement{
             $title.textContent  = thread.subject
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
-        else if (response.status === 206) {
+        else if(response.status === 206){
             const thread   = スレッド[url]
             const dat      = this.parse(response.content, thread.num)
 
@@ -1181,17 +963,17 @@ class KatjushaThread extends HTMLElement{
             $title.textContent  = thread.subject
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
-        else if (response.status === 304) {
+        else if(response.status === 304){
             const thread = スレッド[url]
             thread.新着  = 0
 
             $subject.update(thread)
             $status.textContent = `新着なし (${date()}) ${KB(thread.byte)}`
         }
-        else if (response.status === 404) {
+        else if(response.status === 404){
             $status.textContent = `スレッドが見つかりません (${date()})`
         }
-        else if (response.status === 416) {
+        else if(response.status === 416){
             delete スレッド[url]
             $katjusha.link(url)
             return
@@ -1203,12 +985,11 @@ class KatjushaThread extends HTMLElement{
         history.replaceState(null, null, url)
     }
 
-
-    parse(text, n = 0) {
+    parse(text, n = 0){
         const dat  = text.trim().split('\n')
         let  html  = ''
 
-        for (const v of dat) {
+        for(const v of dat){
             const [from, mail, date, message, subject] = v.split('<>')
 
             const messageHTML = message
@@ -1228,7 +1009,6 @@ class KatjushaThread extends HTMLElement{
         return {html, num:dat.length, subject:dat[0].split('<>').pop()}
     }
 
-
     render(thread, append){
         const tab     = $tab.find(thread.url) || $tab.selected
         tab.innerHTML = thread.subject
@@ -1240,8 +1020,7 @@ class KatjushaThread extends HTMLElement{
         }
     }
 
-
-    URLParse(url) {
+    URLParse(url){
         const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
         const baseurl    = url.replace(/\/test\/.+/, `/`)
         const bbsurl     = `${baseurl}${bbs}/`
@@ -1249,21 +1028,9 @@ class KatjushaThread extends HTMLElement{
         return {bbs, key, bbsurl, baseurl}
     }
 
-
-    $_click(event) {
-        if (event.target.tagName === 'I') {
-            event.stopPropagation()
-
-            new KatjushaContext(`
-                <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
-            `).show(event.pageX, event.pageY)
-        }
-        else if(event.target.className === 'anker'){
-            event.stopPropagation()
-            this.goto(event.target.dataset.n)
-        }
+    html(){
+        return ``
     }
-
 
     css(){
         return `
@@ -1336,18 +1103,211 @@ class KatjushaThread extends HTMLElement{
 
 
 
-class KatjushaStatus extends HTMLElement{
-
-    html(){
-        return `<slot></slot>`
+class KatjushaTab extends HTMLElement{
+    static{
+        customElements.define('katjusha-tab', this)
     }
 
+    constructor(){
+        super()
+        kit(this)
+        this.openNew()
+    }
+
+    $_click(event){
+        if(event.target.tagName === 'LI' && event.target !== this.selected){
+            this.select(event.target)
+        }
+    }
+
+    $_dblclick(event){
+        if(event.target.tagName === 'LI' && event.target.url){
+            $headline.$.レス更新アイコン.click()
+        }
+    }
+
+    $_contextmenu(event){
+        event.preventDefault()
+        event.stopPropagation()
+
+        if(event.target.tagName === 'LI'){
+            new KatjushaContext(`
+                <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
+                <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
+                <li><a onclick="toClipboard('${event.target.url}')">URLをコピー</a></li>
+                <li><a onclick="toClipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+            `).show(event.pageX, event.pageY)
+        }
+    }
+
+    open(url, thread = {}){
+        if(!this.$.tab.childElementCount){
+            return this.openNew(url, thread)
+        }
+
+        let tab = this.find(url)
+
+        if(tab){
+            return this.select(tab)
+        }
+        else{
+            tab = this.selected
+        }
+
+        tab.url             = url
+        tab.innerHTML       = thread.subject || ''
+        tab.panel.url       = url
+        tab.panel.innerHTML = thread.html || ''
+
+        return this.select(tab)
+    }
+
+    openNew(url, thread = {}){
+        const tab = this.find(url)
+
+        if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
+            return this.open(url, thread)
+        }
+        else if(tab){
+            return this.select(tab)
+        }
+        else{
+            return this.select( this.create(url, thread.subject, thread.html) )
+        }
+    }
+
+    close(tab){
+        if(typeof tab === 'string'){
+            tab = this.find(tab)
+        }
+
+        if(tab?.url){
+            this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
+            tab.panel.remove()
+            tab.remove()
+        }
+    }
+
+    closeAll(url){
+        for (const tab of Array.from(this.$.tab.children).filter(v => v.url !== url)){
+            this.close(tab)
+        }
+    }
+
+    create(url, subject='', html=''){
+        const thread     = document.createElement('div')
+        thread.className = 'スレッド'
+        thread.url       = url
+        thread.innerHTML = html
+
+        const tab        = document.createElement('li')
+        tab.url          = url
+        tab.innerHTML    = subject
+        tab.panel        = thread
+
+        this.$.tab.append(tab)
+        $thread.shadowRoot.append(thread)
+
+        return tab
+    }
+
+    select(tab){
+        this.selected?.removeAttribute('selected')
+        this.selected = tab
+        tab.setAttribute('selected', true)
+
+        $thread.active(tab.panel)
+
+        if(tab.url){
+            const thread = スレッド[tab.url]
+            $headline.render(thread)
+            $thread.scrollTop  = thread.scroll
+            $title.textContent = thread.subject
+            history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
+        }
+
+        return tab
+    }
+
+    find(url){
+        return Array.from(this.$.tab.children).find(v => v.url === url)
+    }
+
+    loading(url, bool){
+        this.find(url)?.toggleAttribute('loading', bool)
+    }
+
+    html(){
+        return `<ul id="tab"></ul>`
+    }
+
+    css(){
+        return `
+ul{
+    list-style: none;
+    cursor: default;
+    display: flex;
+    align-items: flex-end;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding-left: 10px;
+    border-bottom: 1px solid #c0c0c0;
+}
+li{
+    text-align: left;
+    border-top: 1px solid #e3e3e3;
+    border-left: 1px solid #e3e3e3;
+    border-right: 1px solid #e3e3e3;
+    background-color: #f0f0f0;
+    color: #909090;
+    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    width: 100px;
+    margin: 0 -5px;
+    padding-left: 10px;
+    height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 20px;
+    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
+}
+[selected]{
+    color: #000;
+    z-index: 2;
+    height: 22px;
+    line-height: 22px;
+}
+[selected]::before{
+    box-shadow: 2px 2px 0 #fff;
+}
+[selected]::after{
+    box-shadow: -2px 2px 0 #fff;
+}
+[loading]{
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+'), linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
+    background-repeat: no-repeat;
+    background-size: 12px;
+    background-position: 4px center;
+}
+    `}
+}
+
+
+
+class KatjushaStatus extends HTMLElement{
+    static{
+        customElements.define('katjusha-status', this)
+    }
 
     constructor(){
         super()
         kit(this)
     }
 
+    html(){
+        return `<slot></slot>`
+    }
 
     css(){
         return `
@@ -1365,6 +1325,117 @@ class KatjushaStatus extends HTMLElement{
 
 
 class KatjushaForm extends HTMLElement{
+    static{
+        customElements.define('katjusha-form', this)
+    }
+
+    constructor(url){
+        super()
+        this.url  = url
+        this.id   = '$form'
+        kit(this)
+    }
+
+    $_contextmenu(event){
+        if(!['text','textarea'].includes(event.target.type)){
+            event.preventDefault()
+        }
+    }
+
+    $form_reset(event){
+        this.remove()
+    }
+
+    $close_click(event){
+        this.remove()
+    }
+
+    $sage_change(event){
+        this.$.mail.readOnly = this.checked
+        this.$.mail.value    = this.checked ? 'sage' : ''
+    }
+
+    $header_pointermove(event){
+        if(event.buttons){
+            event.target.setPointerCapture(event.pointerId)
+            const {x, y, width, height} = this.getBoundingClientRect()
+
+            this.style.left = clamp(0, x+event.movementX, innerWidth-width)   + 'px'
+            this.style.top  = clamp(0, y+event.movementY, innerHeight-height) + 'px'
+        }
+    }
+
+    async $form_submit(event){
+        event.preventDefault()
+        this.disable(true)
+        const response = await $katjusha.fetch(this.$.form.action, {method:'POST', body:new FormData(this.$.form)})
+        KatjushaForm.recieve(response, this.url)
+    }
+
+    open(){
+        if(!this.url || window.$form){
+            return
+        }
+
+        $body.append(this)
+        this.centering()
+
+        if( this.url.includes('read.cgi') ){
+            const thread = スレッド[this.url]
+
+            this.$.title.textContent = `「${thread.subject}」にレス`
+            this.$.form.action       = `${thread.baseurl}test/bbs.cgi`
+            this.$.bbs.value         = thread.bbs
+            this.$.key.value         = thread.key
+            this.$.subject.value     = thread.subject
+            this.$.subject.disabled  = true
+            this.$.message.focus()
+        }
+        else{
+            const bbs = $bbs.list[this.url]
+
+            this.$.title.textContent = `『${bbs.name}』に新規スレッド`
+            this.$.form.action       = `${bbs.baseurl}test/bbs.cgi`
+            this.$.bbs.value         = bbs.bbs
+            this.$.subject.focus()
+        }
+    }
+
+    centering(){
+        const {width, height} = this.getBoundingClientRect()
+        this.style.left = `${innerWidth/2 - width/2}px`
+        this.style.top  = `${innerHeight/2 - height/2}px`
+    }
+
+    insert(text){
+        const before = this.$.message.value.substr(0, this.$.message.selectionStart)
+        const after  = this.$.message.value.substr(this.$.message.selectionStart)
+
+        this.$.message.value = before + text + after
+    }
+
+    disable(bool){
+        this.$.submit.toggleAttribute('disabled', bool)
+    }
+
+    static recieve(response, url){
+        window.$form?.disable(false)
+        $status.textContent = ``
+
+        if(response.status !== 200){
+            alert('エラーが発生して投稿できませんでした')
+        }
+        else if(response.content.includes('ＥＲＲＯＲ！')){
+            alert( response.content.match(/<b>(.+?)</i)[1] )
+        }
+        else{
+            if(url.includes('read.cgi')){
+                スレッド[url].最終書き込み = date()
+            }
+            window.$form?.remove()
+            $katjusha.link(url)
+        }
+    }
 
     html(){
         return `
@@ -1401,128 +1472,6 @@ class KatjushaForm extends HTMLElement{
   </form>
 </div>
     `}
-
-
-    constructor(url){
-        super()
-        this.url  = url
-        this.id   = '$form'
-        kit(this)
-    }
-
-
-    open(){
-        if(!this.url || window.$form){
-            return
-        }
-
-        $body.append(this)
-        this.centering()
-
-        if( this.url.includes('read.cgi') ){
-            const thread = スレッド[this.url]
-
-            this.$.title.textContent = `「${thread.subject}」にレス`
-            this.$.form.action       = `${thread.baseurl}test/bbs.cgi`
-            this.$.bbs.value         = thread.bbs
-            this.$.key.value         = thread.key
-            this.$.subject.value     = thread.subject
-            this.$.subject.disabled  = true
-            this.$.message.focus()
-        }
-        else{
-            const bbs = $bbs.list[this.url]
-
-            this.$.title.textContent = `『${bbs.name}』に新規スレッド`
-            this.$.form.action       = `${bbs.baseurl}test/bbs.cgi`
-            this.$.bbs.value         = bbs.bbs
-            this.$.subject.focus()
-        }
-    }
-
-
-    centering(){
-        const {width, height} = this.getBoundingClientRect()
-        this.style.left = `${innerWidth/2 - width/2}px`
-        this.style.top  = `${innerHeight/2 - height/2}px`
-    }
-
-
-    insert(text){
-        const before = this.$.message.value.substr(0, this.$.message.selectionStart)
-        const after  = this.$.message.value.substr(this.$.message.selectionStart)
-
-        this.$.message.value = before + text + after
-    }
-
-
-    disable(bool){
-        this.$.submit.toggleAttribute('disabled', bool)
-    }
-
-
-    $_contextmenu(event) {
-        if (!['text','textarea'].includes(event.target.type)) {
-            event.preventDefault()
-        }
-    }
-
-
-    $form_reset(event) {
-        this.remove()
-    }
-
-
-    $close_click(event) {
-        this.remove()
-    }
-
-
-    $sage_change(event) {
-        this.$.mail.readOnly = this.checked
-        this.$.mail.value    = this.checked ? 'sage' : ''
-    }
-
-
-    $header_pointermove(event) {
-        if(event.buttons){
-            event.target.setPointerCapture(event.pointerId)
-            const {x, y, width, height} = this.getBoundingClientRect()
-
-            this.style.left = clamp(0, x+event.movementX, innerWidth-width)   + 'px'
-            this.style.top  = clamp(0, y+event.movementY, innerHeight-height) + 'px'
-        }
-    }
-
-
-    async $form_submit(event) {
-        event.preventDefault()
-        this.disable(true)
-        const response = await $katjusha.fetch(this.$.form.action, {method:'POST', body:new FormData(this.$.form)})
-        KatjushaForm.recieve(response, this.url)
-    }
-
-
-    static recieve(response, url){
-
-        window.$form?.disable(false)
-        $status.textContent = ``
-
-        if(response.status !== 200){
-            alert('エラーが発生して投稿できませんでした')
-        }
-        else if(response.content.includes('ＥＲＲＯＲ！')){
-            alert( response.content.match(/<b>(.+?)</i)[1] )
-        }
-        else{
-            if (url.includes('read.cgi')) {
-                スレッド[url].最終書き込み = date()
-            }
-            window.$form?.remove()
-            $katjusha.link(url)
-        }
-    }
-
 
     css(){
         return `
@@ -1712,11 +1661,9 @@ class KatjushaForm extends HTMLElement{
 
 
 class KatjushaContext extends HTMLElement{
-
-    html(){
-        return `<ul id="context" class="menu"></ul>`
+    static{
+        customElements.define('katjusha-context', this)
     }
-
 
     constructor(html){
         super()
@@ -1729,6 +1676,15 @@ class KatjushaContext extends HTMLElement{
         document.addEventListener('click', () => this.remove(), {once:true})
     }
 
+    $_click(event){
+        if(!event.target.onclick && !event.target.href){
+            event.stopPropagation()
+        }
+    }
+
+    $_contextmenu(event){
+        event.preventDefault()
+    }
 
     show(x, y){
         this.style.left = `${x}px`
@@ -1736,18 +1692,9 @@ class KatjushaContext extends HTMLElement{
         $body.append(this)
     }
 
-
-    $_click(event){
-        if (!event.target.onclick && !event.target.href) {
-            event.stopPropagation()
-        }
+    html(){
+        return `<ul id="context" class="menu"></ul>`
     }
-
-
-    $_contextmenu(event){
-        event.preventDefault()
-    }
-
 
     css(){
         return `
@@ -1819,11 +1766,9 @@ class KatjushaContext extends HTMLElement{
 
 
 class KatjushaPopup extends HTMLElement{
-
-    html(){
-        return `<div id="popup"></div>`
+    static{
+        customElements.define('katjusha-popup', this)
     }
-
 
     constructor(html){
         super()
@@ -1832,13 +1777,15 @@ class KatjushaPopup extends HTMLElement{
         this.$.popup.innerHTML = html
     }
 
-
     show(x, y){
         this.style.left   = `${x}px`
         this.style.bottom = `${y}px`
         $body.prepend(this)
     }
 
+    html(){
+        return `<div id="popup"></div>`
+    }
 
     css(){
         return `
@@ -1947,7 +1894,7 @@ function toClipboard(text){
 }
 
 
-function date() {
+function date(){
     const d  = new Date()
 
     const 年 = d.getFullYear()
@@ -1961,7 +1908,7 @@ function date() {
 }
 
 
-function KB(byte = 0) {
+function KB(byte = 0){
     return `${Math.ceil(byte/1024)}KB`
 }
 
@@ -1969,20 +1916,6 @@ function KB(byte = 0) {
 function clamp(min, num, max){
     return Math.min(Math.max(min, num), max)
 }
-
-
-
-customElements.define('katjusha-toolbar', KatjushaToolbar)
-customElements.define('katjusha-border', KatjushaBorder)
-customElements.define('katjusha-bbs', KatjushaBBS)
-customElements.define('katjusha-subject', KatjushaSubject)
-customElements.define('katjusha-headline', KatjushaHeadline)
-customElements.define('katjusha-thread', KatjushaThread)
-customElements.define('katjusha-tab', KatjushaTab)
-customElements.define('katjusha-status', KatjushaStatus)
-customElements.define('katjusha-form', KatjushaForm)
-customElements.define('katjusha-context', KatjushaContext)
-customElements.define('katjusha-popup', KatjushaPopup)
 
 
 $katjusha.start()
