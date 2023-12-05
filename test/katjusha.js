@@ -185,6 +185,7 @@ class KatjushaBBS extends HTMLElement{
 
 class KatjushaSubject extends HTMLElement{
     static{
+        this.compare = new Intl.Collator('ja-JP', {numeric:true}).compare
         customElements.define('katjusha-subject', this)
     }
 
@@ -238,16 +239,12 @@ class KatjushaSubject extends HTMLElement{
     }
 
     sort(th){
-        const index = th.cellIndex
-        const order = Number(th.dataset.order || -1)
-        const tbody = th.closest('table').tBodies[0]
-        const rows  = Array.from(tbody.rows)
-        const compare = new Intl.Collator('ja-JP', {numeric: true}).compare
+        const i  = th.cellIndex
+        th.order = th.order ? -th.order : -1
 
-        rows.sort((a, b) => compare(a.cells[index].textContent, b.cells[index].textContent) * order)
-        rows.forEach(tr  => tbody.append(tr))
-
-        th.dataset.order = -order
+        Array.from(this.$.tbody.rows)
+        .toSorted((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent) * th.order)
+        .forEach(tr => this.$.tbody.append(tr))
     }
 
     recieve(response, url){
@@ -828,7 +825,7 @@ class KatjushaPopup extends HTMLElement{
 
     constructor(html){
         super()
-        this.id   = '$popup'
+        this.id = '$popup'
         kit(this, $popupTemplate)
         this.$.popup.innerHTML = html
     }
