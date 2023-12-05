@@ -1,4 +1,3 @@
-import kit from 'https://cdn.jsdelivr.net/gh/worldace/kit/kit.js'
 
 
 $katjusha.start = function(){
@@ -85,148 +84,6 @@ class KatjushaToolbar extends HTMLElement{
     $スレッド投稿アイコン_click(event){
         new KatjushaForm($subject.bbsurl).open()
     }
-
-    html(){
-        return `
-<header id="ヘッダ">
-  <div id="ナビアイコン">
-    <span id="オンラインアイコン" class="icon"></span>
-    <span id="セーブアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="検索アイコン" class="icon"></span>
-    <span id="巡回アイコン" class="icon"></span>
-    <span id="スレッド投稿アイコン" class="icon" title="新規スレッド書き込み"></span>
-    <span class="icon-separate"></span>
-    <span id="ペインアイコン" class="icon"></span>
-    <span id="グリッド1アイコン" class="icon"></span>
-    <span id="グリッド2アイコン" class="icon"></span>
-    <span id="グリッド3アイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="設定アイコン" class="icon"></span>
-    <span id="ヘルプアイコン" class="icon" title="ヘルプ"></span>
-    <span class="icon-separate"></span>
-  </div>
-  <div id="板ボタン">
-    <span class="icon-text" id="全板ボタン">▽</span>
-  </div>
-  <div id="anime" data-ajax="0"></div>
-</header>
-    `}
-
-    css(){
-        return `
-#ヘッダ{
-    background-color: #f0f0f0;
-    display: flex;
-    border-bottom: solid 1px #a0a0a0;
-}
-#ナビアイコン{
-    display: flex;
-    align-items: center;
-}
-#オンラインアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAABSGAD/vQD//wCtewD///9149PrAAAAAXRSTlMAQObYZgAAAERJREFUCNdjQAOCMNoRSjsJQGkVAQhtDJZhdDIOhsgIGYcaghmMyqbGECFhYyVFsIixkgrYQBEgDVEMpRlBNFhGENViAOIhBof9+an+AAAAAElFTkSuQmCC');
-}
-#セーブアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAAAAP////8A//+9vb0AAHt7e3sAAADJRqraAAAAAXRSTlMAQObYZgAAADZJREFUCNdjgANmYzBgYDAUUgICwQAoQwzGECSSIQgCqAwxFxcXCMO9BMFAlmINDUtLSwtlAAC7RBPuQ+XDIQAAAABJRU5ErkJggg==');
-}
-#検索アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAD/vQAAAAD//wDWnFJ7WgCEhIT////MopgYAAAAAXRSTlMAQObYZgAAAGRJREFUCNctysENgDAIhWFidACqAwgm3hGN11oZxE7h+pbW/8IX8gB6M6jdqtFvL4i7WYQBA4+qRwEJIQYYgupWQecr5Fh20woSbJ9UNpdjIuFckTitDjQzzgE69laGFj8/uvkDXJEPCVqpxYQAAAAASUVORK5CYII=');
-}
-#巡回アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAD/GACEAAApWv8AAITWAAAAAAD/WlIdvawAAAAAAXRSTlMAQObYZgAAAGFJREFUCNdNzDEOgCAQRNEJEPu1secERDgAES5ggbY2HsDC+7uzlVP9PMLiNxdjtFhF5gQgbxotwXenERpCZvgC9KwrFVq6ap/1iQfuXUTGBUzjkfcAlM6FQCIYEYwINsIHyLoO36kkZ4wAAAAASUVORK5CYII=');
-}
-#スレッド投稿アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAAhUv9SOQAAAACMrf8AMZTWnFJ7WgB7e1L///9SWlL/3q2cp7MCAAAAAXRSTlMAQObYZgAAAGFJREFUCNdjAAEmJQUGMChKSwLT7E7JZmChEqdkq2SQgMtEtVUgRomnoFBaMlhAUFBJGSwgKBRqABFQDWZgaIcKMDRBBRi6FUECIMYmiACDVYYSWIBhsUWHMthGY2NjsAAABugWBjID06AAAAAASUVORK5CYII=');
-}
-#ペインアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAD/vQAAAAB7WgAppcrEAAAAAXRSTlMAQObYZgAAAB9JREFUCNdjAAOtVatWMOi/f/+DQTc3N4J0AmIACAAAqFUWZyWMfcYAAAAASUVORK5CYII=');
-}
-#グリッド1アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEUAAAAAAAD//////wB7e3vPJERoAAAAAXRSTlMAQObYZgAAACFJREFUCNdjgAMWF0dBIBBgYGFgVAYCHAwUNZQyEJbCAAB61wj/gpHNVgAAAABJRU5ErkJggg==');
-}
-#グリッド2アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAAAAAD//////wDo8JS4AAAAAXRSTlMAQObYZgAAACFJREFUCNdjAAPR0NAQBgHp3VuQCVGQmAADCxEExAAQAADKVAjjS/YQ1AAAAABJRU5ErkJggg==');
-}
-#グリッド3アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAAAAAD//////wDo8JS4AAAAAXRSTlMAQObYZgAAACFJREFUCNdjAAPR0NAQBgEBBhZkQhQkJr17CxEExAAQAAAQNhAxyyxjBAAAAABJRU5ErkJggg==');
-}
-#設定アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAUVBMVEUAAAAAAACEhITG3sZ7OQApOf9S/wApOVIp3gAAnFL/WgD///97/61Se/8pWv8AAIR73gApOa0Ae1IAewCte/8A/60Ava17/1JSWlIA/wB7vQDXW3VzAAAAAXRSTlMAQObYZgAAAItJREFUGNM9zQsOwyAMA1AcGj4rBdbuf/+DzhmjFkL4AYr7BRY7zKqas56EpltOve9tCHJ65XSXEYPU0yeIePGr98IeSmCPMdIk8kcpQVasgHibhZYCr9hsRYI+CKggCKIjbM//i+WyEBxqCeAAKMEZXLdbFfbDYIgq4XgbDIHBjglGBDiDGQHItn0BWkgEOp0LAPAAAAAASUVORK5CYII=');
-}
-#ヘルプアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEUAAAApOf8pOVIpOa17nP////+EhITG3satva1SWlKL+I0lAAAAAXRSTlMAQObYZgAAAHFJREFUCNclyDEOgzAQRNGRbzAW9AlBDim9N7BEDoCECzokCqB1R03DsVnjXz19aOaFUitFJrCoZRxUOurwp+RRsabVQcaRP7zJvg92R+OrkewWfJMPtJfAxeTZnQ6fNSbZZIZRHYsDsiYdj/J41Oi4AaXME0dzTLUNAAAAAElFTkSuQmCC');
-}
-#板ボタン{
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-#板ボタン span{
-    padding: 2px 6px;
-}
-#anime{
-    width: 32px;
-    height: 32px;
-    background-image: url('data:image/gif;base64,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');
-    background-repeat: no-repeat;
-    background-size: 32px;
-    background-position: center;
-    z-index: 2;
-}
-#anime[data-ajax="0"]{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX4+ND42KD4uFio6ACg6AD4+MiQ6ACIUABK2ACI4ACASABAIgDwiAAi0AiY6AD48Lj4wFgy0AiA4AD46LhA0Ah44ABY2AD4yICISAD44KgYyAhg2AD4yHhw4ABo4ABo2AD40IDoiABIKADogAAAAACzzM64AAABjElEQVQ4y22QAXPaMAyFn7R5orKZzbIRp4UWWP//b6wUxwSu+bjcvcv7Ihnjx4ps5UdBtzJ+rtSt/CAIy0bG7zs66UbGr05lKvV7XgUhkPQ8UM94WRDOgViWjKHnu6AU7K2+qKjnTJYd/GloyQCItbA9MNcML7pQCUYh4sI0uDsxVxf+NTQHhKJMDixnFhYrsPTF3kGhecgDPA8SZgPnmbZBPivu1E8d6/mMd0c4w7CpoC7YvrHoOz4cpTaXERLNBBDTyPKBN0doakYwQ0Xl6v/zwhzfmlCJMp6wfjyVZMJxRp+N7N+fmG/H4yIImbHswJCJTqP1KZqwO+4cUb+fTJOZk09n763AbkHIR9uX1pSU4i1G71ehLmcbL5wcbx38NUTtt+z3Gema/qdoheFC61bjMhtdOBwqKCUC2pLczuFLDo4JkdJEZiiaQX4OfhJKAFOQx1vgcl2E/T5OjFB6H/IwkfUc9zMuEJghcOx7G2ACp7tgRru/SP0ex9J7E14Nv7VbZJvbHtsfXxe+ALc1JiQ/QQazAAAAAElFTkSuQmCC');
-}
-.icon{
-    padding: 1px;
-    border: solid 1px #f0f0f0;
-    width: 20px;
-    height: 18px;
-    background-repeat: no-repeat;
-    background-size: 16px;
-    background-position: center;
-}
-.icon:hover{
-    border-top: solid 1px #fff;
-    border-left: solid 1px #fff;
-    border-bottom: solid 1px #a0a0a0;
-    border-right: solid 1px #a0a0a0;
-}
-.icon:active{
-    border-top: solid 1px #a0a0a0;
-    border-left: solid 1px #a0a0a0;
-    border-bottom: solid 1px #fff;
-    border-right: solid 1px #fff;
-    transform: translate(1px, 1px);
-}
-.icon-separate{
-    width: 2px;
-    height: 16px;
-    margin: 0 3px;
-    background-repeat: no-repeat;
-    background-size: 2px 16px;
-    background-position: center;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAQAQMAAAAGZjz3AAAABlBMVEX///+goKD0a5EfAAAAC0lEQVQI12NowA8BgCAIAWcmA/MAAAAASUVORK5CYII=');
-}
-.icon-text{
-    padding: 2px 2px;
-    margin: 0 1px;
-    border: solid 1px #f0f0f0;
-}
-.icon-text:hover{
-    border-top: solid 1px #fff;
-    border-left: solid 1px #fff;
-    border-bottom: solid 1px #a0a0a0;
-    border-right: solid 1px #a0a0a0;
-}
-.icon-text:active{
-    border-top: solid 1px #a0a0a0;
-    border-left: solid 1px #a0a0a0;
-    border-bottom: solid 1px #fff;
-    border-right: solid 1px #fff;
-    transform: translate(1px, 1px);
-}
-    `}
 }
 
 
@@ -240,22 +97,6 @@ class KatjushaBorder extends HTMLElement{
         super()
         kit(this)
     }
-
-    html(){
-        return ``
-    }
-
-    css(){
-        return `
-:host{
-    height: 7px;
-    margin-top: 1px;
-    background-color: #f0f0f0;
-    border-bottom: solid 1px #a0a0a0;
-    border-left: none;
-    border-top: none;
-}
-    `}
 }
 
 
@@ -335,135 +176,6 @@ class KatjushaBBS extends HTMLElement{
             el.setAttribute('selected', true)
         }
     }
-
-    html(){
-        return `<div id="bbs"></div>`
-    }
-
-    css(){
-        return `
-:host{
-    padding-top: 3px;
-    border-right: solid 1px #a0a0a0;
-    overflow-y: scroll;
-}
-details{
-}
-summary{
-    outline: none;
-    padding: 1px 1px;
-}
-a{
-    text-decoration: none;
-    color: #000;
-    padding: 1px 8px;
-    margin: 1px 0;
-    display: block;
-}
-a[selected]{
-    color: #fff;
-    background-color: #0078d7;
-}
-details:nth-of-type(33n+1){
-    border-left: 4px solid #ffffff;
-}
-details:nth-of-type(33n+2){
-    border-left: 4px solid #985a62;
-}
-details:nth-of-type(33n+3){
-    border-left: 4px solid #ddffdd;
-}
-details:nth-of-type(33n+4){
-    border-left: 4px solid #ffd7ff;
-}
-details:nth-of-type(33n+5){
-    border-left: 4px solid #519db0;
-}
-details:nth-of-type(33n+6){
-    border-left: 4px solid #d7d7ff;
-}
-details:nth-of-type(33n+7){
-    border-left: 4px solid #008080;
-}
-details:nth-of-type(33n+8){
-    border-left: 4px solid #ff0000;
-}
-details:nth-of-type(33n+9){
-    border-left: 4px solid #baa047;
-}
-details:nth-of-type(33n+10){
-    border-left: 4px solid #ff8686;
-}
-details:nth-of-type(33n+11){
-    border-left: 4px solid #c2b1ba;
-}
-details:nth-of-type(33n+12){
-    border-left: 4px solid #8b3f78;
-}
-details:nth-of-type(33n+13){
-    border-left: 4px solid #a9ba32;
-}
-details:nth-of-type(33n+14){
-    border-left: 4px solid #a096de;
-}
-details:nth-of-type(33n+15){
-    border-left: 4px solid #d3c48d;
-}
-details:nth-of-type(33n+16){
-    border-left: 4px solid #ff00ff;
-}
-details:nth-of-type(33n+17){
-    border-left: 4px solid #ffff00;
-}
-details:nth-of-type(33n+18){
-    border-left: 4px solid #8f8c91;
-}
-details:nth-of-type(33n+19){
-    border-left: 4px solid #ffa2ff;
-}
-details:nth-of-type(33n+20){
-    border-left: 4px solid #0000ff;
-}
-details:nth-of-type(33n+21){
-    border-left: 4px solid #d022c4;
-}
-details:nth-of-type(33n+22){
-    border-left: 4px solid #b3ffb3;
-}
-details:nth-of-type(33n+23){
-    border-left: 4px solid #37e6d9;
-}
-details:nth-of-type(33n+24){
-    border-left: 4px solid #9595ff;
-}
-details:nth-of-type(33n+25){
-    border-left: 4px solid #5b30c2;
-}
-details:nth-of-type(33n+26){
-    border-left: 4px solid #c8f1ff;
-}
-details:nth-of-type(33n+27){
-    border-left: 4px solid #00ff00;
-}
-details:nth-of-type(33n+28){
-    border-left: 4px solid #28caff;
-}
-details:nth-of-type(33n+29){
-    border-left: 4px solid #ffffd2;
-}
-details:nth-of-type(33n+30){
-    border-left: 4px solid #ffd0d0;
-}
-details:nth-of-type(33n+31){
-    border-left: 4px solid #008cbb;
-}
-details:nth-of-type(33n+32){
-    border-left: 4px solid #ea8aac;
-}
-details:nth-of-type(33n+33){
-    border-left: 4px solid #000000;
-}
-    `}
 }
 
 
@@ -589,116 +301,7 @@ class KatjushaSubject extends HTMLElement{
             tr.cells[6].textContent = thread.最終書き込み || ''
         }
     }
-
-    html(){
-        return `
-<table>
-  <thead id="thead">
-    <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
-    `}
-
-    css(){
-        return `
-:host{
-    overflow-y: scroll;
 }
-table{
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1px 0 3px 0;
-    /*table-layout: fixed;*/
-}
-thead{
-    /*position: sticky;
-    top: 0;*/
-}
-th{
-    background-color: #f0f0f0;
-    border-top: solid 1px #e3e3e3;
-    border-left: solid 1px #e3e3e3;
-    border-right: solid 1px #a0a0a0;
-    border-bottom: solid 3px #fff;
-    box-shadow: 0 -1px 0 0 #a0a0a0 inset;
-    font-weight: normal;
-    padding: 1px 4px 2px 4px;
-}
-th:nth-of-type(1){
-    text-align: right;
-    width: 40px;
-}
-th:nth-of-type(2){
-    text-align: left;
-    padding-left: 8px;
-    width: 450px;
-    overflow: hidden;
-}
-th:nth-of-type(3){
-    text-align: right;
-    width: 45px;
-}
-th:nth-of-type(4){
-    text-align: right;
-    width: 45px;
-}
-th:nth-of-type(5){
-    text-align: right;
-    width: 45px;
-}
-th:nth-of-type(6){
-    text-align: left;
-    width: 140px;
-}
-th:nth-of-type(7){
-    text-align: left;
-    width: 140px;
-}
-td{
-    padding: 2px 4px;
-}
-td:nth-of-type(1){
-    text-align: right;
-}
-td:nth-of-type(2){
-    text-align: left;
-    padding-left: 10px;
-}
-td:nth-of-type(3){
-    text-align: right;
-}
-td:nth-of-type(4){
-    text-align: right;
-}
-td:nth-of-type(5){
-    text-align: right;
-}
-td:nth-of-type(6){
-    text-align: left;
-}
-td:nth-of-type(7){
-    text-align: left;
-}
-td:nth-of-type(8){
-    z-index: 2;
-    background-color: #fff;
-}
-a{
-    text-decoration: none;
-    color: #000;
-    cursor: default;
-}
-tr[selected]{
-    color: #fff;
-    background-color: #0078d7;
-}
-tr[selected] a{
-    color: #fff;
-}
-    `}
-}
-
 
 
 class KatjushaHeadline extends HTMLElement{
@@ -746,124 +349,6 @@ class KatjushaHeadline extends HTMLElement{
     $タブ閉じるアイコン_click (event){
         $tab.close($tab.selected)
     }
-
-    html(){
-        return `
-<div id="headline">
-  <div>
-    <span id="bbs"></span>
-    <span id="thread"></span>
-  </div>
-  <div id="icons">
-    <span id="リストアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="レス更新アイコン" class="icon" title="レスを取得"></span>
-    <span id="中止アイコン" class="icon" title="レス受信中止"></span>
-    <span class="icon-separate"></span>
-    <span id="レス投稿アイコン" class="icon" title="レス書き込み"></span>
-    <span id="お気に入りアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="ごみ箱アイコン" class="icon" title="ログ削除"></span>
-    <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
-  </div>
-</div>
-    `}
-
-    css(){
-        return `
-#headline{
-    background-color: #f0f0f0;
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #c0c0c0;
-    box-shadow: 0 1px 0 0 #fff inset;
-}
-#bbs{
-    margin-left: 14px;
-}
-#bbs a{
-    color: #000;
-    text-decoration: none;
-}
-#icons{
-    display: flex;
-    align-items: center;
-    padding-top: 1px;
-}
-#リストアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAAD///+EhIQAAADG3sZSWlK9Ut21AAAAAXRSTlMAQObYZgAAAD1JREFUCNdjQAAlMAAyFAWBQAjGEAYxVJSUnIRRRVSclFBFgEpU0EWU0EVcVEKDoSIhzjCGAZChbAwEDAwApasK+zo+x0wAAAAASUVORK5CYII=');
-}
-#レス更新アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAAD/GACEAADWAAAAAAD/WlLW5g+1AAAAAXRSTlMAQObYZgAAAD9JREFUCNdjQAJKQKAAYigKCgqSymBRAjGUVBgYnA2BDGMHoJBxoGCwCUiNs6koSAAkBBIAC4EEwEImMPtBAgBdxwlHhjWoKgAAAABJRU5ErkJggg==');
-}
-#中止アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAIVBMVEUAAACEAAD/AADWAACtAAD///8AAAClpaVSAAD/WlL/nK0BYpsaAAAAAXRSTlMAQObYZgAAAIZJREFUCNdjYGBgFBQUYADRwkpKhiCWsNLMmUqGQAEjJc1JSsoCDIxK5UpAJACUCS1SDwXKCRuphpcGGQMZxsZLo4yBjBZn49JwY2MPhhYX99DQEhcPhkaX0hDXcBcJBjbBUBeXUMcEBrZGERcXR4kEBoYMQSBoA9rFligoKAYUALLS0oA0ANegGhWasO0CAAAAAElFTkSuQmCC');
-}
-#レス投稿アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEUAAAD/vQBSOQAAAAB7WgD/3q3WnFJ7e1KAgIBSWlLnpR9xAAAAAXRSTlMAQObYZgAAAGFJREFUCNdjAAEmJQUGMHBKSwLTLEHJZmAh16Bky2SQQGij2kwQwzVCUCgtGSwgKKikDBYQFHIxgAioODMwlEAFGIqgAgyliiABECMIIsBgma4EFmCYbF6uDLbR2NgYLAAAk/AUIWxYH70AAAAASUVORK5CYII=');
-}
-#お気に入りアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAFVBMVEUAAAD/vQAAAAAAAITWnFL//wB7WgBge4O/AAAAAXRSTlMAQObYZgAAAEdJREFUCNdjQAAWFxcIwzU01AEsECgoGOLi4sDAJigoKBoaGgZkgIEQmGEIZRgaGkIYwsZgESANZMFEEGoQuhDmMClBANwRAHcUC4t31YHOAAAAAElFTkSuQmCC');
-}
-#ごみ箱アイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAFVBMVEUAAAClpaUAAABSWlLG3sb///f////hVKakAAAAAXRSTlMAQObYZgAAAElJREFUCNdjAAIlJQYIFWwIYjIJgoCwAgOTS2iIo6AxkGEMAkAGg0qoi6CwEQOQIQiUATNEHQMNyWEkmoAYioKCEHOMlIBAmQEAhE4QrWeW2SgAAAAASUVORK5CYII=');
-}
-#タブ閉じるアイコン{
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEUAAAAAAAD///+D3c/SAAAAAXRSTlMAQObYZgAAAEpJREFUCNcdxLENwCAMAMEHBSl0adynIXMwggsLuWQUlkDKuLFyxfE74ELAaD05VcskmyzYA2geFY3EorEheeuUWRVZ2Xjg5YT7A0oLCUNeetUUAAAAAElFTkSuQmCC');
-}
-.icon{
-    padding: 2px 3px;
-    margin: 0 1px;
-    border: solid 1px #f0f0f0;
-    width: 20px;
-    height: 20px;
-    background-repeat: no-repeat;
-    background-size: 16px;
-    background-position: center;
-}
-.icon:hover{
-    border-top: solid 1px #fff;
-    border-left: solid 1px #fff;
-    border-bottom: solid 1px #a0a0a0;
-    border-right: solid 1px #a0a0a0;
-}
-.icon:active{
-    border-top: solid 1px #a0a0a0;
-    border-left: solid 1px #a0a0a0;
-    border-bottom: solid 1px #fff;
-    border-right: solid 1px #fff;
-    transform: translate(1px, 1px);
-}
-.icon-separate{
-    width: 2px;
-    height: 16px;
-    margin: 0 3px;
-    background-repeat: no-repeat;
-    background-size: 2px 16px;
-    background-position: center;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAQAQMAAAAGZjz3AAAABlBMVEX///+goKD0a5EfAAAAC0lEQVQI12NowA8BgCAIAWcmA/MAAAAASUVORK5CYII=');
-}
-.icon-text{
-    padding: 2px 2px;
-    margin: 0 1px;
-    border: solid 1px #f0f0f0;
-}
-.icon-text:hover{
-    border-top: solid 1px #fff;
-    border-left: solid 1px #fff;
-    border-bottom: solid 1px #a0a0a0;
-    border-right: solid 1px #a0a0a0;
-}
-.icon-text:active{
-    border-top: solid 1px #a0a0a0;
-    border-left: solid 1px #a0a0a0;
-    border-bottom: solid 1px #fff;
-    border-right: solid 1px #fff;
-    transform: translate(1px, 1px);
-}
-    `}
 }
 
 
@@ -1027,78 +512,6 @@ class KatjushaThread extends HTMLElement{
 
         return {bbs, key, bbsurl, baseurl}
     }
-
-    html(){
-        return ``
-    }
-
-    css(){
-        return `
-:host{
-    font-size: 18px;
-    user-select: text;
-    cursor: auto;
-    overflow-y: scroll;
-    padding: 2px 12px 24px 6px;
-    word-break: break-all;
-    line-height: 1.15;
-}
-.スレッド{
-    display: none;
-}
-.スレッド[selected]{
-    display: block;
-}
-.レス{
-    margin: 20px 8px;
-}
-.レス i{
-    color: blue;
-    font-style: normal;
-    cursor: pointer;
-}
-.レス i:hover{
-    text-decoration: underline;
-}
-.レス .from{
-    color: forestgreen;
-}
-.レス .from::before{
-    content: '名前：';
-    color: #000;
-    margin: 0 0.1rem 0 0.7rem;
-    user-select: text;
-}
-.レス time{
-}
-.レス time::before{
-    content: '投稿日：';
-    margin: 0 0.1rem 0 0.7rem;
-    user-select: text;
-}
-.レス address{
-    display: inline;
-    font-style: normal;
-    color: red;
-    margin-left: 8px;
-}
-.レス p{
-    margin-top: 2px;
-    margin-left: 36px;
-    white-space: pre-wrap;
-}
-.レス a{
-    text-decoration: none;
-}
-.レス a:hover{
-    text-decoration: underline;
-}
-.レス .anker{
-    position: relative;
-    cursor: pointer;
-    color: blue;
-}
-    `}
 }
 
 
@@ -1236,61 +649,6 @@ class KatjushaTab extends HTMLElement{
     loading(url, bool){
         this.find(url)?.toggleAttribute('loading', bool)
     }
-
-    html(){
-        return `<ul id="tab"></ul>`
-    }
-
-    css(){
-        return `
-ul{
-    list-style: none;
-    cursor: default;
-    display: flex;
-    align-items: flex-end;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding-left: 10px;
-    border-bottom: 1px solid #c0c0c0;
-}
-li{
-    text-align: left;
-    border-top: 1px solid #e3e3e3;
-    border-left: 1px solid #e3e3e3;
-    border-right: 1px solid #e3e3e3;
-    background-color: #f0f0f0;
-    color: #909090;
-    background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    width: 100px;
-    margin: 0 -5px;
-    padding-left: 10px;
-    height: 20px;
-    white-space: nowrap;
-    overflow: hidden;
-    line-height: 20px;
-    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
-}
-[selected]{
-    color: #000;
-    z-index: 2;
-    height: 22px;
-    line-height: 22px;
-}
-[selected]::before{
-    box-shadow: 2px 2px 0 #fff;
-}
-[selected]::after{
-    box-shadow: -2px 2px 0 #fff;
-}
-[loading]{
-    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+'), linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-    background-repeat: no-repeat;
-    background-size: 12px;
-    background-position: 4px center;
-}
-    `}
 }
 
 
@@ -1304,22 +662,6 @@ class KatjushaStatus extends HTMLElement{
         super()
         kit(this)
     }
-
-    html(){
-        return `<slot></slot>`
-    }
-
-    css(){
-        return `
-:host{
-    border-top: 1px solid #c0c0c0;
-    box-shadow: 0 1px 0 0 #fff inset;
-    background-color: #f0f0f0;
-    line-height: 18px;
-    font-family: 'Meiryo', sans-serif;
-    padding-left: 4px;
-}
-    `}
 }
 
 
@@ -1915,6 +1257,63 @@ function KB(byte = 0){
 
 function clamp(min, num, max){
     return Math.min(Math.max(min, num), max)
+}
+
+
+function kit(self){
+    self.$ = new Proxy(function(){}, {get:(_, name) => self.shadowRoot.querySelector('#'+name), apply})
+
+    if(!self.shadowRoot){
+        self.attachShadow({mode:'open'})
+
+        if(self.css){
+            if(!self.constructor.css){
+                self.constructor.css = new CSSStyleSheet()
+                self.constructor.css.replaceSync(self.css())
+            }
+            self.shadowRoot.adoptedStyleSheets = [self.constructor.css]
+        }
+
+        const dom = self.html()
+        if(typeof dom === 'string'){
+            self.shadowRoot.innerHTML = dom
+        }
+        else if(dom instanceof Node){
+            const el = dom.tagName === 'TEMPLATE' ? dom.content : dom
+            self.shadowRoot.append(el.cloneNode(true))
+        }
+    }
+
+    const specialID = {'':self.shadowRoot, 'Host':self, 'Window':window, 'Document':document}
+
+    for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(self))){
+        self[method] = self[method].bind(self)
+        const m = method.match(/^\$(.*?)_([^_]+)$/)
+        if(m){
+            const el = specialID[m[1]] ?? self.$('#'+m[1])
+            el.addEventListener(m[2], self[method])
+        }
+    }
+}
+
+function apply(_, self, [arg, ...values]){
+    if(typeof arg === 'string'){
+        if(arg.startsWith('@')){
+            self.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
+        }
+        else if(arg.startsWith('*')){
+            return Array.from(self.shadowRoot.querySelectorAll(arg.slice(1) || '*'))
+        }
+        else{
+            return self.shadowRoot.querySelector(arg)
+        }
+    }
+    else if(Array.isArray(arg)){ //タグ関数で起動
+        const template = document.createElement('template')
+        template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
+
+        return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
+    }
 }
 
 
