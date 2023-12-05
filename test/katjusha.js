@@ -106,9 +106,8 @@ class KatjushaBorder extends HTMLElement{
 
 
 class KatjushaBBS extends HTMLElement{
-    static observedAttributes = ['bbslist']
-
     static{
+        this.observedAttributes = ['bbslist']
         customElements.define('katjusha-bbs', this)
     }
 
@@ -194,7 +193,6 @@ class KatjushaSubject extends HTMLElement{
         kit(this)
     }
 
-
     $_contextmenu(event){
         event.preventDefault()
     }
@@ -239,12 +237,11 @@ class KatjushaSubject extends HTMLElement{
     }
 
     sort(th){
-        const i  = th.cellIndex
         th.order = th.order ? -th.order : -1
+        const i  = th.cellIndex
+        const tr = Array.from(this.$.tbody.rows).sort((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent)*th.order)
 
-        Array.from(this.$.tbody.rows)
-        .toSorted((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent) * th.order)
-        .forEach(tr => this.$.tbody.append(tr))
+        this.$.tbody.append(...tr)
     }
 
     recieve(response, url){
@@ -496,7 +493,7 @@ class KatjushaThread extends HTMLElement{
     }
 
     render(thread, append){
-        const tab     = $tab.find(thread.url) || $tab.selected
+        const tab     = $tab.find(thread.url) ?? $tab.selected
         tab.innerHTML = thread.subject
         if(append){
             tab.panel.insertAdjacentHTML('beforeend', append)
@@ -596,7 +593,7 @@ class KatjushaTab extends HTMLElement{
         }
 
         if(tab?.url){
-            this.select(tab.previousElementSibling || tab.nextElementSibling || this.openNew())
+            this.select(tab.previousElementSibling ?? tab.nextElementSibling ?? this.openNew())
             tab.panel.remove()
             tab.remove()
         }
@@ -637,7 +634,7 @@ class KatjushaTab extends HTMLElement{
             $headline.render(thread)
             $thread.scrollTop  = thread.scroll
             $title.textContent = thread.subject
-            history.replaceState(null, null, tab.url || $subject.bbsurl || $base.href)
+            history.replaceState(null, null, tab.url ?? $subject.bbsurl ?? $base.href)
         }
 
         return tab
@@ -674,8 +671,8 @@ class KatjushaForm extends HTMLElement{
 
     constructor(url){
         super()
-        this.url  = url
-        this.id   = '$form'
+        this.url = url
+        this.id  = '$form'
         kit(this, $formTemplate)
     }
 
@@ -887,7 +884,7 @@ function date(){
 
 
 function KB(byte = 0){
-    return `${Math.ceil(byte/1024)}KB`
+    return Math.ceil(byte/1024) + 'KB'
 }
 
 
