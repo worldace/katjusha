@@ -68,7 +68,7 @@ $katjusha.onclick = function(event){
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
 
         target ? $tab.openNew(href, thread) : $tab.open(href, thread)
-        $tab.loading(href, true)
+        $tab.loading(href)
 
         $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
     }
@@ -344,7 +344,7 @@ class KatjushaHeadline extends HTMLElement{
         }
     }
 
-    $タブ閉じるアイコン_click (event){
+    $タブ閉じるアイコン_click(event){
         $tab.close($tab.selected)
     }
 }
@@ -469,8 +469,8 @@ class KatjushaThread extends HTMLElement{
     }
 
     parse(text, n = 0){
-        const dat  = text.trim().split('\n')
-        let  html  = ''
+        const dat = text.trim().split('\n')
+        let  html = ''
 
         for(const v of dat){
             const [from, mail, date, message, subject] = v.split('<>')
@@ -557,18 +557,14 @@ class KatjushaTab extends HTMLElement{
         }
 
         let tab = this.find(url)
-
-        if(tab){
-            return this.select(tab)
-        }
-        else{
+        if(!tab){
             tab = this.selected
-        }
 
-        tab.url             = url
-        tab.innerHTML       = thread.subject || ''
-        tab.panel.url       = url
-        tab.panel.innerHTML = thread.html || ''
+            tab.url             = url
+            tab.innerHTML       = thread.subject || ''
+            tab.panel.url       = url
+            tab.panel.innerHTML = thread.html || ''
+        }
 
         return this.select(tab)
     }
@@ -600,8 +596,10 @@ class KatjushaTab extends HTMLElement{
     }
 
     closeAll(url){
-        for (const tab of Array.from(this.$.tab.children).filter(v => v.url !== url)){
-            this.close(tab)
+        for(const tab of this.$.tab.children){
+            if(tab.url !== url){
+                this.close(tab)
+            }
         }
     }
 
@@ -644,7 +642,7 @@ class KatjushaTab extends HTMLElement{
         return Array.from(this.$.tab.children).find(v => v.url === url)
     }
 
-    loading(url, bool){
+    loading(url, bool = true){
         this.find(url)?.toggleAttribute('loading', bool)
     }
 }
@@ -720,7 +718,7 @@ class KatjushaForm extends HTMLElement{
         $body.append(this)
         this.centering()
 
-        if( this.url.includes('read.cgi') ){
+        if(this.url.includes('read.cgi')){
             const thread = スレッド[this.url]
 
             this.$.title.textContent = `「${thread.subject}」にレス`
