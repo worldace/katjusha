@@ -553,10 +553,6 @@ class KatjushaTab extends HTMLElement{
     }
 
     open(url, thread = {}){
-        if(!this.$.tab.childElementCount){
-            return this.openNew(url, thread)
-        }
-
         let tab = this.find(url)
         if(!tab){
             tab = this.selected
@@ -572,12 +568,12 @@ class KatjushaTab extends HTMLElement{
 
     openNew(url, thread = {}){
         const tab = this.find(url)
+        if(tab){
+            return this.select(tab)
+        }
 
         if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
             return this.open(url, thread)
-        }
-        else if(tab){
-            return this.select(tab)
         }
         else{
             return this.select( this.create(url, thread.subject, thread.html) )
