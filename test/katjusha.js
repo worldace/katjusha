@@ -584,43 +584,6 @@ class KatjushaTab extends HTMLElement{
         }
     }
 
-    close(tab){
-        if(typeof tab === 'string'){
-            tab = this.find(tab)
-        }
-
-        if(tab?.url){
-            this.select(tab.previousElementSibling ?? tab.nextElementSibling ?? this.openNew())
-            tab.panel.remove()
-            tab.remove()
-        }
-    }
-
-    closeAll(url){
-        for(const tab of this.$.tab.children){
-            if(tab.url !== url){
-                this.close(tab)
-            }
-        }
-    }
-
-    create(url, subject='', html=''){
-        const thread     = document.createElement('div')
-        thread.className = 'スレッド'
-        thread.url       = url
-        thread.innerHTML = html
-
-        const tab        = document.createElement('li')
-        tab.url          = url
-        tab.innerHTML    = subject
-        tab.panel        = thread
-
-        this.$.tab.append(tab)
-        $thread.shadowRoot.append(thread)
-
-        return tab
-    }
-
     select(tab){
         this.selected?.removeAttribute('selected')
         this.selected = tab
@@ -641,6 +604,43 @@ class KatjushaTab extends HTMLElement{
 
     find(url){
         return Array.from(this.$.tab.children).find(v => v.url === url)
+    }
+
+    create(url, subject='', html=''){
+        const thread     = document.createElement('div')
+        thread.className = 'スレッド'
+        thread.url       = url
+        thread.innerHTML = html
+
+        const tab        = document.createElement('li')
+        tab.url          = url
+        tab.innerHTML    = subject
+        tab.panel        = thread
+
+        this.$.tab.append(tab)
+        $thread.shadowRoot.append(thread)
+
+        return tab
+    }
+
+    close(tab){
+        if(typeof tab === 'string'){
+            tab = this.find(tab)
+        }
+
+        if(tab?.url){
+            this.select(tab.previousElementSibling ?? tab.nextElementSibling ?? this.openNew())
+            tab.panel.remove()
+            tab.remove()
+        }
+    }
+
+    closeAll(url){
+        for(const tab of Array.from(this.$.tab.children)){
+            if(tab.url !== url){
+                this.close(tab)
+            }
+        }
     }
 
     loading(url, bool = true){
