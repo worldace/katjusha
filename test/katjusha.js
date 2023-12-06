@@ -365,7 +365,7 @@ class KatjushaThread extends HTMLElement{
             event.stopPropagation()
 
             new KatjushaContext(`
-                <li><a onclick="$thread.responseTo(${event.target.textContent})">これにレス</a></li>
+                <li><a onclick="$thread.resTo(${event.target.textContent})">これにレス</a></li>
             `).show(event.pageX, event.pageY)
         }
         else if(event.target.className === 'anker'){
@@ -390,7 +390,7 @@ class KatjushaThread extends HTMLElement{
         this.selected.children[n-1]?.scrollIntoView()
     }
 
-    responseTo(n){
+    resTo(n){
         $headline.$.レス投稿アイコン.click()
         $form.insert(`>>${n}\n`)
     }
