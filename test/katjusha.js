@@ -566,7 +566,7 @@ class KatjushaTab extends HTMLElement{
             this.open(url, thread)
         }
         else{
-            this.select( this.create(url, thread.subject, thread.html) )
+            this.create(url, thread.subject, thread.html)
         }
     }
 
@@ -603,7 +603,7 @@ class KatjushaTab extends HTMLElement{
         this.$.tab.append(tab)
         $thread.shadowRoot.append(thread)
 
-        return tab
+        this.select(tab)
     }
 
     overwrite(url, subject='', html=''){
