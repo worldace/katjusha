@@ -553,17 +553,8 @@ class KatjushaTab extends HTMLElement{
     }
 
     open(url, thread = {}){
-        let tab = this.find(url)
-        if(!tab){
-            tab = this.selected
-
-            tab.url             = url
-            tab.innerHTML       = thread.subject || ''
-            tab.panel.url       = url
-            tab.panel.innerHTML = thread.html || ''
-        }
-
-        this.select(tab)
+        const tab = this.find(url)
+        tab ? this.select(tab) : this.overwrite(url, thread.subject, thread.html)
     }
 
     openNew(url, thread = {}){
@@ -583,7 +574,6 @@ class KatjushaTab extends HTMLElement{
         this.selected?.removeAttribute('selected')
         tab.setAttribute('selected', true)
         this.selected = tab
-
         $thread.active(tab.panel)
 
         if(tab.url){
@@ -593,8 +583,6 @@ class KatjushaTab extends HTMLElement{
             $headline.render(thread)
             history.replaceState(null, null, tab.url)
         }
-
-        return tab
     }
 
     find(url){
@@ -616,6 +604,13 @@ class KatjushaTab extends HTMLElement{
         $thread.shadowRoot.append(thread)
 
         return tab
+    }
+
+    overwrite(url, subject='', html=''){
+        this.selected.url             = url
+        this.selected.innerHTML       = subject
+        this.selected.panel.url       = url
+        this.selected.panel.innerHTML = html
     }
 
     close(tab){
