@@ -586,8 +586,8 @@ class KatjushaTab extends HTMLElement{
 
     select(tab){
         this.selected?.removeAttribute('selected')
-        this.selected = tab
         tab.setAttribute('selected', true)
+        this.selected = tab
 
         $thread.active(tab.panel)
 
@@ -596,7 +596,7 @@ class KatjushaTab extends HTMLElement{
             $headline.render(thread)
             $thread.scrollTop  = thread.scroll
             $title.textContent = thread.subject
-            history.replaceState(null, null, tab.url ?? $subject.bbsurl ?? $base.href)
+            history.replaceState(null, null, tab.url)
         }
 
         return tab
