@@ -563,20 +563,19 @@ class KatjushaTab extends HTMLElement{
             tab.panel.innerHTML = thread.html || ''
         }
 
-        return this.select(tab)
+        this.select(tab)
     }
 
     openNew(url, thread = {}){
         const tab = this.find(url)
         if(tab){
-            return this.select(tab)
+            this.select(tab)
         }
-
-        if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
-            return this.open(url, thread)
+        else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
+            this.open(url, thread)
         }
         else{
-            return this.select( this.create(url, thread.subject, thread.html) )
+            this.select( this.create(url, thread.subject, thread.html) )
         }
     }
 
@@ -588,10 +587,10 @@ class KatjushaTab extends HTMLElement{
         $thread.active(tab.panel)
 
         if(tab.url){
-            const thread = スレッド[tab.url]
-            $headline.render(thread)
+            const thread       = スレッド[tab.url]
             $thread.scrollTop  = thread.scroll
             $title.textContent = thread.subject
+            $headline.render(thread)
             history.replaceState(null, null, tab.url)
         }
 
@@ -623,9 +622,10 @@ class KatjushaTab extends HTMLElement{
         if(typeof tab === 'string'){
             tab = this.find(tab)
         }
-
         if(tab?.url){
-            this.select(tab.previousElementSibling ?? tab.nextElementSibling ?? this.openNew())
+            const select = tab.previousElementSibling ?? tab.nextElementSibling
+            select ? this.select(select) : this.openNew()
+
             tab.panel.remove()
             tab.remove()
         }
