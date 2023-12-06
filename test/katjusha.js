@@ -552,6 +552,10 @@ class KatjushaTab extends HTMLElement{
         }
     }
 
+    find(url){
+        return Array.from(this.$.tab.children).find(v => v.url === url)
+    }
+
     open(url, thread = {}){
         const tab = this.find(url)
         tab ? this.select(tab) : this.overwrite(url, thread.subject, thread.html)
@@ -583,10 +587,6 @@ class KatjushaTab extends HTMLElement{
             $headline.render(thread)
             history.replaceState(null, null, tab.url)
         }
-    }
-
-    find(url){
-        return Array.from(this.$.tab.children).find(v => v.url === url)
     }
 
     create(url, subject='', html=''){
