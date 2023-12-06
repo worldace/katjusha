@@ -358,11 +358,6 @@ class KatjushaThread extends HTMLElement{
     constructor(){
         super()
         kit(this)
-        this.onscroll = event => {
-            if(this.selected.url){
-                スレッド[this.selected.url].scroll = this.scrollTop
-            }
-        }
     }
 
     $_click(event){
@@ -376,6 +371,12 @@ class KatjushaThread extends HTMLElement{
         else if(event.target.className === 'anker'){
             event.stopPropagation()
             this.goto(event.target.dataset.n)
+        }
+    }
+
+    $Host_scroll(event){
+        if(this.selected.url){
+            スレッド[this.selected.url].scroll = this.scrollTop
         }
     }
 

@@ -1,66 +1,45 @@
 *{
-    box-sizing: border-box;
-}
+  box-sizing: border-box;}
 :not(:defined){
-    display: none;
-}
+  display: none;}
 html{
-    --font-default: 'MS PGothic';
-    font-size: 12px;
-    font-family: var(--font-default), sans-serif;
-}
+  --font-default: 'MS PGothic';
+  font-family: var(--font-default), sans-serif;
+  font-size: 12px;}
 body{
-    width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    user-select: none;
-    cursor: default;
-    line-height: 1;
-    position: relative;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 150px 1fr;
-    grid-template-rows: 26px 8px 0.4fr 28px 24px 1fr 18px;
-    grid-template-areas:
-        "toolbar toolbar"
-        "border border"
-        "bbs subject"
-        "bbs headline"
-        "bbs tab"
-        "bbs thread"
-        "status status";
-}
-
-
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  cursor: default;
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-template-rows: 26px 8px 0.4fr 28px 24px 1fr 18px;
+  grid-template-areas:
+    "toolbar toolbar"
+    "border border"
+    "bbs subject"
+    "bbs headline"
+    "bbs tab"
+    "bbs thread"
+    "status status";}
 katjusha-toolbar{
-    grid-area: toolbar;
-}
-
+  grid-area: toolbar;}
 katjusha-border{
-    grid-area: border;
-}
-
+  grid-area: border;}
 katjusha-bbs{
-    grid-area: bbs;
-}
-
+  grid-area: bbs;}
 katjusha-subject{
-    grid-area: subject;
-}
-
+  grid-area: subject;}
 katjusha-headline{
-    grid-area: headline;
-}
-
+  grid-area: headline;}
 katjusha-tab{
-    grid-area: tab;
-}
-
+  grid-area: tab;}
 katjusha-thread{
-    grid-area: thread;
-}
-
+  grid-area: thread;}
 katjusha-status{
-    grid-area: status;
-}
+  grid-area: status;}
