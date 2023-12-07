@@ -497,10 +497,10 @@ class KatjushaThread extends HTMLElement{
         const tab     = $tab.find(thread.url) ?? $tab.selected
         tab.innerHTML = thread.subject
         if(append){
-            tab.panel.insertAdjacentHTML('beforeend', append)
+            tab.thread.insertAdjacentHTML('beforeend', append)
         }
         else{
-            tab.panel.innerHTML = thread.html
+            tab.thread.innerHTML = thread.html
         }
     }
 
@@ -578,7 +578,7 @@ class KatjushaTab extends HTMLElement{
         this.selected?.removeAttribute('selected')
         tab.setAttribute('selected', true)
         this.selected = tab
-        $thread.active(tab.panel)
+        $thread.active(tab.thread)
 
         if(tab.url){
             const thread       = スレッド[tab.url]
@@ -590,27 +590,19 @@ class KatjushaTab extends HTMLElement{
     }
 
     create(url, subject='', html=''){
-        const thread     = document.createElement('div')
-        thread.className = 'スレッド'
-        thread.url       = url
-        thread.innerHTML = html
-
-        const tab        = document.createElement('li')
-        tab.url          = url
-        tab.innerHTML    = subject
-        tab.panel        = thread
+        const thread = t('div', html, {url, className:'スレッド'})
+        const tab    = t('li', subject, {url, thread})
 
         this.$.tab.append(tab)
         $thread.shadowRoot.append(thread)
-
         this.select(tab)
     }
 
     overwrite(url, subject='', html=''){
-        this.selected.url             = url
-        this.selected.innerHTML       = subject
-        this.selected.panel.url       = url
-        this.selected.panel.innerHTML = html
+        this.selected.url              = url
+        this.selected.innerHTML        = subject
+        this.selected.thread.url       = url
+        this.selected.thread.innerHTML = html
     }
 
     close(tab){
@@ -621,7 +613,7 @@ class KatjushaTab extends HTMLElement{
             const select = tab.previousElementSibling ?? tab.nextElementSibling
             select ? this.select(select) : this.openNew()
 
-            tab.panel.remove()
+            tab.thread.remove()
             tab.remove()
         }
     }
@@ -857,7 +849,12 @@ const スレッド = new Proxy({}, {
 
 
 
+function t(name, html = '', prop = {}){
+    const el = document.createElement(name)
+    el.innerHTML = html
 
+    return Object.assign(el, prop)
+}
 
 function date(){
     const d  = new Date()
@@ -872,16 +869,13 @@ function date(){
     return `${年}/${月}/${日} ${時}:${分}:${秒}`
 }
 
-
 function KB(byte = 0){
     return Math.ceil(byte/1024) + 'KB'
 }
 
-
 function clamp(min, num, max){
     return Math.min(Math.max(min, num), max)
 }
-
 
 function kit(self, template){
     if(!self.shadowRoot){
