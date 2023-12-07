@@ -101,6 +101,8 @@ class KatjushaBorder extends HTMLElement{
 
 
 class KatjushaBBS extends HTMLElement{
+    list = {}
+
     static{
         this.observedAttributes = ['bbslist']
         customElements.define('katjusha-bbs', this)
@@ -138,7 +140,6 @@ class KatjushaBBS extends HTMLElement{
     }
 
     parse(text){
-        this.list = {}
         let html  = ''
         let category
 
@@ -165,7 +166,7 @@ class KatjushaBBS extends HTMLElement{
 
     select(el){
         if(typeof el === 'string'){
-            el = this.$(`[href="${el}"]`)
+            el = this.$(`[href='${el}']`)
         }
 
         if(el){
@@ -245,11 +246,11 @@ class KatjushaSubject extends HTMLElement{
         const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
         const url      = this.bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
         const thread   = スレッド[url]
-        thread.subject = subject
 
         if(thread.num === thread.既得){
             thread.新着 = 0
         }
+        thread.subject = subject
 
         return `<tr data-url="${url}">
                   <td>${i+1}</td>
