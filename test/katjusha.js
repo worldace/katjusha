@@ -9,18 +9,28 @@ $katjusha.start = function(){
     }
 }
 
+$katjusha.onclick = function(event){
+    const {href, target} = event.composedPath()[0]
 
-$katjusha.link = function(url, target){
-    $katjusha.href   = url
-    $katjusha.target = target
-    $katjusha.click()
+    if(href === $base.href){
+        event.preventDefault()
+        history.replaceState(null, null, href)
+    }
+    else if(href in $bbs.list){
+        event.preventDefault()
+        $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
+    }
+    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
+        event.preventDefault()
+        const thread  = スレッド[href]
+        const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
+
+        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
+        $tab.loading(href)
+
+        $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
+    }
 }
-
-
-$katjusha.clipboard = function(text){
-    navigator.clipboard.writeText(text)
-}
-
 
 $katjusha.fetch = async function(url, option = {}){
     const host  = new URL(url).hostname
@@ -50,28 +60,14 @@ $katjusha.fetch = async function(url, option = {}){
     }
 }
 
+$katjusha.link = function(url, target){
+    $katjusha.href   = url
+    $katjusha.target = target
+    $katjusha.click()
+}
 
-$katjusha.onclick = function(event){
-    const {href, target} = event.composedPath()[0]
-
-    if(href === $base.href){
-        event.preventDefault()
-        history.replaceState(null, null, href)
-    }
-    else if(href in $bbs.list){
-        event.preventDefault()
-        $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
-    }
-    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
-        event.preventDefault()
-        const thread  = スレッド[href]
-        const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
-
-        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
-        $tab.loading(href)
-
-        $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
-    }
+$katjusha.clipboard = function(text){
+    navigator.clipboard.writeText(text)
 }
 
 
@@ -102,7 +98,6 @@ class KatjushaBorder extends HTMLElement{
         kit(this)
     }
 }
-
 
 
 class KatjushaBBS extends HTMLElement{
@@ -308,11 +303,6 @@ class KatjushaHeadline extends HTMLElement{
         kit(this)
     }
 
-    render(thread){
-        this.$.thread.innerHTML = `${thread.subject} (${thread.num})`
-        this.$.bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
-    }
-
     $_contextmenu(event){
         event.preventDefault()
     }
@@ -342,6 +332,11 @@ class KatjushaHeadline extends HTMLElement{
 
     $タブ閉じるアイコン_click(event){
         $tab.close($tab.selected)
+    }
+
+    render(thread){
+        this.$.thread.innerHTML = `${thread.subject} (${thread.num})`
+        this.$.bbs.innerHTML    = `<a href="${thread.bbsurl}">[${thread.bbsname}]</a>`
     }
 }
 
@@ -510,7 +505,6 @@ class KatjushaThread extends HTMLElement{
 }
 
 
-
 class KatjushaTab extends HTMLElement{
     static{
         customElements.define('katjusha-tab', this)
@@ -587,10 +581,10 @@ class KatjushaTab extends HTMLElement{
     }
 
     create(url, subject='', html=''){
-        const thread = t('div', html, {url, className:'スレッド'})
+        const thread = tag('div', html, {url, className:'スレッド'})
         $thread.shadowRoot.append(thread)
 
-        const tab = t('li', subject, {url, thread})
+        const tab = tag('li', subject, {url, thread})
         this.$.tab.append(tab)
         this.select(tab)
     }
@@ -629,7 +623,6 @@ class KatjushaTab extends HTMLElement{
 }
 
 
-
 class KatjushaStatus extends HTMLElement{
     static{
         customElements.define('katjusha-status', this)
@@ -640,7 +633,6 @@ class KatjushaStatus extends HTMLElement{
         kit(this)
     }
 }
-
 
 
 class KatjushaForm extends HTMLElement{
@@ -758,7 +750,6 @@ class KatjushaForm extends HTMLElement{
 }
 
 
-
 class KatjushaContext extends HTMLElement{
     static{
         customElements.define('katjusha-context', this)
@@ -791,7 +782,6 @@ class KatjushaContext extends HTMLElement{
         $body.append(this)
     }
 }
-
 
 
 class KatjushaPopup extends HTMLElement{
@@ -845,8 +835,7 @@ const スレッド = new Proxy({}, {
 })
 
 
-
-function t(name, html = '', prop = {}){
+function tag(name, html = '', prop = {}){
     const el = document.createElement(name)
     el.innerHTML = html
 
