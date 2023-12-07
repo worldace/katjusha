@@ -115,7 +115,7 @@ class KatjushaBBS extends HTMLElement{
 
     attributeChangedCallback(name, _, value){
         if(name === 'bbslist'){
-            this.$.bbs.innerHTML = this.parse(value)
+            this.$.bbs.innerHTML = value.trim().split(/\n(?!\s)/).map(this.toHTML).join('')
         }
     }
 
@@ -139,25 +139,19 @@ class KatjushaBBS extends HTMLElement{
         }
     }
 
-    parse(text){
-        let html  = ''
-        let category
+    toHTML(text){
+        let html = ''
+        const list     = text.split('\n')
+        const category = list.shift()
 
-        for(const v of text.trim().split('\n')){
-            if(v.startsWith('#')){
-                category = v.slice(1)
-                html += html && `</details>`
-                html += `<details open><summary>${category}</summary>`
-            }
-            else{
-                const [name, url]    = v.split(' ')
-                const [,baseurl,bbs] = url.match(/(.+\/)([^\/]+)\/$/)
-                html += `<a href="${url}">${name}</a>`
-                this.list[url] = {category, name, url, baseurl, bbs}
-            }
+        for(const v of list){
+            const [, name, url]    = v.split(' ')
+            const [, baseurl, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
+            html += `<a href="${url}">${name}</a>`
+            this.list[url] = {category, name, url, baseurl, bbs}
         }
 
-        return html + `</details>`
+        return `<details open><summary>${category}</summary>${html}</details>`
     }
 
     name(url){
