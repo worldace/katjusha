@@ -567,7 +567,7 @@ class KatjushaTab extends HTMLElement{
             this.select(tab)
         }
         else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
-            this.open(url, thread)
+            this.overwrite(url, thread.subject, thread.html)
         }
         else{
             this.create(url, thread.subject, thread.html)
