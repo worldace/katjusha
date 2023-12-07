@@ -230,25 +230,11 @@ class KatjushaSubject extends HTMLElement{
         }
     }
 
-    select(el){
-        this.selected?.removeAttribute('selected')
-        this.selected = el
-        el.setAttribute('selected', true)
-    }
-
-    sort(th){
-        th.order = th.order ? -th.order : -1
-        const i  = th.cellIndex
-        const tr = Array.from(this.$.tbody.rows).sort((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent)*th.order)
-
-        this.$.tbody.append(...tr)
-    }
-
     recieve(response, url){
         if(response.status === 200){
             this.bbsurl = url
             this.scrollTop = 0
-            this.$.tbody.innerHTML = this.toHTML(this.parse(response.content), url)
+            this.$.tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML).join('')
 
             $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
             $bbs.select(url)
@@ -261,30 +247,32 @@ class KatjushaSubject extends HTMLElement{
         }
     }
 
-    parse(text){
-        return text.trim().split('\n').map( (v, i) => {
-            const [, key, subject, num] = v.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-            return {i:i+1, key, subject, num:Number(num)}
-        })
+    toHTML(line, i){
+        const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+        const url      = this.bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
+        const thread   = スレッド[url]
+        thread.subject = subject
+
+        if(thread.num === thread.既得){
+            thread.新着 = 0
+        }
+
+        return `<tr data-url="${url}">
+                  <td>${i+1}</td>
+                  <td><a href="${url}">${subject}</a></td>
+                  <td>${num}</td>
+                  <td>${thread.既得 || ''}</td>
+                  <td>${thread.新着 || ''}</td>
+                  <td>${thread.最終取得}</td>
+                  <td>${thread.最終書き込み}</td>
+                  <td></td>
+                </tr>`
     }
 
-    toHTML(list, bbsurl){
-        let html = ''
-
-        for(const {i, key, subject, num} of list){
-            const url    = bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
-            const thread = スレッド[url]
-            thread.subject = subject
-
-            if(thread.num == thread.既得){
-                thread.新着 = 0
-            }
-
-            html += `<tr data-url="${url}"><td>${i}</td><td><a href="${url}">${subject}</a></td><td>${num}</td>
-                     <td>${thread.既得 || ''}</td><td>${thread.新着 || ''}</td><td>${thread.最終取得}</td><td>${thread.最終書き込み}</td><td></td></tr>`
-        }
-    
-        return html
+    select(el){
+        this.selected?.removeAttribute('selected')
+        this.selected = el
+        el.setAttribute('selected', true)
     }
 
     update(thread){
@@ -298,6 +286,14 @@ class KatjushaSubject extends HTMLElement{
             tr.cells[5].textContent = thread.最終取得 || ''
             tr.cells[6].textContent = thread.最終書き込み || ''
         }
+    }
+
+    sort(th){
+        th.order = th.order ? -th.order : -1
+        const i  = th.cellIndex
+        const tr = Array.from(this.$.tbody.rows).sort((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent)*th.order)
+
+        this.$.tbody.append(...tr)
     }
 }
 
