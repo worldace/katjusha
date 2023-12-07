@@ -184,7 +184,6 @@ class KatjushaBBS extends HTMLElement{
 
 class KatjushaSubject extends HTMLElement{
     static{
-        this.compare = new Intl.Collator('ja-JP', {numeric:true}).compare
         customElements.define('katjusha-subject', this)
     }
 
@@ -289,9 +288,10 @@ class KatjushaSubject extends HTMLElement{
     }
 
     sort(th){
+        this.cmp ??= new Intl.Collator('ja-JP', {numeric:true}).compare
         th.order = th.order ? -th.order : -1
         const i  = th.cellIndex
-        const tr = Array.from(this.$.tbody.rows).sort((a, b) => KatjushaSubject.compare(a.cells[i].textContent, b.cells[i].textContent)*th.order)
+        const tr = Array.from(this.$.tbody.rows).sort((a, b) => this.cmp(a.cells[i].textContent, b.cells[i].textContent)*th.order)
 
         this.$.tbody.append(...tr)
     }
