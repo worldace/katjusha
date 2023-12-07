@@ -124,7 +124,7 @@ class KatjushaBBS extends HTMLElement{
 
     $_click(event){
         if(event.target.tagName === 'A'){
-            this.active(event.target)
+            this.select(event.target)
         }
     }
 
@@ -133,7 +133,7 @@ class KatjushaBBS extends HTMLElement{
         event.stopPropagation()
 
         if(event.target.tagName === 'A'){
-            this.active(event.target)
+            this.select(event.target)
 
             new KatjushaContext(`
                 <li><a onclick="$katjusha.clipboard('${event.target.href}')">URLをコピー</a></li>
@@ -168,7 +168,7 @@ class KatjushaBBS extends HTMLElement{
         return this.list[url]?.name
     }
 
-    active(el){
+    select(el){
         if(typeof el === 'string'){
             el = this.$(`[href="${el}"]`)
         }
@@ -208,7 +208,7 @@ class KatjushaSubject extends HTMLElement{
         const tr = event.target.closest('tr')
 
         if(tr && event.target.cellIndex < 7){
-            this.active(tr)
+            this.select(tr)
             $katjusha.link(tr.dataset.url)
         }
     }
@@ -220,7 +220,7 @@ class KatjushaSubject extends HTMLElement{
 
         if(tr){
             const url = tr.dataset.url
-            this.active(tr)
+            this.select(tr)
 
             new KatjushaContext(`
                 <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
@@ -230,7 +230,7 @@ class KatjushaSubject extends HTMLElement{
         }
     }
 
-    active(el){
+    select(el){
         this.selected?.removeAttribute('selected')
         this.selected = el
         el.setAttribute('selected', true)
@@ -251,7 +251,7 @@ class KatjushaSubject extends HTMLElement{
             this.$.tbody.innerHTML = this.toHTML(this.parse(response.content), url)
 
             $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
-            $bbs.active(url)
+            $bbs.select(url)
 
             $status.textContent = `${this.$.tbody.rows.length}件のスレッドを受信 (${date()})`
             history.replaceState(null, null, url)
@@ -291,7 +291,7 @@ class KatjushaSubject extends HTMLElement{
         const tr = Array.from(this.$.tbody.rows).find(v => v.dataset.url === thread.url)
 
         if(tr){
-            this.active(tr)
+            this.select(tr)
             tr.cells[2].textContent = thread.num || ''
             tr.cells[3].textContent = thread.既得 || ''
             tr.cells[4].textContent = thread.新着 || ''
@@ -380,7 +380,7 @@ class KatjushaThread extends HTMLElement{
         }
     }
 
-    active(el){
+    select(el){
         this.selected?.removeAttribute('selected')
         this.selected = el
         el.setAttribute('selected', true)
@@ -579,7 +579,7 @@ class KatjushaTab extends HTMLElement{
         this.selected?.removeAttribute('selected')
         tab.setAttribute('selected', true)
         this.selected = tab
-        $thread.active(tab.thread)
+        $thread.select(tab.thread)
 
         if(tab.url){
             const thread       = スレッド[tab.url]
