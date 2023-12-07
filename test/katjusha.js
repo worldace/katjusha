@@ -731,10 +731,10 @@ class KatjushaForm extends HTMLElement{
     }
 
     insert(text){
-        const before = this.$.message.value.substr(0, this.$.message.selectionStart)
-        const after  = this.$.message.value.substr(this.$.message.selectionStart)
+        const i = this.$.message.selectionStart
 
-        this.$.message.value = before + text + after
+        this.$.message.value = this.$.message.value.slice(0, i) + text + this.$.message.value.slice(i)
+        this.$.message.focus()
     }
 
     disable(bool){
