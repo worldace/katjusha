@@ -563,6 +563,7 @@ class KatjushaTab extends HTMLElement{
 
     openNew(url, thread = {}){
         const tab = this.find(url)
+
         if(tab){
             this.select(tab)
         }
@@ -591,10 +592,10 @@ class KatjushaTab extends HTMLElement{
 
     create(url, subject='', html=''){
         const thread = t('div', html, {url, className:'スレッド'})
-        const tab    = t('li', subject, {url, thread})
-
-        this.$.tab.append(tab)
         $thread.shadowRoot.append(thread)
+
+        const tab = t('li', subject, {url, thread})
+        this.$.tab.append(tab)
         this.select(tab)
     }
 
