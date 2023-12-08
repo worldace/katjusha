@@ -16,11 +16,11 @@ $katjusha.onclick = function(event){
         event.preventDefault()
         history.replaceState(null, null, href)
     }
-    else if(href in $bbs.list){
+    else if(href in $bbs){
         event.preventDefault()
         $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
     }
-    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs.list){
+    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
@@ -101,8 +101,6 @@ class KatjushaBorder extends HTMLElement{
 
 
 class KatjushaBBS extends HTMLElement{
-    list = {}
-
     static{
         this.observedAttributes = ['bbslist']
         customElements.define('katjusha-bbs', this)
@@ -140,22 +138,21 @@ class KatjushaBBS extends HTMLElement{
     }
 
     toHTML(text){
+        const [category, ...list] = text.split('\n')
         let html = ''
-        const list     = text.split('\n')
-        const category = list.shift()
 
         for(const v of list){
             const [, name, url]    = v.split(' ')
             const [, baseurl, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
             html += `<a href="${url}">${name}</a>`
-            this.list[url] = {category, name, url, baseurl, bbs}
+            $bbs[url] = {category, name, url, baseurl, bbs}
         }
 
         return `<details open><summary>${category}</summary>${html}</details>`
     }
 
     name(url){
-        return this.list[url]?.name
+        return $bbs[url]?.name
     }
 
     select(el){
@@ -238,8 +235,8 @@ class KatjushaSubject extends HTMLElement{
 
     toHTML(line, i){
         const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-        const url      = this.bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
-        const thread   = スレッド[url]
+        const url    = this.bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
+        const thread = スレッド[url]
 
         if(thread.num === thread.既得){
             thread.新着 = 0
@@ -698,7 +695,7 @@ class KatjushaForm extends HTMLElement{
             this.$.message.focus()
         }
         else{
-            const bbs = $bbs.list[this.url]
+            const bbs = $bbs[this.url]
 
             this.$.title.textContent = `『${bbs.name}』に新規スレッド`
             this.$.form.action       = `${bbs.baseurl}test/bbs.cgi`
@@ -786,8 +783,8 @@ class KatjushaPopup extends HTMLElement{
 
     constructor(html){
         super()
-        this.id = '$popup'
         kit(this, $popupTemplate)
+        this.id = '$popup'
         this.$.popup.innerHTML = html
     }
 
