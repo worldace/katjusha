@@ -71,14 +71,52 @@ $katjusha.clipboard = function(text){
 }
 
 
-class KatjushaToolbar extends HTMLElement{
-    static{
-        customElements.define('katjusha-toolbar', this)
+class kage extends HTMLElement{
+    constructor(template){
+        super()
+        if(!this.shadowRoot){
+            this.attachShadow({mode:'open'})
+            this.shadowRoot.append(template.content.cloneNode(true))
+        }
+
+        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector('#'+name), apply:this.apply})
+        const specialID = {'':this.shadowRoot, 'Host':this, 'Window':window, 'Document':document}
+
+        for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
+            this[method] = this[method].bind(this)
+            const m = method.match(/^\$(.*?)_([^_]+)$/)
+            if(m){
+                const el = specialID[m[1]] ?? this.$('#'+m[1])
+                el.addEventListener(m[2], this[method])
+            }
+        }
     }
 
-    constructor(){
-        super()
-        kit(this)
+    apply(_, self, [arg, ...values]){
+        if(typeof arg === 'string'){
+            if(arg.startsWith('@')){
+                self.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
+            }
+            else if(arg.startsWith('*')){
+                return Array.from(self.shadowRoot.querySelectorAll(arg.slice(1) || '*'))
+            }
+            else{
+                return self.shadowRoot.querySelector(arg)
+            }
+        }
+        else if(Array.isArray(arg)){ //タグ関数で起動
+            const template = document.createElement('template')
+            template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
+
+            return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
+        }
+    }
+}
+
+
+class KatjushaToolbar extends kage{
+    static{
+        customElements.define('katjusha-toolbar', this)
     }
 
     $スレッド投稿アイコン_click(event){
@@ -88,27 +126,17 @@ class KatjushaToolbar extends HTMLElement{
 
 
 
-class KatjushaBorder extends HTMLElement{
+class KatjushaBorder extends kage{
     static{
         customElements.define('katjusha-border', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 }
 
 
-class KatjushaBBS extends HTMLElement{
+class KatjushaBBS extends kage{
     static{
         this.observedAttributes = ['bbslist']
         customElements.define('katjusha-bbs', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 
     attributeChangedCallback(name, _, value){
@@ -169,14 +197,9 @@ class KatjushaBBS extends HTMLElement{
 }
 
 
-class KatjushaSubject extends HTMLElement{
+class KatjushaSubject extends kage{
     static{
         customElements.define('katjusha-subject', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 
     $_contextmenu(event){
@@ -285,14 +308,9 @@ class KatjushaSubject extends HTMLElement{
 }
 
 
-class KatjushaHeadline extends HTMLElement{
+class KatjushaHeadline extends kage{
     static{
         customElements.define('katjusha-headline', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 
     $_contextmenu(event){
@@ -333,14 +351,9 @@ class KatjushaHeadline extends HTMLElement{
 }
 
 
-class KatjushaThread extends HTMLElement{
+class KatjushaThread extends kage{
     static{
         customElements.define('katjusha-thread', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 
     $_click(event){
@@ -490,14 +503,13 @@ class KatjushaThread extends HTMLElement{
 }
 
 
-class KatjushaTab extends HTMLElement{
+class KatjushaTab extends kage{
     static{
         customElements.define('katjusha-tab', this)
     }
 
     constructor(){
         super()
-        kit(this)
         this.openNew()
     }
 
@@ -608,26 +620,20 @@ class KatjushaTab extends HTMLElement{
 }
 
 
-class KatjushaStatus extends HTMLElement{
+class KatjushaStatus extends kage{
     static{
         customElements.define('katjusha-status', this)
-    }
-
-    constructor(){
-        super()
-        kit(this)
     }
 }
 
 
-class KatjushaForm extends HTMLElement{
+class KatjushaForm extends kage{
     static{
         customElements.define('katjusha-form', this)
     }
 
     constructor(url){
-        super()
-        kit(this, $formTemplate)
+        super($formTemplate)
         this.url = url
         this.id  = '$form'
     }
@@ -735,14 +741,13 @@ class KatjushaForm extends HTMLElement{
 }
 
 
-class KatjushaContext extends HTMLElement{
+class KatjushaContext extends kage{
     static{
         customElements.define('katjusha-context', this)
     }
 
     constructor(html){
-        super()
-        kit(this, $contextTemplate)
+        super($contextTemplate)
         this.id = '$context'
         this.$.context.innerHTML = html
 
@@ -768,14 +773,13 @@ class KatjushaContext extends HTMLElement{
 }
 
 
-class KatjushaPopup extends HTMLElement{
+class KatjushaPopup extends kage{
     static{
         customElements.define('katjusha-popup', this)
     }
 
     constructor(html){
-        super()
-        kit(this, $popupTemplate)
+        super($popupTemplate)
         this.id = '$popup'
         this.$.popup.innerHTML = html
     }
@@ -851,45 +855,6 @@ function KB(byte = 0){
 
 function clamp(min, num, max){
     return Math.min(Math.max(min, num), max)
-}
-
-function kit(self, template){
-    if(!self.shadowRoot){
-        self.attachShadow({mode:'open'})
-        self.shadowRoot.append(template.content.cloneNode(true))
-    }
-
-    self.$ = new Proxy(function(){}, {get:(_, name) => self.shadowRoot.querySelector('#'+name), apply})
-    const specialID = {'':self.shadowRoot, 'Host':self, 'Window':window, 'Document':document}
-
-    for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(self))){
-        self[method] = self[method].bind(self)
-        const m = method.match(/^\$(.*?)_([^_]+)$/)
-        if(m){
-            const el = specialID[m[1]] ?? self.$('#'+m[1])
-            el.addEventListener(m[2], self[method])
-        }
-    }
-}
-
-function apply(_, self, [arg, ...values]){
-    if(typeof arg === 'string'){
-        if(arg.startsWith('@')){
-            self.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
-        }
-        else if(arg.startsWith('*')){
-            return Array.from(self.shadowRoot.querySelectorAll(arg.slice(1) || '*'))
-        }
-        else{
-            return self.shadowRoot.querySelector(arg)
-        }
-    }
-    else if(Array.isArray(arg)){ //タグ関数で起動
-        const template = document.createElement('template')
-        template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
-
-        return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
-    }
 }
 
 
