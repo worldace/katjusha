@@ -79,7 +79,7 @@ class kage extends HTMLElement{
             this.shadowRoot.append(template.content.cloneNode(true))
         }
 
-        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector('#'+name)})
+        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
         const specialID = {'':this.shadowRoot, 'Host':this, 'Window':window, 'Document':document}
 
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
@@ -152,7 +152,7 @@ class KatjushaBBS extends kage{
         for(const v of list){
             const [, name, url]    = v.split(' ')
             const [, baseurl, bbs] = url.match(/(.+\/)([^/]+)\/$/)
-            html += `<a href="${url}">${name}</a>`
+            html += `<a href="${url}" id="${url}">${name}</a>`
             $bbs[url] = {category, name, url, baseurl, bbs}
         }
 
@@ -165,7 +165,7 @@ class KatjushaBBS extends kage{
 
     select(el){
         if(typeof el === 'string'){
-            el = this.shadowRoot.querySelector(`[href='${el}']`)
+            el = this.$[el]
         }
 
         if(el){
