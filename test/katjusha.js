@@ -143,7 +143,7 @@ class KatjushaBBS extends HTMLElement{
 
         for(const v of list){
             const [, name, url]    = v.split(' ')
-            const [, baseurl, bbs] = url.match(/(.+\/)([^\/]+)\/$/)
+            const [, baseurl, bbs] = url.match(/(.+\/)([^/]+)\/$/)
             html += `<a href="${url}">${name}</a>`
             $bbs[url] = {category, name, url, baseurl, bbs}
         }
@@ -235,7 +235,7 @@ class KatjushaSubject extends HTMLElement{
 
     toHTML(line, i){
         const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-        const url    = this.bbsurl.replace(/([^\/]+)\/$/, `test/read.cgi/$1/${key}/`)
+        const url    = this.bbsurl.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
         const thread = スレッド[url]
 
         if(thread.num === thread.既得){
@@ -439,7 +439,7 @@ class KatjushaThread extends HTMLElement{
             //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
 
             html += `
-              <article class="レス" data-n="${n}">
+              <article class="res" data-n="${n}">
                 <header><i>${++n}</i><span class="from"><b>${from}</b></span><time>${date}</time><address>${mail}</address></header>
                 <p>${messageHTML}</p>
               </article>
@@ -566,7 +566,7 @@ class KatjushaTab extends HTMLElement{
     }
 
     create(url, subject='', html=''){
-        const thread = tag('div', html, {url, className:'スレッド'})
+        const thread = tag('div', html, {url, className:'thread'})
         $thread.shadowRoot.append(thread)
 
         const tab = tag('li', subject, {url, thread})
@@ -822,7 +822,7 @@ const スレッド = new Proxy({}, {
 function parseURL(url){
     const [,baseurl,bbs,key] = url.match(/^(.+)test\/read.cgi\/([^/])\/(\d+)\/$/)
 
-    return {bbs, key, baseurl, bbsurl:`${baseurl}${bbs}/`}
+    return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
 }
 
 function tag(name, html = '', prop = {}){
