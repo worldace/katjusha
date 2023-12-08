@@ -351,7 +351,7 @@ class KatjushaThread extends HTMLElement{
                 <li><a onclick="$thread.resTo(${event.target.textContent})">これにレス</a></li>
             `).show(event.pageX, event.pageY)
         }
-        else if(event.target.className === 'anker'){
+        else if(event.target.className === 'anchor'){
             event.stopPropagation()
             this.goto(event.target.dataset.n)
         }
@@ -433,7 +433,7 @@ class KatjushaThread extends HTMLElement{
             const [from, mail, date, message, subject] = v.split('<>')
 
             const messageHTML = message
-            .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anker" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
+            .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<span class="anchor" data-n="$1" onmouseenter="$thread.popup(event, $1)" onmouseleave="$popup.remove()">&gt;&gt;$1</span>')
             .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
             .replace(/^ /, '')
             //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
