@@ -1,3 +1,4 @@
+// id振り：タブ。スレッド
 
 $katjusha.start = function(){
     $base.title = document.title
@@ -298,7 +299,7 @@ class KatjushaHeadline extends kage{
     }
 
     $レス更新アイコン_click(event){
-        $katjusha.link($tab.selected.url)
+        $katjusha.link($tab.selected.id)
     }
 
     $中止アイコン_click(event){
@@ -308,11 +309,11 @@ class KatjushaHeadline extends kage{
     }
 
     $レス投稿アイコン_click(event){
-        new KatjushaForm($tab.selected.url).open()
+        new KatjushaForm($tab.selected.id).open()
     }
 
     $ごみ箱アイコン_click(event){
-        const url = $tab.selected.url
+        const url = $tab.selected.id
 
         if(url in スレッド){
             $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
@@ -351,8 +352,8 @@ class KatjushaThread extends kage{
     }
 
     $Host_scroll(event){ // scrollend
-        if(this.selected.url){
-            スレッド[this.selected.url].scroll = this.scrollTop
+        if(this.selected.id){
+            スレッド[this.selected.id].scroll = this.scrollTop
         }
     }
 
@@ -443,7 +444,7 @@ class KatjushaThread extends kage{
     }
 
     render(thread, append){
-        const tab = $tab.find(thread.url) ?? $tab.selected
+        const tab = $tab.$[thread.url] ?? $tab.selected
 
         tab.innerHTML = thread.subject
         if(append){
@@ -500,7 +501,7 @@ class KatjushaTab extends kage{
     }
 
     $_dblclick(event){
-        if(event.target.tagName === 'LI' && event.target.url){
+        if(event.target.tagName === 'LI' && event.target.id){
             $headline.$.レス更新アイコン.click()
         }
     }
@@ -511,30 +512,23 @@ class KatjushaTab extends kage{
 
         if(event.target.tagName === 'LI'){
             new KatjushaContext(`
-                <li><a onclick="$tab.close('${event.target.url}')">閉じる</a></li>
-                <li><a onclick="$tab.closeAll('${event.target.url}')">このタブ以外全て閉じる</a></li>
-                <li><a onclick="$katjusha.clipboard('${event.target.url}')">URLをコピー</a></li>
-                <li><a onclick="$katjusha.clipboard('${event.target.innerHTML}\\n${event.target.url}\\n')">タイトルとURLをコピー</a></li>
+                <li><a onclick="$tab.close('${event.target.id}')">閉じる</a></li>
+                <li><a onclick="$tab.closeAll('${event.target.id}')">このタブ以外全て閉じる</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.id}')">URLをコピー</a></li>
+                <li><a onclick="$katjusha.clipboard('${event.target.innerHTML}\\n${event.target.id}\\n')">タイトルとURLをコピー</a></li>
             `).show(event.pageX, event.pageY)
         }
     }
 
-    find(url){
-        return Array.from(this.$.tab.children).find(v => v.url === url)
-    }
-
     open(url, thread = {}){
-        const tab = this.find(url)
-        tab ? this.select(tab) : this.overwrite(url, thread.subject, thread.html)
+        this.$[url] ? this.select(this.$[url]) : this.overwrite(url, thread.subject, thread.html)
     }
 
     openNew(url, thread = {}){
-        const tab = this.find(url)
-
-        if(tab){
-            this.select(tab)
+        if(url && this.$[url]){
+            this.select(this.$[url])
         }
-        else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.url){
+        else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.id){
             this.overwrite(url, thread.subject, thread.html)
         }
         else{
@@ -548,36 +542,36 @@ class KatjushaTab extends kage{
         this.selected = tab
         $thread.select(tab.thread)
 
-        if(tab.url){
-            const thread       = スレッド[tab.url]
+        if(tab.id){
+            const thread       = スレッド[tab.id]
             $thread.scrollTop  = thread.scroll
             $title.textContent = thread.subject
             $headline.render(thread)
-            history.replaceState(null, null, tab.url)
+            history.replaceState(null, null, tab.id)
         }
     }
 
-    create(url, subject='', html=''){
-        const thread = tag('div', html, {url, className:'thread'})
+    create(url = '', subject='', html=''){
+        const thread = tag('div', html, {id:url, className:'thread'})
         $thread.shadowRoot.append(thread)
 
-        const tab = tag('li', subject, {url, thread})
+        const tab = tag('li', subject, {id:url, thread})
         this.$.tab.append(tab)
         this.select(tab)
     }
 
     overwrite(url, subject='', html=''){
-        this.selected.url              = url
+        this.selected.id               = url
         this.selected.innerHTML        = subject
-        this.selected.thread.url       = url
+        this.selected.thread.id        = url
         this.selected.thread.innerHTML = html
     }
 
     close(tab){
         if(typeof tab === 'string'){
-            tab = this.find(tab)
+            tab = this.$[tab]
         }
-        if(tab?.url){
+        if(tab?.id){
             const select = tab.previousElementSibling ?? tab.nextElementSibling
             select ? this.select(select) : this.openNew()
 
@@ -588,14 +582,14 @@ class KatjushaTab extends kage{
 
     closeAll(url){
         for(const tab of Array.from(this.$.tab.children)){
-            if(tab.url !== url){
+            if(tab.id !== url){
                 this.close(tab)
             }
         }
     }
 
     loading(url, bool = true){
-        this.find(url)?.toggleAttribute('loading', bool)
+        this.$[url]?.toggleAttribute('loading', bool)
     }
 }
 
