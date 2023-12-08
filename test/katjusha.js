@@ -199,7 +199,7 @@ class KatjushaSubject extends kage{
 
         if(tr && event.target.cellIndex < 7){
             this.select(tr)
-            $katjusha.link(tr.dataset.url)
+            $katjusha.link(tr.id)
         }
     }
 
@@ -212,11 +212,10 @@ class KatjushaSubject extends kage{
         event.stopPropagation()
 
         this.select(tr)
-        const url = tr.dataset.url
         new KatjushaContext(`
-            <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
-            <li><a onclick="$katjusha.clipboard('${url}')">URLをコピー</a></li>
-            <li><a onclick="$katjusha.clipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+            <li><a onclick="$katjusha.link('${tr.id}', '_blank')">新しいタブで開く</a></li>
+            <li><a onclick="$katjusha.clipboard('${tr.id}')">URLをコピー</a></li>
+            <li><a onclick="$katjusha.clipboard('${スレッド[tr.id].subject}\\n${tr.id}\\n')">タイトルとURLをコピー</a></li>
         `).show(event.pageX, event.pageY)
     }
 
@@ -247,7 +246,7 @@ class KatjushaSubject extends kage{
         }
         thread.subject = subject
 
-        return `<tr data-url="${url}">
+        return `<tr id="${url}">
                   <td>${i+1}</td>
                   <td><a href="${url}">${subject}</a></td>
                   <td>${num}</td>
@@ -266,7 +265,7 @@ class KatjushaSubject extends kage{
     }
 
     update(thread){
-        const tr = Array.from(this.$.tbody.rows).find(v => v.dataset.url === thread.url)
+        const tr = this.$[thread.url]
 
         if(tr){
             this.select(tr)
