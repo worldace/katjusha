@@ -79,36 +79,16 @@ class kage extends HTMLElement{
             this.shadowRoot.append(template.content.cloneNode(true))
         }
 
-        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector('#'+name), apply:this.apply})
+        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector('#'+name)})
         const specialID = {'':this.shadowRoot, 'Host':this, 'Window':window, 'Document':document}
 
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
             this[method] = this[method].bind(this)
             const m = method.match(/^\$(.*?)_([^_]+)$/)
             if(m){
-                const el = specialID[m[1]] ?? this.$('#'+m[1])
+                const el = specialID[m[1]] ?? this.$[m[1]]
                 el.addEventListener(m[2], this[method])
             }
-        }
-    }
-
-    apply(_, self, [arg, ...values]){
-        if(typeof arg === 'string'){
-            if(arg.startsWith('@')){
-                self.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
-            }
-            else if(arg.startsWith('*')){
-                return Array.from(self.shadowRoot.querySelectorAll(arg.slice(1) || '*'))
-            }
-            else{
-                return self.shadowRoot.querySelector(arg)
-            }
-        }
-        else if(Array.isArray(arg)){ //タグ関数で起動
-            const template = document.createElement('template')
-            template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
-
-            return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
         }
     }
 }
@@ -185,7 +165,7 @@ class KatjushaBBS extends kage{
 
     select(el){
         if(typeof el === 'string'){
-            el = this.$(`[href='${el}']`)
+            el = this.shadowRoot.querySelector(`[href='${el}']`)
         }
 
         if(el){
