@@ -200,20 +200,20 @@ class KatjushaSubject extends HTMLElement{
     }
 
     $tbody_contextmenu(event){
+        const tr = event.target.closest('tr')
+        if(!tr){
+            return
+        }
         event.preventDefault()
         event.stopPropagation()
-        const tr = event.target.closest('tr')
 
-        if(tr){
-            const url = tr.dataset.url
-            this.select(tr)
-
-            new KatjushaContext(`
-                <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
-                <li><a onclick="$katjusha.clipboard('${url}')">URLをコピー</a></li>
-                <li><a onclick="$katjusha.clipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
-            `).show(event.pageX, event.pageY)
-        }
+        this.select(tr)
+        const url = tr.dataset.url
+        new KatjushaContext(`
+            <li><a onclick="$katjusha.link('${url}', '_blank')">新しいタブで開く</a></li>
+            <li><a onclick="$katjusha.clipboard('${url}')">URLをコピー</a></li>
+            <li><a onclick="$katjusha.clipboard('${スレッド[url].subject}\\n${url}\\n')">タイトルとURLをコピー</a></li>
+        `).show(event.pageX, event.pageY)
     }
 
     recieve(response, url){
@@ -357,36 +357,9 @@ class KatjushaThread extends HTMLElement{
         }
     }
 
-    $Host_scroll(event){
+    $Host_scroll(event){ // scrollend
         if(this.selected.url){
             スレッド[this.selected.url].scroll = this.scrollTop
-        }
-    }
-
-    select(el){
-        this.selected?.removeAttribute('selected')
-        this.selected = el
-        el.setAttribute('selected', true)
-    }
-
-    goto(n){
-        this.selected.children[n-1]?.scrollIntoView()
-    }
-
-    resTo(n){
-        $headline.$.レス投稿アイコン.click()
-        $form.insert(`>>${n}\n`)
-    }
-
-    popup(event, n){
-        const el = this.selected.children[n-1]
-
-        if(el){
-            const {left, width, top} = event.target.getBoundingClientRect()
-            const x = left + width / 2
-            const y = innerHeight - top + 6
-
-            new KatjushaPopup(el.outerHTML).show(x, y)
         }
     }
 
@@ -477,7 +450,8 @@ class KatjushaThread extends HTMLElement{
     }
 
     render(thread, append){
-        const tab     = $tab.find(thread.url) ?? $tab.selected
+        const tab = $tab.find(thread.url) ?? $tab.selected
+
         tab.innerHTML = thread.subject
         if(append){
             tab.thread.insertAdjacentHTML('beforeend', append)
@@ -485,6 +459,33 @@ class KatjushaThread extends HTMLElement{
         else{
             tab.thread.innerHTML = thread.html
         }
+    }
+
+    select(el){
+        this.selected?.removeAttribute('selected')
+        this.selected = el
+        el.setAttribute('selected', true)
+    }
+
+    goto(n){
+        this.selected.children[n-1]?.scrollIntoView()
+    }
+
+    popup(event, n){
+        const el = this.selected.children[n-1]
+
+        if(el){
+            const {left, width, top} = event.target.getBoundingClientRect()
+            const x = left + width / 2
+            const y = innerHeight - top + 6
+
+            new KatjushaPopup(el.outerHTML).show(x, y)
+        }
+    }
+
+    resTo(n){
+        $headline.$.レス投稿アイコン.click()
+        $form.insert(`>>${n}\n`)
     }
 
     URLParse(url){
