@@ -20,7 +20,7 @@ $katjusha.onclick = function(event){
         event.preventDefault()
         $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
     }
-    else if(href?.includes('read.cgi') && $thread.URLParse(href).bbsurl in $bbs){
+    else if(href?.includes('read.cgi') && parseURL(href).bbsurl in $bbs){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
@@ -487,14 +487,6 @@ class KatjushaThread extends HTMLElement{
         $headline.$.レス投稿アイコン.click()
         $form.insert(`>>${n}\n`)
     }
-
-    URLParse(url){
-        const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
-        const baseurl    = url.replace(/\/test\/.+/, `/`)
-        const bbsurl     = `${baseurl}${bbs}/`
-
-        return {bbs, key, bbsurl, baseurl}
-    }
 }
 
 
@@ -635,9 +627,9 @@ class KatjushaForm extends HTMLElement{
 
     constructor(url){
         super()
+        kit(this, $formTemplate)
         this.url = url
         this.id  = '$form'
-        kit(this, $formTemplate)
     }
 
     $_contextmenu(event){
@@ -750,9 +742,8 @@ class KatjushaContext extends HTMLElement{
 
     constructor(html){
         super()
-
-        this.id   = '$context'
         kit(this, $contextTemplate)
+        this.id = '$context'
         this.$.context.innerHTML = html
 
         window.$context?.remove()
@@ -800,7 +791,7 @@ class KatjushaPopup extends HTMLElement{
 const スレッド = new Proxy({}, {
     get(target, url){
         if(!(url in target)){
-            const {bbs, key, bbsurl, baseurl} = $thread.URLParse(url)
+            const {bbs, key, bbsurl, baseurl} = parseURL(url)
 
             target[url] = {
                 url     : url,
@@ -827,6 +818,13 @@ const スレッド = new Proxy({}, {
     }
 })
 
+
+function parseURL(url){
+    const [,bbs,key] = url.match(/([^\/]+)\/([^\/]+)\/$/)
+    const baseurl    = url.replace(/\/test\/.+/, '/')
+
+    return {bbs, key, baseurl, bbsurl:`${baseurl}${bbs}/`}
+}
 
 function tag(name, html = '', prop = {}){
     const el = document.createElement(name)
