@@ -1,4 +1,3 @@
-// id振り：タブ。スレッド
 
 $katjusha.start = function(){
     $base.title = document.title
@@ -72,12 +71,21 @@ $katjusha.clipboard = function(text){
 }
 
 
-class kage extends HTMLElement{
-    constructor(template){
+class Kage extends HTMLElement{
+    constructor(){
         super()
         if(!this.shadowRoot){
             this.attachShadow({mode:'open'})
-            this.shadowRoot.append(template.content.cloneNode(true))
+            
+            if(this.html){
+                const html = this.html()
+                if(typeof html === 'string'){
+                    this.shadowRoot.innerHTML = html
+                }
+                else if(html instanceof HTMLTemplateElement){
+                    this.shadowRoot.append(html.content.cloneNode(true))
+                }
+            }
         }
 
         this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
@@ -95,7 +103,7 @@ class kage extends HTMLElement{
 }
 
 
-class KatjushaToolbar extends kage{
+class KatjushaToolbar extends Kage{
     static{
         customElements.define('katjusha-toolbar', this)
     }
@@ -107,14 +115,14 @@ class KatjushaToolbar extends kage{
 
 
 
-class KatjushaBorder extends kage{
+class KatjushaBorder extends Kage{
     static{
         customElements.define('katjusha-border', this)
     }
 }
 
 
-class KatjushaBBS extends kage{
+class KatjushaBBS extends Kage{
     static{
         this.observedAttributes = ['bbslist']
         customElements.define('katjusha-bbs', this)
@@ -178,7 +186,7 @@ class KatjushaBBS extends kage{
 }
 
 
-class KatjushaSubject extends kage{
+class KatjushaSubject extends Kage{
     static{
         customElements.define('katjusha-subject', this)
     }
@@ -288,7 +296,7 @@ class KatjushaSubject extends kage{
 }
 
 
-class KatjushaHeadline extends kage{
+class KatjushaHeadline extends Kage{
     static{
         customElements.define('katjusha-headline', this)
     }
@@ -331,7 +339,7 @@ class KatjushaHeadline extends kage{
 }
 
 
-class KatjushaThread extends kage{
+class KatjushaThread extends Kage{
     static{
         customElements.define('katjusha-thread', this)
     }
@@ -483,7 +491,7 @@ class KatjushaThread extends kage{
 }
 
 
-class KatjushaTab extends kage{
+class KatjushaTab extends Kage{
     static{
         customElements.define('katjusha-tab', this)
     }
@@ -593,20 +601,20 @@ class KatjushaTab extends kage{
 }
 
 
-class KatjushaStatus extends kage{
+class KatjushaStatus extends Kage{
     static{
         customElements.define('katjusha-status', this)
     }
 }
 
 
-class KatjushaForm extends kage{
+class KatjushaForm extends Kage{
     static{
         customElements.define('katjusha-form', this)
     }
 
     constructor(url){
-        super($formTemplate)
+        super()
         this.url = url
         this.id  = '$form'
     }
@@ -645,6 +653,10 @@ class KatjushaForm extends kage{
         this.disable(true)
         const response = await $katjusha.fetch(this.$.form.action, {method:'POST', body:new FormData(this.$.form)})
         KatjushaForm.recieve(response, this.url)
+    }
+
+    html(){
+        return $KatjushaFormTemplate
     }
 
     open(){
@@ -714,13 +726,13 @@ class KatjushaForm extends kage{
 }
 
 
-class KatjushaContext extends kage{
+class KatjushaContext extends Kage{
     static{
         customElements.define('katjusha-context', this)
     }
 
     constructor(html){
-        super($contextTemplate)
+        super()
         this.id = '$context'
         this.$.context.innerHTML = html
 
@@ -738,6 +750,10 @@ class KatjushaContext extends kage{
         event.preventDefault()
     }
 
+    html(){
+        return $KatjushaContextTemplate
+    }
+
     show(x, y){
         this.style.left = `${x}px`
         this.style.top  = `${y}px`
@@ -746,15 +762,19 @@ class KatjushaContext extends kage{
 }
 
 
-class KatjushaPopup extends kage{
+class KatjushaPopup extends Kage{
     static{
         customElements.define('katjusha-popup', this)
     }
 
     constructor(html){
-        super($popupTemplate)
+        super()
         this.id = '$popup'
         this.$.popup.innerHTML = html
+    }
+
+    html(){
+        return $KatjushaPopupTemplate
     }
 
     show(x, y){
