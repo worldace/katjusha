@@ -76,16 +76,14 @@ class Kage extends HTMLElement{
         super()
         if(!this.shadowRoot){
             this.attachShadow({mode:'open'})
-            
-            if(this.html){
-                const html = this.html()
-                if(typeof html === 'string'){
-                    this.shadowRoot.innerHTML = html
-                }
-                else if(html instanceof HTMLTemplateElement){
-                    this.shadowRoot.append(html.content.cloneNode(true))
-                }
-            }
+        }
+
+        const html = this.html?.()
+        if(typeof html === 'string'){
+            this.shadowRoot.innerHTML = html
+        }
+        else if(html instanceof HTMLTemplateElement){
+            this.shadowRoot.append(html.content.cloneNode(true))
         }
 
         this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
