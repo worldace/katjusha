@@ -107,7 +107,7 @@ class KatjushaToolbar extends Kage{
     }
 
     $スレッド投稿アイコン_click(event){
-        new KatjushaForm($subject.bbsurl).open()
+        new KatjushaForm($bbs.selected.id).open()
     }
 }
 
@@ -227,12 +227,11 @@ class KatjushaSubject extends Kage{
 
     recieve(response, url){
         if(response.status === 200){
-            this.bbsurl = url
+            $bbs.select(url)
             this.scrollTop = 0
             this.$.tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML).join('')
 
             $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
-            $bbs.select(url)
 
             $status.textContent = `${this.$.tbody.rows.length}件のスレッドを受信 (${date()})`
             history.replaceState(null, null, url)
@@ -244,7 +243,7 @@ class KatjushaSubject extends Kage{
 
     toHTML(line, i){
         const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-        const url    = this.bbsurl.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
+        const url    = $bbs.selected.id.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
         const thread = スレッド[url]
 
         if(thread.num === thread.既得){
@@ -530,7 +529,7 @@ class KatjushaTab extends Kage{
     }
 
     openNew(url, thread = {}){
-        if(url && this.$[url]){
+        if(this.$[url]){
             this.select(this.$[url])
         }
         else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.id){
