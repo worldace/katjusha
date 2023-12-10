@@ -166,10 +166,6 @@ class KatjushaBBS extends Kage{
         return `<details open><summary>${category}</summary>${html}</details>`
     }
 
-    name(url){
-        return $bbs[url]?.name
-    }
-
     select(el){
         if(typeof el === 'string'){
             el = this.$[el]
@@ -231,7 +227,7 @@ class KatjushaSubject extends Kage{
             this.scrollTop = 0
             this.$.tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML).join('')
 
-            $title.textContent = `${$base.title} [ ${$bbs.name(url)} ]`
+            $title.textContent = `${$base.title} [ ${$bbs[url].name} ]`
 
             $status.textContent = `${this.$.tbody.rows.length}件のスレッドを受信 (${date()})`
             history.replaceState(null, null, url)
@@ -792,7 +788,7 @@ const スレッド = new Proxy({}, {
                 key     : key,
                 bbs     : bbs,
                 bbsurl  : bbsurl,
-                bbsname : $bbs.name(bbsurl),
+                bbsname : $bbs[bbsurl].name,
                 baseurl : baseurl,
                 daturl  : `${bbsurl}dat/${key}.dat`,
                 subject : '',
