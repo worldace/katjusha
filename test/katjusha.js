@@ -643,9 +643,26 @@ class KatjushaForm extends Kage{
 
     async $form_submit(event){
         event.preventDefault()
-        this.disable(true)
+        this.$.submit.disabled = true
+
         const response = await $katjusha.fetch(this.$.form.action, {method:'POST', body:new FormData(this.$.form)})
-        KatjushaForm.recieve(response, this.url)
+
+        this.$.submit.disabled = false
+        $status.textContent = ``
+
+        if(!response.ok){
+            alert('エラーが発生して投稿できませんでした')
+        }
+        else if(response.content.includes('ＥＲＲＯＲ！')){
+            alert( response.content.match(/<b>(.+?)</i)[1] )
+        }
+        else{
+            if(this.url.includes('read.cgi')){
+                スレッド[this.url].最終書き込み = date()
+            }
+            this.remove()
+            $katjusha.link(this.url)
+        }
     }
 
     html(){
@@ -692,29 +709,6 @@ class KatjushaForm extends Kage{
 
         this.$.message.value = this.$.message.value.slice(0, i) + text + this.$.message.value.slice(i)
         this.$.message.focus()
-    }
-
-    disable(bool){
-        this.$.submit.toggleAttribute('disabled', bool)
-    }
-
-    static recieve(response, url){
-        window.$form?.disable(false)
-        $status.textContent = ``
-
-        if(response.status !== 200){
-            alert('エラーが発生して投稿できませんでした')
-        }
-        else if(response.content.includes('ＥＲＲＯＲ！')){
-            alert( response.content.match(/<b>(.+?)</i)[1] )
-        }
-        else{
-            if(url.includes('read.cgi')){
-                スレッド[url].最終書き込み = date()
-            }
-            window.$form?.remove()
-            $katjusha.link(url)
-        }
     }
 }
 
