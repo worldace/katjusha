@@ -106,15 +106,13 @@ class Kage extends HTMLElement{
 
     static $(arg, ...values){
         if(typeof arg === 'string'){
-            const node = !this ? document : this.shadowRoot
             if(arg.startsWith('@')){
+                const node = !this ? window : this
                 node.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
             }
-            else if(arg.startsWith('*')){
-                return Array.from(node.querySelectorAll(arg.slice(1) || '*'))
-            }
             else{
-                return node.querySelector(arg)
+                const node = !this ? document : this.shadowRoot
+                return arg.startsWith('*') ? Array.from(node.querySelectorAll(arg.slice(1) || '*')) : node.querySelector(arg)
             }
         }
         else if(Array.isArray(arg)){ //タグ関数で起動
