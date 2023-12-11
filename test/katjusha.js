@@ -634,6 +634,7 @@ class KatjushaForm extends Kage{
         super()
         this.url = url
         this.id  = '$form'
+        this.className = 'window'
     }
 
     $_contextmenu(event){
@@ -694,7 +695,7 @@ class KatjushaForm extends Kage{
     }
 
     open(){
-        if(!this.url || window.$form){
+        if(!this.url || $('.window')){
             return
         }
 
