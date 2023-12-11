@@ -1,4 +1,5 @@
 
+
 $katjusha.start = function(){
     $base.title = document.title
     $toolbar.$.全板ボタン.textContent = `▽${document.title}`
@@ -72,6 +73,10 @@ $katjusha.clipboard = function(text){
 
 
 class Kage extends HTMLElement{
+    static{
+        window.$ = this.$
+    }
+
     constructor(){
         super()
         if(!this.shadowRoot){
@@ -86,7 +91,7 @@ class Kage extends HTMLElement{
             this.shadowRoot.append(html.content.cloneNode(true))
         }
 
-        this.$ = new Proxy(function(){}, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
+        this.$ = new Proxy(Kage.$, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
         const specialID = {'':this.shadowRoot, 'Host':this, 'Window':window, 'Document':document}
 
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
@@ -96,6 +101,27 @@ class Kage extends HTMLElement{
                 const el = specialID[m[1]] ?? this.$[m[1]]
                 el.addEventListener(m[2], this[method])
             }
+        }
+    }
+
+    static $(arg, ...values){
+        if(typeof arg === 'string'){
+            const node = !this ? document : this.shadowRoot
+            if(arg.startsWith('@')){
+                node.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
+            }
+            else if(arg.startsWith('*')){
+                return Array.from(node.querySelectorAll(arg.slice(1) || '*'))
+            }
+            else{
+                return node.querySelector(arg)
+            }
+        }
+        else if(Array.isArray(arg)){ //タグ関数で起動
+            const template = document.createElement('template')
+            template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
+
+            return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
         }
     }
 }
