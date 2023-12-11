@@ -196,9 +196,9 @@ class KatjushaBBS extends Kage{
         }
 
         if(el){
-            this.selected?.removeAttribute('selected')
+            this.selected?.classList.remove('selected')
+            el.classList.add('selected')
             this.selected = el
-            el.setAttribute('selected', true)
         }
     }
 }
@@ -284,9 +284,9 @@ class KatjushaSubject extends Kage{
     }
 
     select(el){
-        this.selected?.removeAttribute('selected')
+        this.selected?.classList.remove('selected')
+        el.classList.add('selected')
         this.selected = el
-        el.setAttribute('selected', true)
     }
 
     update(thread){
@@ -480,9 +480,9 @@ class KatjushaThread extends Kage{
     }
 
     select(el){
-        this.selected?.removeAttribute('selected')
+        this.selected?.classList.remove('selected')
+        el.classList.add('selected')
         this.selected = el
-        el.setAttribute('selected', true)
     }
 
     goto(n){
@@ -561,8 +561,8 @@ class KatjushaTab extends Kage{
     }
 
     select(tab){
-        this.selected?.removeAttribute('selected')
-        tab.setAttribute('selected', true)
+        this.selected?.classList.remove('selected')
+        tab.classList.add('selected')
         this.selected = tab
         $thread.select(tab.thread)
 
