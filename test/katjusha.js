@@ -83,12 +83,12 @@ class Kage extends HTMLElement{
             this.attachShadow({mode:'open'})
         }
 
-        const html = this.html?.()
-        if(typeof html === 'string'){
-            this.shadowRoot.innerHTML = html
+        const template = this.template?.()
+        if(typeof template === 'string'){
+            this.shadowRoot.innerHTML = template
         }
-        else if(html instanceof HTMLTemplateElement){
-            this.shadowRoot.append(html.content.cloneNode(true))
+        else if(template instanceof HTMLTemplateElement){
+            this.shadowRoot.append(template.content.cloneNode(true))
         }
 
         this.$ = new Proxy(Kage.$, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
@@ -690,7 +690,7 @@ class KatjushaForm extends Kage{
         }
     }
 
-    html(){
+    template(){
         return $KatjushaFormTemplate
     }
 
@@ -762,7 +762,7 @@ class KatjushaContext extends Kage{
         event.preventDefault()
     }
 
-    html(){
+    template(){
         return $KatjushaContextTemplate
     }
 
@@ -785,7 +785,7 @@ class KatjushaPopup extends Kage{
         this.$.popup.innerHTML = html
     }
 
-    html(){
+    template(){
         return $KatjushaPopupTemplate
     }
 
