@@ -605,7 +605,7 @@ class KatjushaTab extends Kage{
     }
 
     closeAll(url){
-        for(const tab of Array.from(this.$.tab.children)){
+        for(const tab of this.$('*li')){
             if(tab.id !== url){
                 this.close(tab)
             }
