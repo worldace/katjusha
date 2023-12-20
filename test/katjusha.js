@@ -107,12 +107,12 @@ class Kage extends HTMLElement{
     static $(arg, ...values){
         if(typeof arg === 'string'){
             if(arg.startsWith('@')){
-                const node = !this ? window : this
-                node.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
+                const context = this instanceof Kage ? this : window
+                context.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
             }
             else{
-                const node = !this ? document : this.shadowRoot
-                return arg.startsWith('*') ? Array.from(node.querySelectorAll(arg.slice(1) || '*')) : node.querySelector(arg)
+                const context = this instanceof Kage ? this.shadowRoot : document
+                return arg.startsWith('*') ? Array.from(context.querySelectorAll(arg.slice(1) || '*')) : context.querySelector(arg)
             }
         }
         else if(Array.isArray(arg)){ //タグ関数で起動
