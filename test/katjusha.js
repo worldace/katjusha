@@ -241,7 +241,7 @@ class KatjushaSubject extends Kage{
         new KatjushaContext(`
             <li><a onclick="$katjusha.link('${tr.id}', '_blank')">新しいタブで開く</a></li>
             <li><a onclick="$katjusha.clipboard('${tr.id}')">URLをコピー</a></li>
-            <li><a onclick="$katjusha.clipboard('${スレッド[tr.id].subject}\\n${tr.id}\\n')">タイトルとURLをコピー</a></li>
+            <li><a onclick="$katjusha.clipboard('${tr.cells[1].textContent}\\n${tr.id}\\n')">タイトルとURLをコピー</a></li>
         `).show(event.pageX, event.pageY)
     }
 
@@ -340,8 +340,8 @@ class KatjushaHeadline extends Kage{
         const url = $tab.selected.id
 
         if(url in スレッド){
-            $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
             delete スレッド[url]
+            $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
         }
     }
 
