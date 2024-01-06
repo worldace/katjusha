@@ -116,10 +116,25 @@ class Kage extends HTMLElement{
             }
         }
         else if(Array.isArray(arg)){ //タグ関数で起動
-            const template = document.createElement('template')
-            template.innerHTML = arg.reduce((result, v, i) => result + values[i-1] + v).trim()
+            const props = []
+            let template = document.createElement('template')
+            template.innerHTML = arg.reduce(function(result, v, i){
+                if(typeof values[i-1] === 'object'){
+                    props.push(values[i-1])
+                    return result + v
+                }
+                else{
+                    return result + values[i-1] + v
+                }
+            }).trim()
+            template = template.content
 
-            return template.content.childNodes.length === 1 ? template.content.firstChild : template.content
+            for(const el of template.querySelectorAll('[_]')){
+                el.removeAttribute('_')
+                Object.assign(el, props.shift())
+            }
+
+            return template.childNodes.length === 1 ? template.firstChild : template
         }
     }
 }
@@ -575,11 +590,11 @@ class KatjushaTab extends Kage{
         }
     }
 
-    create(url = '', subject='', html=''){
-        const thread = tag('div', html, {id:url, className:'thread'})
+    create(url='', subject='', html=''){
+        const thread = $`<div id="${url}" class="thread">${html}</div>`
         $thread.shadowRoot.append(thread)
 
-        const tab = tag('li', subject, {id:url, thread})
+        const tab = $`<li id="${url}" _=${{thread}}>${subject}</li>`
         this.$.tab.append(tab)
         this.select(tab)
     }
@@ -832,13 +847,6 @@ function parseURL(url){
     const [,baseurl,bbs,key] = url.match(/^(.+)test\/read.cgi\/([^/])\/(\d+)\/$/)
 
     return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
-}
-
-function tag(name, html = '', prop = {}){
-    const el = document.createElement(name)
-    el.innerHTML = html
-
-    return Object.assign(el, prop)
 }
 
 function date(){
