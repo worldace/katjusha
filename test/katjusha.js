@@ -487,10 +487,10 @@ class KatjushaThread extends Kage{
 
         tab.innerHTML = thread.subject
         if(append){
-            this.$[thread.url].insertAdjacentHTML('beforeend', append)
+            tab.thread.insertAdjacentHTML('beforeend', append)
         }
         else{
-            this.$[thread.url].innerHTML = thread.html
+            tab.thread.innerHTML = thread.html
         }
     }
 
@@ -614,7 +614,7 @@ class KatjushaTab extends Kage{
             const select = tab.previousElementSibling ?? tab.nextElementSibling
             select ? this.select(select) : this.openNew()
 
-            $thread.$[tab.id].remove()
+            tab.thread.remove()
             tab.remove()
         }
     }
