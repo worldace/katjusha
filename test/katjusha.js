@@ -530,7 +530,7 @@ class KatjushaTab extends Kage{
 
     constructor(){
         super()
-        this.openNew()
+        this.add()
     }
 
     $_click(event){
@@ -560,14 +560,19 @@ class KatjushaTab extends Kage{
     }
 
     open(url, thread = {}){
-        this.$[url] ? this.select(this.$[url]) : this.overwrite(url, thread.subject, thread.html)
+        if(this.$[url]){
+            this.select(this.$[url])
+        }
+        else{
+            this.overwrite(url, thread.subject, thread.html)
+        }
     }
 
     openNew(url, thread = {}){
         if(this.$[url]){
             this.select(this.$[url])
         }
-        else if(this.$.tab.childElementCount === 1 && !this.$.tab.firstElementChild.id){
+        else if(!this.selected.id){
             this.overwrite(url, thread.subject, thread.html)
         }
         else{
@@ -610,8 +615,8 @@ class KatjushaTab extends Kage{
         const tab = this.$[url]
 
         if(tab){
-            const select = tab.previousElementSibling ?? tab.nextElementSibling
-            select ? this.select(select) : this.openNew()
+            const sibling = tab.previousElementSibling ?? tab.nextElementSibling
+            sibling ? this.select(sibling) : this.add()
 
             tab.thread.remove()
             tab.remove()
