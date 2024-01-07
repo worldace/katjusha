@@ -622,11 +622,7 @@ class KatjushaTab extends Kage{
     }
 
     closeAll(url){
-        for(const tab of this.$('*li')){
-            if(tab.id !== url){
-                this.close(tab.id)
-            }
-        }
+        this.$('*li').forEach(el => el.id !== url && this.close(el.id))
     }
 
     loading(url, bool = true){
