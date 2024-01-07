@@ -361,7 +361,7 @@ class KatjushaHeadline extends Kage{
     }
 
     $タブ閉じるアイコン_click(event){
-        $tab.close($tab.selected)
+        $tab.close($tab.selected.id)
     }
 
     render(thread){
@@ -606,11 +606,10 @@ class KatjushaTab extends Kage{
         this.selected.thread.innerHTML = html
     }
 
-    close(tab){
-        if(typeof tab === 'string'){
-            tab = this.$[tab]
-        }
-        if(tab?.id){
+    close(url){
+        const tab = this.$[url]
+
+        if(tab){
             const select = tab.previousElementSibling ?? tab.nextElementSibling
             select ? this.select(select) : this.openNew()
 
@@ -622,7 +621,7 @@ class KatjushaTab extends Kage{
     closeAll(url){
         for(const tab of this.$('*li')){
             if(tab.id !== url){
-                this.close(tab)
+                this.close(tab.id)
             }
         }
     }
