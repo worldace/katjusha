@@ -615,9 +615,7 @@ class KatjushaTab extends Kage{
         const tab = this.$[url]
 
         if(tab){
-            const sibling = tab.previousElementSibling ?? tab.nextElementSibling
-            sibling ? this.select(sibling) : this.add()
-
+            this.$.tab.childElementCount === 1 ? this.add() : this.select(tab.previousElementSibling ?? tab.nextElementSibling)
             tab.thread.remove()
             tab.remove()
         }
