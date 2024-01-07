@@ -571,7 +571,7 @@ class KatjushaTab extends Kage{
             this.overwrite(url, thread.subject, thread.html)
         }
         else{
-            this.create(url, thread.subject, thread.html)
+            this.add(url, thread.subject, thread.html)
         }
     }
 
@@ -590,7 +590,7 @@ class KatjushaTab extends Kage{
         }
     }
 
-    create(url='', subject='', html=''){
+    add(url='', subject='', html=''){
         const thread = $`<div id="${url}" class="thread">${html}</div>`
         $thread.shadowRoot.append(thread)
 
