@@ -541,7 +541,7 @@ class KatjushaTab extends Kage{
 
     $_dblclick(event){
         if(event.target.tagName === 'LI' && event.target.id){
-            $headline.$.レス更新アイコン.click()
+            $katjusha.link(event.target.id)
         }
     }
 
