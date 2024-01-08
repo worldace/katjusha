@@ -115,7 +115,7 @@ class Kage extends HTMLElement{
                 return arg.startsWith('*') ? Array.from(context.querySelectorAll(arg.slice(1) || '*')) : context.querySelector(arg)
             }
         }
-        else if(Array.isArray(arg)){ //タグ関数で起動
+        else if(Array.isArray(arg) && arg.raw){ //タグ関数で起動
             const props = []
             let template = document.createElement('template')
             template.innerHTML = arg.reduce(function(result, v, i){
