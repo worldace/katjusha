@@ -26,7 +26,7 @@ $katjusha.onclick = function(event){
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
 
-        target ? $tab.openNew(href, thread) : $tab.open(href, thread)
+        $tab.open(href, thread, target)
         $tab.loading(href)
 
         $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
@@ -559,20 +559,11 @@ class KatjushaTab extends Kage{
         }
     }
 
-    open(url, thread = {}){
+    open(url, thread = {}, target){
         if(this.$[url]){
             this.select(this.$[url])
         }
-        else{
-            this.overwrite(url, thread.subject, thread.html)
-        }
-    }
-
-    openNew(url, thread = {}){
-        if(this.$[url]){
-            this.select(this.$[url])
-        }
-        else if(!this.selected.id){
+        else if(!target || !this.selected.id){
             this.overwrite(url, thread.subject, thread.html)
         }
         else{
@@ -622,7 +613,7 @@ class KatjushaTab extends Kage{
     }
 
     closeAll(url){
-        this.$('*li').forEach(el => el.id !== url && this.close(el.id))
+        this.$('*li').forEach(li => li.id !== url && this.close(li.id))
     }
 
     loading(url, bool = true){
