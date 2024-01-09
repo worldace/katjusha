@@ -827,7 +827,7 @@ const スレッド = new Proxy({}, {
 
 
 function parseURL(url){
-    const [,baseurl,bbs,key] = url.match(/^(.+)test\/read.cgi\/([^/])\/(\d+)\/$/)
+    const [,baseurl,bbs,key] = url.match(/^(.+)test\/read.cgi\/([^/]+)\/(\d+)\/$/)
 
     return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
 }
