@@ -13,7 +13,10 @@ $katjusha.start = function(){
 $katjusha.onclick = function(event){
     const {href, target} = event.composedPath()[0]
 
-    if(href === $base.href){
+    if(!href){
+        return
+    }
+    else if(href === $base.href){
         event.preventDefault()
         history.replaceState(null, null, href)
     }
