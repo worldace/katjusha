@@ -19,7 +19,7 @@ $katjusha.onclick = function(event){
     }
     else if(href in $bbs){
         event.preventDefault()
-        $katjusha.fetch(`${href}subject.txt`).then(response => $subject.recieve(response, href))
+        $katjusha.fetch(`${href}subject.txt`).then(r => $subject.recieve(r, href))
     }
     else if(href?.includes('read.cgi') && parseURL(href).bbsurl in $bbs){
         event.preventDefault()
@@ -28,12 +28,11 @@ $katjusha.onclick = function(event){
 
         $tab.open(href, thread, target)
         $tab.loading(href)
-
-        $katjusha.fetch(thread.daturl, {headers}).then(response => $thread.recieve(response, href))
+        $katjusha.fetch(thread.daturl, {headers}).then(r => $thread.recieve(r, href))
     }
 }
 
-$katjusha.fetch = async function(url, option = {}){
+$katjusha.fetch = async function(url, option){
     const host  = new URL(url).hostname
     const abort = new AbortController()
 
@@ -41,18 +40,16 @@ $katjusha.fetch = async function(url, option = {}){
         $toolbar.$.anime.dataset.ajax++
         $katjusha.aborts.add(abort)
         $status.textContent = `${host}に接続しています`
-        const response      = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
-        $status.textContent = `${host}に接続しました`
-
-        const buffer     = await response.arrayBuffer()
-        response.content = new TextDecoder('shift-jis').decode(buffer)
-        response.byte    = buffer.byteLength
+        const response   = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
+        response.content = new TextDecoder('shift-jis').decode(await response.arrayBuffer())
+        response.byte    = Number(response.headers.get('Content-Length'))
         response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
+        $status.textContent = `${host}に接続しました`
 
         return response
     }
     catch(error){ // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
-        $status.textContent = (error.name === 'AbortError') ? `` : `${host}に接続できませんでした`
+        $status.textContent = error.name === 'AbortError' ? `` : `${host}に接続できませんでした`
         return error
     }
     finally{
