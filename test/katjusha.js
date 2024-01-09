@@ -28,7 +28,7 @@ $katjusha.onclick = function(event){
 
         $tab.open(href, thread, target)
         $tab.loading(href)
-        $katjusha.fetch(thread.daturl, {headers}).then(r => $thread.recieve(r, href))
+        $katjusha.fetch(thread.daturl, {headers}).then(r => $thread.recieve(r, thread))
     }
 }
 
@@ -393,12 +393,11 @@ class KatjushaThread extends Kage{
         }
     }
 
-    recieve(response, url){
-        $tab.loading(url, false)
+    recieve(response, thread){
+        $tab.loading(thread.url, false)
 
         if(response.status === 200){
-            const thread   = スレッド[url]
-            const dat      = this.parse(response.content)
+            const dat = this.parse(response.content)
 
             thread.subject = dat.subject
             thread.html    = dat.html
@@ -416,8 +415,7 @@ class KatjushaThread extends Kage{
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
         else if(response.status === 206){
-            const thread   = スレッド[url]
-            const dat      = this.parse(response.content, thread.num)
+            const dat = this.parse(response.content, thread.num)
 
             thread.html   += dat.html
             thread.num    += dat.num
@@ -434,7 +432,6 @@ class KatjushaThread extends Kage{
             $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(thread.byte)}`
         }
         else if(response.status === 304){
-            const thread = スレッド[url]
             thread.新着  = 0
 
             $subject.update(thread)
@@ -444,15 +441,15 @@ class KatjushaThread extends Kage{
             $status.textContent = `スレッドが見つかりません (${date()})`
         }
         else if(response.status === 416){
-            delete スレッド[url]
-            $katjusha.link(url)
+            delete スレッド[thread.url]
+            $katjusha.link(thread.url)
             return
         }
         else{
             return
         }
 
-        history.replaceState(null, null, url)
+        history.replaceState(null, null, thread.url)
     }
 
     parse(text, n = 0){
