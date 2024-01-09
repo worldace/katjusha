@@ -106,7 +106,7 @@ class Kage extends HTMLElement{
         if(typeof arg === 'string'){
             if(arg.startsWith('@')){
                 const context = this instanceof Kage ? this : window
-                context.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, detail:values[0]}) )
+                return context.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, cancelable:true, detail:values[0]}) )
             }
             else{
                 const context = this instanceof Kage ? this.shadowRoot : document
