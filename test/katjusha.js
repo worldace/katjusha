@@ -81,6 +81,9 @@ class Kage extends HTMLElement{
         super()
         const root = this.shadowRoot ?? this.attachShadow({mode:'open'})
         const html = this.template?.()
+        const node = {'':root, 'Host':this, 'Window':window, 'Document':document}
+
+        this.$ = new Proxy(Kage.$, {get:(_, name) => root.querySelector(`[id='${name}']`)})
 
         if(typeof html === 'string'){
             root.innerHTML = html
@@ -89,14 +92,11 @@ class Kage extends HTMLElement{
             root.append(html.content.cloneNode(true))
         }
 
-        this.$ = new Proxy(Kage.$, {get:(_, name) => root.querySelector(`[id='${name}']`)})
-        const specialID = {'':root, 'Host':this, 'Window':window, 'Document':document}
-
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
             this[method] = this[method].bind(this)
             const m = method.match(/^\$(.*?)_([^_]+)$/)
             if(m){
-                const el = specialID[m[1]] ?? this.$[m[1]]
+                const el = node[m[1]] ?? this.$[m[1]]
                 el.addEventListener(m[2], this[method])
             }
         }
