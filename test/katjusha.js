@@ -106,11 +106,16 @@ class Kage extends HTMLElement{
         if(typeof arg === 'string'){
             if(arg.startsWith('@')){
                 const context = this instanceof Kage ? this : window
-                return context.dispatchEvent( new CustomEvent(arg.slice(1), {bubbles:true, composed:true, cancelable:true, detail:values[0]}) )
+                const custom  = new CustomEvent(arg.slice(1), {bubbles:true, composed:true, cancelable:true, detail:values[0]})
+                return context.dispatchEvent(custom)
+            }
+            else if(arg.startsWith('*')){
+                const context = this instanceof Kage ? this.shadowRoot : document
+                return Array.from(context.querySelectorAll(arg.slice(1) || '*'))
             }
             else{
                 const context = this instanceof Kage ? this.shadowRoot : document
-                return arg.startsWith('*') ? Array.from(context.querySelectorAll(arg.slice(1) || '*')) : context.querySelector(arg)
+                return context.querySelector(arg)
             }
         }
         else if(Array.isArray(arg) && arg.raw){
