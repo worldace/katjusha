@@ -17,11 +17,11 @@ $katjusha.onclick = function(event){
         event.preventDefault()
         history.replaceState(null, null, href)
     }
-    else if(href in $bbs){
+    else if($URL.isBBS(href)){
         event.preventDefault()
         $katjusha.fetch(`${href}subject.txt`).then(r => $subject.recieve(r, href))
     }
-    else if(href?.includes('read.cgi') && parseURL(href).bbsurl in $bbs){
+    else if($URL.isThread(href)){
         event.preventDefault()
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
@@ -33,23 +33,23 @@ $katjusha.onclick = function(event){
 }
 
 $katjusha.fetch = async function(url, option){
-    const host  = new URL(url).hostname
-    const abort = new AbortController()
+    const {hostname} = new URL(url)
+    const abort      = new AbortController()
 
     try{
         $toolbar.$.anime.dataset.ajax++
         $katjusha.aborts.add(abort)
-        $status.textContent = `${host}に接続しています`
+        $status.textContent = `${hostname}に接続しています`
         const response   = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
         response.content = new TextDecoder('shift-jis').decode(await response.arrayBuffer())
         response.byte    = Number(response.headers.get('Content-Length'))
         response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
-        $status.textContent = `${host}に接続しました`
+        $status.textContent = `${hostname}に接続しました`
 
         return response
     }
     catch(error){ // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
-        $status.textContent = error.name === 'AbortError' ? `` : `${host}に接続できませんでした`
+        $status.textContent = error.name === 'AbortError' ? `` : `${hostname}に接続できませんでした`
         return error
     }
     finally{
@@ -136,6 +136,31 @@ class Kage extends HTMLElement{
     }
 }
 
+class $URL{
+    static build(bbsurl, key){
+        return bbsurl.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
+    }
+
+    static parse(url){
+        const [,baseurl,bbs,key] = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
+        return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
+    }
+
+    static parseBBS(url){
+        const [, baseurl, bbs] = url.match(/(.+\/)([^/]+)\/$/)
+        return {baseurl, bbs}
+    }
+
+    static isThread(url=''){
+        const m = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
+        return m ? $URL.isBBS(m[1]+m[2]+'/') : false
+    }
+
+    static isBBS(url=''){
+        return url in $bbs
+    }
+}
+
 
 class KatjushaToolbar extends Kage{
     static{
@@ -193,10 +218,10 @@ class KatjushaBBS extends Kage{
         let html = ''
 
         for(const v of list){
-            const [, name, url]    = v.split(' ')
-            const [, baseurl, bbs] = url.match(/(.+\/)([^/]+)\/$/)
+            const [, name, url] = v.split(' ')
+ 
             html += `<a href="${url}" id="${url}">${name}</a>`
-            $bbs[url] = {category, name, url, baseurl, bbs}
+            $bbs[url] = {category, name, url, ...$URL.parseBBS(url)}
         }
 
         return `<details open><summary>${category}</summary>${html}</details>`
@@ -275,7 +300,7 @@ class KatjushaSubject extends Kage{
 
     toHTML(line, i){
         const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-        const url    = $bbs.selected.id.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
+        const url    = $URL.build($bbs.selected.id, key)
         const thread = スレッド[url]
 
         if(thread.num === thread.既得){
@@ -680,7 +705,7 @@ class KatjushaForm extends Kage{
             alert( response.content.match(/<b>(.+?)</i)[1] )
         }
         else{
-            if(this.url.includes('read.cgi')){
+            if($URL.isThread(this.url)){
                 スレッド[this.url].最終書き込み = date()
             }
             this.remove()
@@ -700,7 +725,7 @@ class KatjushaForm extends Kage{
         $body.append(this)
         this.centering()
 
-        if(this.url.includes('read.cgi')){
+        if($URL.isThread(this.url)){
             const thread = スレッド[this.url]
 
             this.$.title.textContent = `「${thread.subject}」にレス`
@@ -798,7 +823,7 @@ class KatjushaPopup extends Kage{
 const スレッド = new Proxy({}, {
     get(target, url){
         if(!(url in target)){
-            const {bbs, key, bbsurl, baseurl} = parseURL(url)
+            const {bbs, key, bbsurl, baseurl} = $URL.parse(url)
 
             target[url] = {
                 url     : url,
@@ -825,12 +850,6 @@ const スレッド = new Proxy({}, {
     }
 })
 
-
-function parseURL(url){
-    const [,baseurl,bbs,key] = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
-
-    return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
-}
 
 function date(){
     const d  = new Date()
