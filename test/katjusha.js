@@ -79,20 +79,18 @@ class Kage extends HTMLElement{
 
     constructor(){
         super()
-        if(!this.shadowRoot){
-            this.attachShadow({mode:'open'})
+        const root = this.shadowRoot ?? this.attachShadow({mode:'open'})
+        const html = this.template?.()
+
+        if(typeof html === 'string'){
+            root.innerHTML = html
+        }
+        else if(html instanceof HTMLTemplateElement){
+            root.append(html.content.cloneNode(true))
         }
 
-        const template = this.template?.()
-        if(typeof template === 'string'){
-            this.shadowRoot.innerHTML = template
-        }
-        else if(template instanceof HTMLTemplateElement){
-            this.shadowRoot.append(template.content.cloneNode(true))
-        }
-
-        this.$ = new Proxy(Kage.$, {get:(_, name) => this.shadowRoot.querySelector(`[id='${name}']`)})
-        const specialID = {'':this.shadowRoot, 'Host':this, 'Window':window, 'Document':document}
+        this.$ = new Proxy(Kage.$, {get:(_, name) => root.querySelector(`[id='${name}']`)})
+        const specialID = {'':root, 'Host':this, 'Window':window, 'Document':document}
 
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
             this[method] = this[method].bind(this)
@@ -115,7 +113,7 @@ class Kage extends HTMLElement{
                 return arg.startsWith('*') ? Array.from(context.querySelectorAll(arg.slice(1) || '*')) : context.querySelector(arg)
             }
         }
-        else if(Array.isArray(arg) && arg.raw){ //タグ関数で起動
+        else if(Array.isArray(arg) && arg.raw){
             const props = []
             let template = document.createElement('template')
             template.innerHTML = arg.reduce(function(result, v, i){
