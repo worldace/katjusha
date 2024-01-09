@@ -708,7 +708,7 @@ class KatjushaForm extends Kage{
             alert( response.content.match(/<b>(.+?)</i)[1] )
         }
         else{
-            if($URL.isThread(this.url)){
+            if(this.$.key.value){
                 スレッド[this.url].最終書き込み = date()
             }
             this.remove()
