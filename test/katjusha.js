@@ -247,11 +247,6 @@ class KatjushaSubject extends Kage{
 
     $tbody_contextmenu(event){
         const tr = event.target.closest('tr')
-        if(!tr){
-            return
-        }
-        event.preventDefault()
-        event.stopPropagation()
 
         this.select(tr)
         new KatjushaContext(`
