@@ -176,7 +176,7 @@ class KatjushaBBS extends Kage{
 
     $_click(event){
         if(event.target.tagName === 'A'){
-            this.select(event.target)
+            this.select(event.target.id)
         }
     }
 
@@ -185,7 +185,7 @@ class KatjushaBBS extends Kage{
         event.stopPropagation()
 
         if(event.target.tagName === 'A'){
-            this.select(event.target)
+            this.select(event.target.id)
 
             new KatjushaContext(`
                 <li><a onclick="$katjusha.clipboard('${event.target.href}')">URLをコピー</a></li>
@@ -208,10 +208,8 @@ class KatjushaBBS extends Kage{
         return `<details open><summary>${category}</summary>${html}</details>`
     }
 
-    select(el){
-        if(typeof el === 'string'){
-            el = this.$[el]
-        }
+    select(url){
+        const el = this.$[url]
 
         if(el){
             this.selected?.classList.remove('selected')
