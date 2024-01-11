@@ -196,16 +196,15 @@ class KatjushaBBS extends Kage{
 
     toHTML(text){
         const [category, ...list] = text.split('\n')
-        let html = ''
 
-        for(const v of list){
+        const a = list.map(v => {
             const [, name, url] = v.split(' ')
- 
-            html += `<a href="${url}" id="${url}">${name}</a>`
             $bbs[url] = {category, name, url, ...URLparseBBS(url)}
-        }
+ 
+            return `<a href="${url}" id="${url}">${name}</a>`
+        })
 
-        return `<details open><summary>${category}</summary>${html}</details>`
+        return `<details open><summary>${category}</summary>${a.join('')}</details>`
     }
 
     select(url){
