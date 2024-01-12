@@ -29,7 +29,7 @@ $katjusha.onclick = function(event){
         const thread  = スレッド[href]
         const headers = thread.etag ? {'If-None-Match':thread.etag, 'Range':`bytes=${thread.byte}-`} : {}
 
-        $tab.open(href, thread, target)
+        $tab.open(href, target, thread)
         $tab.loading(href)
         $katjusha.fetch(thread.daturl, {headers}).then(r => $thread.recieve(r, thread))
     }
@@ -238,7 +238,7 @@ class KatjushaSubject extends Kage{
         event.preventDefault()
         const tr = event.target.closest('tr')
 
-        if(tr && event.target.cellIndex < 7){
+        if(tr && !event.button && event.target.cellIndex < 7){
             this.select(tr)
             $katjusha.link(tr.id)
         }
@@ -246,7 +246,6 @@ class KatjushaSubject extends Kage{
 
     $tbody_contextmenu(event){
         const tr = event.target.closest('tr')
-
         this.select(tr)
         new KatjushaContext(`
             <li><a onclick="$katjusha.link('${tr.id}', '_blank')">新しいタブで開く</a></li>
@@ -551,7 +550,7 @@ class KatjushaTab extends Kage{
         }
     }
 
-    open(url, thread = {}, target){
+    open(url, target, thread = {}){
         if(this.$[url]){
             this.select(this.$[url])
         }
@@ -592,6 +591,7 @@ class KatjushaTab extends Kage{
         this.selected.innerHTML        = subject
         this.selected.thread.id        = url
         this.selected.thread.innerHTML = html
+        this.select(this.selected)
     }
 
     close(url){
