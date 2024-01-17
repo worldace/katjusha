@@ -2,3 +2,4 @@ RewriteEngine on
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([0-9]{3})([0-9]+)\.dat$ ../kako/$1/$1$2.dat [L]
+# RewriteRule ^([^/]+)/dat/([0-9]{3})([0-9]+)\.dat$ $1/kako/$2/$2$3.dat
