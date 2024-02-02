@@ -119,22 +119,41 @@ class Kage extends HTMLElement{
             }
         }
         else if(Array.isArray(arg) && arg.raw){
-            const props = []
+            const vars = {prop:[], node:[], array:[]}
             let template = document.createElement('template')
             template.innerHTML = arg.reduce(function(result, v, i){
-                if(typeof values[i-1] === 'object'){
-                    props.push(values[i-1])
+                const v0 = values[i-1]
+                if(v0 instanceof Node){
+                    vars.node.push(v0)
+                    return result + '<template class="node"></template>' + v
+                }
+                else if(Array.isArray(v0)){
+                    vars.array.push(v0)
+                    return result + '<template class="array"></template>' + v
+                }
+                else if(typeof v0 === 'object'){ //nullとかマズイ
+                    vars.prop.push(v0)
                     return result + v
                 }
                 else{
-                    return result + values[i-1] + v
+                    return result + v0 + v
                 }
             }).trim()
             template = template.content
 
-            for(const el of template.querySelectorAll('[_]')){
-                el.removeAttribute('_')
-                Object.assign(el, props.shift())
+            for(const el of template.querySelectorAll('template, [_]')){
+                if(el.tagName === 'TEMPLATE'){
+                    if(el.className === 'node'){
+                        el.replaceWith(vars.node.shift())
+                    }
+                    else if(el.className === 'array'){
+                        el.replaceWith(...vars.array.shift())
+                    }
+                }
+                else{
+                    el.removeAttribute('_')
+                    Object.assign(el, vars.prop.shift())
+                }
             }
 
             return template.childNodes.length === 1 ? template.firstChild : template
