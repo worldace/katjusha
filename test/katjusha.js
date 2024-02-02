@@ -123,7 +123,10 @@ class Kage extends HTMLElement{
             let template = document.createElement('template')
             template.innerHTML = arg.reduce(function(result, v, i){
                 const v0 = values[i-1]
-                if(v0 instanceof Node){
+                if(v0 == null){
+                    return result + v
+                }
+                else if(v0 instanceof Node){
                     vars.node.push(v0)
                     return result + '<template class="node"></template>' + v
                 }
@@ -131,7 +134,7 @@ class Kage extends HTMLElement{
                     vars.array.push(v0)
                     return result + '<template class="array"></template>' + v
                 }
-                else if(typeof v0 === 'object'){ //nullとかマズイ
+                else if(typeof v0 === 'object'){
                     vars.prop.push(v0)
                     return result + v
                 }
