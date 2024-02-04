@@ -110,7 +110,7 @@ class Kage extends HTMLElement{
                 return context.dispatchEvent(custom)
             }
             else if(arg.startsWith('--')){
-                const context = this instanceof Kage ? this.shadowRoot : document.querySelector(':root')
+                const context = this instanceof Kage ? this : document.querySelector(':root')
                 if(values[0] === undefined){
                     return getComputedStyle(context).getPropertyValue(arg)
                 }
