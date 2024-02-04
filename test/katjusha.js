@@ -109,6 +109,15 @@ class Kage extends HTMLElement{
                 const custom  = new CustomEvent(arg.slice(1), {bubbles:true, composed:true, cancelable:true, detail:values[0]})
                 return context.dispatchEvent(custom)
             }
+            else if(arg.startsWith('--')){
+                const context = this instanceof Kage ? this.shadowRoot : document.querySelector(':root')
+                if(values[0] === undefined){
+                    return getComputedStyle(context).getPropertyValue(arg)
+                }
+                else{
+                    context.style.setProperty(arg, values[0])
+                }
+            }
             else if(arg.startsWith('*')){
                 const context = this instanceof Kage ? this.shadowRoot : document
                 return Array.from(context.querySelectorAll(arg.slice(1) || '*'))
