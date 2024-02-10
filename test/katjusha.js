@@ -688,8 +688,9 @@ class KatjushaForm extends Kage{
             event.target.setPointerCapture(event.pointerId)
             const {x, y, width, height} = this.getBoundingClientRect()
 
-            this.style.left = clamp(0, x+event.movementX, innerWidth-width)   + 'px'
-            this.style.top  = clamp(0, y+event.movementY, innerHeight-height) + 'px'
+            this.style.margin = 0
+            this.style.left   = clamp(0, x+event.movementX, innerWidth-width)   + 'px'
+            this.style.top    = clamp(0, y+event.movementY, innerHeight-height) + 'px'
         }
     }
 
@@ -727,7 +728,6 @@ class KatjushaForm extends Kage{
         }
 
         $body.append(this)
-        this.centering()
 
         if(URLisThread(this.url)){
             const thread = スレッド[this.url]
@@ -748,12 +748,6 @@ class KatjushaForm extends Kage{
             this.$.bbs.value         = bbs.bbs
             this.$.subject.focus()
         }
-    }
-
-    centering(){
-        const {width, height} = this.getBoundingClientRect()
-        this.style.left = `${innerWidth/2 - width/2}px`
-        this.style.top  = `${innerHeight/2 - height/2}px`
     }
 
     insert(text){
