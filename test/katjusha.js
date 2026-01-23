@@ -396,7 +396,7 @@ class KatjushaThread extends Kage{
         }
     }
 
-    $Host_scroll(event){ // scrollend
+    $Host_scrollend(event){
         if(this.selected.id){
             スレッド[this.selected.id].scroll = this.scrollTop
         }
