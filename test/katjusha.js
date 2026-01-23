@@ -72,6 +72,55 @@ $katjusha.clipboard = function(text){
 }
 
 
+const スレッド = new Proxy({}, {get(target, url){
+    if(url in target){
+        return target[url]
+    }
+
+    const {bbs, key, bbsurl, baseurl} = URLparse(url)
+    target[url] = {
+        url     : url,
+        key     : key,
+        bbs     : bbs,
+        bbsurl  : bbsurl,
+        bbsname : $bbs[bbsurl].name,
+        baseurl : baseurl,
+        daturl  : `${bbsurl}dat/${key}.dat`,
+        subject : '',
+        html    : '',
+        num     : 0,
+        byte    : 0,
+        etag    : '',
+        scroll  : 0,
+        既得    : 0,
+        新着    : 0,
+        最終取得: '',
+        最終書き込み: '',
+    }
+
+    return target[url]
+}})
+
+
+const tag = new Proxy({}, {get(_, name){ return function(...args){
+    name = name.replaceAll('_', '-')
+    const el = document.createElement(name)
+    if(el.outerHTML.includes('/')){
+        el.innerHTML = args.shift() ?? ''
+    }
+    for(let attr in args[0] ?? {}){
+        if(attr.startsWith('.')){
+            el[attr.slice(1)] = args[0][attr]
+        }
+        else{
+            el.setAttribute(attr, args[0][attr])
+        }
+    }
+
+    return el
+}}})
+
+
 class Kage extends HTMLElement{
     static{
         window.$ = this.$
@@ -103,72 +152,13 @@ class Kage extends HTMLElement{
     }
 
     static $(arg, ...values){
-        if(typeof arg === 'string'){
-            if(arg.startsWith('@')){
-                const context = this instanceof Kage ? this : window
-                const custom  = new CustomEvent(arg.slice(1), {bubbles:true, composed:true, cancelable:true, detail:values[0]})
-                return context.dispatchEvent(custom)
-            }
-            else if(arg.startsWith('--')){
-                const context = this instanceof Kage ? this : document.querySelector(':root')
-                if(values[0] === undefined){
-                    return getComputedStyle(context).getPropertyValue(arg)
-                }
-                else{
-                    context.style.setProperty(arg, values[0])
-                }
-            }
-            else if(arg.startsWith('*')){
-                const context = this instanceof Kage ? this.shadowRoot : document
-                return Array.from(context.querySelectorAll(arg.slice(1) || '*'))
-            }
-            else{
-                const context = this instanceof Kage ? this.shadowRoot : document
-                return context.querySelector(arg)
-            }
+        const context = this instanceof Kage ? this.shadowRoot : document
+
+        if(arg.startsWith('*')){
+            return Array.from(context.querySelectorAll(arg.slice(1) || '*'))
         }
-        else if(Array.isArray(arg) && arg.raw){
-            const vars = {prop:[], node:[], array:[]}
-            let template = document.createElement('template')
-            template.innerHTML = arg.reduce(function(result, v, i){
-                const v0 = values[i-1]
-                if(v0 == null){
-                    return result + v
-                }
-                else if(v0 instanceof Node){
-                    vars.node.push(v0)
-                    return result + '<template class="node"></template>' + v
-                }
-                else if(Array.isArray(v0)){
-                    vars.array.push(v0)
-                    return result + '<template class="array"></template>' + v
-                }
-                else if(typeof v0 === 'object'){
-                    vars.prop.push(v0)
-                    return result + v
-                }
-                else{
-                    return result + v0 + v
-                }
-            }).trim()
-            template = template.content
-
-            for(const el of template.querySelectorAll('template, [_]')){
-                if(el.tagName === 'TEMPLATE'){
-                    if(el.className === 'node'){
-                        el.replaceWith(vars.node.shift())
-                    }
-                    else if(el.className === 'array'){
-                        el.replaceWith(...vars.array.shift())
-                    }
-                }
-                else{
-                    el.removeAttribute('_')
-                    Object.assign(el, vars.prop.shift())
-                }
-            }
-
-            return template.childNodes.length === 1 ? template.firstChild : template
+        else{
+            return context.querySelector(arg)
         }
     }
 }
@@ -609,10 +599,10 @@ class KatjushaTab extends Kage{
     }
 
     add(url='', subject='', html=''){
-        const thread = $`<div id="${url}" class="thread">${html}</div>`
-        $thread.shadowRoot.append(thread)
+        const thread = tag.div(html, {'id':url, 'class':'thread'})
+        const tab    = tag.li(subject, {'id':url, '.thread':thread})
 
-        const tab = $`<li id="${url}" _=${{thread}}>${subject}</li>`
+        $thread.shadowRoot.append(thread)
         this.$.tab.append(tab)
         this.select(tab)
     }
@@ -816,36 +806,6 @@ class KatjushaPopup extends Kage{
         $body.prepend(this)
     }
 }
-
-
-const スレッド = new Proxy({}, {get(target, url){
-    if(url in target){
-        return target[url]
-    }
-
-    const {bbs, key, bbsurl, baseurl} = URLparse(url)
-    target[url] = {
-        url     : url,
-        key     : key,
-        bbs     : bbs,
-        bbsurl  : bbsurl,
-        bbsname : $bbs[bbsurl].name,
-        baseurl : baseurl,
-        daturl  : `${bbsurl}dat/${key}.dat`,
-        subject : '',
-        html    : '',
-        num     : 0,
-        byte    : 0,
-        etag    : '',
-        scroll  : 0,
-        既得    : 0,
-        新着    : 0,
-        最終取得: '',
-        最終書き込み: '',
-    }
-
-    return target[url]
-}})
 
 
 function date(){
