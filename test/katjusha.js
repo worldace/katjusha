@@ -129,11 +129,9 @@ class Kage extends HTMLElement{
     constructor(){
         super()
         const root = this.shadowRoot ?? this.attachShadow({mode:'open'})
+        this.$     = new Proxy(Kage.$, {get:(_, name) => root.querySelector(`[id='${name}']`)})
+
         const html = this.template?.()
-        const node = {'':root, 'Host':this, 'Window':window, 'Document':document}
-
-        this.$ = new Proxy(Kage.$, {get:(_, name) => root.querySelector(`[id='${name}']`)})
-
         if(typeof html === 'string'){
             root.innerHTML = html
         }
@@ -141,25 +139,18 @@ class Kage extends HTMLElement{
             root.append(html.content.cloneNode(true))
         }
 
+        const special = {'':root, 'Host':this, 'Window':window, 'Document':document}
+
         for(const method of Object.getOwnPropertyNames(Object.getPrototypeOf(this))){
             this[method] = this[method].bind(this)
-            const m = method.match(/^\$(.*?)_([^_]+)$/)
-            if(m){
-                const el = node[m[1]] ?? this.$[m[1]]
-                el.addEventListener(m[2], this[method])
-            }
+            const m = method.match(/^\$(.*?)_(.+)$/)
+            m && (special[m[1]] ?? this.$[m[1]]).addEventListener(m[2], this[method])
         }
     }
 
-    static $(arg, ...values){
+    static $(selector){
         const context = this instanceof Kage ? this.shadowRoot : document
-
-        if(arg.startsWith('*')){
-            return Array.from(context.querySelectorAll(arg.slice(1) || '*'))
-        }
-        else{
-            return context.querySelector(arg)
-        }
+        return selector.startsWith('*') ? [...context.querySelectorAll(selector.slice(1)||'*')] : context.querySelector(selector)
     }
 }
 
