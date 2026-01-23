@@ -818,35 +818,34 @@ class KatjushaPopup extends Kage{
 }
 
 
-const スレッド = new Proxy({}, {
-    get(target, url){
-        if(!(url in target)){
-            const {bbs, key, bbsurl, baseurl} = URLparse(url)
-
-            target[url] = {
-                url     : url,
-                key     : key,
-                bbs     : bbs,
-                bbsurl  : bbsurl,
-                bbsname : $bbs[bbsurl].name,
-                baseurl : baseurl,
-                daturl  : `${bbsurl}dat/${key}.dat`,
-                subject : '',
-                html    : '',
-                num     : 0,
-                byte    : 0,
-                etag    : '',
-                scroll  : 0,
-                既得    : 0,
-                新着    : 0,
-                最終取得: '',
-                最終書き込み: '',
-            }
-        }
-
+const スレッド = new Proxy({}, {get(target, url){
+    if(url in target){
         return target[url]
     }
-})
+
+    const {bbs, key, bbsurl, baseurl} = URLparse(url)
+    target[url] = {
+        url     : url,
+        key     : key,
+        bbs     : bbs,
+        bbsurl  : bbsurl,
+        bbsname : $bbs[bbsurl].name,
+        baseurl : baseurl,
+        daturl  : `${bbsurl}dat/${key}.dat`,
+        subject : '',
+        html    : '',
+        num     : 0,
+        byte    : 0,
+        etag    : '',
+        scroll  : 0,
+        既得    : 0,
+        新着    : 0,
+        最終取得: '',
+        最終書き込み: '',
+    }
+
+    return target[url]
+}})
 
 
 function date(){
