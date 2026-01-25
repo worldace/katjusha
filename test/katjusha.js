@@ -292,16 +292,17 @@ class KatjushaSubject extends Kage{
         }
         thread.subject = subject
 
-        return `<tr id="${url}">
-                  <td>${i+1}</td>
-                  <td><a href="${url}">${subject}</a></td>
-                  <td>${num}</td>
-                  <td>${thread.既得 || ''}</td>
-                  <td>${thread.新着 || ''}</td>
-                  <td>${thread.最終取得}</td>
-                  <td>${thread.最終書き込み}</td>
-                  <td></td>
-                </tr>`
+        return `
+            <tr id="${url}">
+              <td>${i+1}</td>
+              <td><a href="${url}">${subject}</a></td>
+              <td>${num}</td>
+              <td>${thread.既得 || ''}</td>
+              <td>${thread.新着 || ''}</td>
+              <td>${thread.最終取得}</td>
+              <td>${thread.最終書き込み}</td>
+              <td></td>
+            </tr>`
     }
 
     select(el){
@@ -836,7 +837,7 @@ function URLparseBBS(url){
 
 function URLisThread(url=''){
     const m = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
-    return m ? URLisBBS(m[1]+m[2]+'/') : false
+    return m && URLisBBS(m[1]+m[2]+'/')
 }
 
 function URLisBBS(url=''){
