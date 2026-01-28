@@ -341,7 +341,7 @@ $ごみ箱アイコン.onclick = function(event){
 }
 
 $タブ閉じるアイコン.onclick = function(event){
-    $tab.close($tabActive.className)
+    $tab.close($tabActive)
 }
 
 
@@ -412,17 +412,16 @@ $tab.get = function(url){
 }
 
 
-$tab.close = function(url){
-    const tab = $tab.get(url)
-    if(!tab || $tab.childElementCount === 1) return
+$tab.close = function(tab){
+    if($tab.childElementCount === 1) return
 
     this.select(tab.nextElementSibling ?? tab.previousElementSibling)
     $thread.children[brosNo(tab)].remove()
     tab.remove()
 }
 
-$tab.closeElse = function(url){
-    $(`*tab:not([class='${url}'])`, this).forEach(tab => $tab.close(tab.className))
+$tab.closeElse = function(tab){
+    [...$tab.children].forEach(el => el !== tab && $tab.close(el))
 }
 
 $tab.contextmenu = function(event){
@@ -433,8 +432,8 @@ $tab.contextmenu = function(event){
 
     const url = event.target.className
     $contextmenu.show(event, {
-        '閉じる'                 : _=> $tab.close(url),
-        'このタブ以外全て閉じる' : _=> $tab.closeElse(url),
+        '閉じる'                 : _=> $tab.close(event.target),
+        'このタブ以外全て閉じる' : _=> $tab.closeElse(event.target),
         'URLをコピー'            : _=> clipboard(url),
         'タイトルとURLをコピー'  : _=> clipboard(`${event.target.innerHTML}\n${url}\n`),
     })
