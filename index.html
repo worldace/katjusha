@@ -1,881 +1,768 @@
 <!DOCTYPE html>
-<html lang="ja" id="$katjusha">
+<html id="$katjusha" lang="ja">
 <head id="$head">
-  <base href="http://localhost/katjusha/" id="$base">
+  <base id="$base" href="http://localhost/katjusha/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="test/katjusha.css">
   <link rel="icon" href="test/favicon.png">
-  <script type="module" src="test/katjusha.js"></script>
   <title id="$title">かちゅぼ～ど</title>
 </head>
 <body id="$body">
 
 
-
-<katjusha-toolbar id="$toolbar">
-<template shadowrootmode="open">
-<header id="ヘッダ">
-  <div id="ナビアイコン">
-    <span id="オンラインアイコン" class="icon"></span>
-    <span id="セーブアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="検索アイコン" class="icon"></span>
-    <span id="巡回アイコン" class="icon"></span>
-    <span id="スレッド投稿アイコン" class="icon" title="新規スレッド書き込み"></span>
-    <span class="icon-separate"></span>
-    <span id="ペインアイコン" class="icon"></span>
-    <span id="グリッド1アイコン" class="icon"></span>
-    <span id="グリッド2アイコン" class="icon"></span>
-    <span id="グリッド3アイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="設定アイコン" class="icon"></span>
-    <span id="ヘルプアイコン" class="icon" title="ヘルプ"></span>
-    <span class="icon-separate"></span>
-  </div>
-  <div id="板ボタン">
-    <span class="icon-text" id="全板ボタン">▽</span>
-  </div>
-  <div id="anime" data-ajax="0"></div>
-</header>
-<style>
-#ヘッダ{
-  background-color: #f0f0f0;
-  display: flex;
-  border-bottom: solid 1px #a0a0a0;}
-#ナビアイコン{
-  display: flex;
-  align-items: center;}
-#オンラインアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAABSGAD/vQD//wCtewD///9149PrAAAAAXRSTlMAQObYZgAAAERJREFUCNdjQAOCMNoRSjsJQGkVAQhtDJZhdDIOhsgIGYcaghmMyqbGECFhYyVFsIixkgrYQBEgDVEMpRlBNFhGENViAOIhBof9+an+AAAAAElFTkSuQmCC');}
-#セーブアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAAAAP////8A//+9vb0AAHt7e3sAAADJRqraAAAAAXRSTlMAQObYZgAAADZJREFUCNdjgANmYzBgYDAUUgICwQAoQwzGECSSIQgCqAwxFxcXCMO9BMFAlmINDUtLSwtlAAC7RBPuQ+XDIQAAAABJRU5ErkJggg==');}
-#検索アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAD/vQAAAAD//wDWnFJ7WgCEhIT////MopgYAAAAAXRSTlMAQObYZgAAAGRJREFUCNctysENgDAIhWFidACqAwgm3hGN11oZxE7h+pbW/8IX8gB6M6jdqtFvL4i7WYQBA4+qRwEJIQYYgupWQecr5Fh20woSbJ9UNpdjIuFckTitDjQzzgE69laGFj8/uvkDXJEPCVqpxYQAAAAASUVORK5CYII=');}
-#巡回アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGFBMVEUAAAD/GACEAAApWv8AAITWAAAAAAD/WlIdvawAAAAAAXRSTlMAQObYZgAAAGFJREFUCNdNzDEOgCAQRNEJEPu1secERDgAES5ggbY2HsDC+7uzlVP9PMLiNxdjtFhF5gQgbxotwXenERpCZvgC9KwrFVq6ap/1iQfuXUTGBUzjkfcAlM6FQCIYEYwINsIHyLoO36kkZ4wAAAAASUVORK5CYII=');}
-#スレッド投稿アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAAhUv9SOQAAAACMrf8AMZTWnFJ7WgB7e1L///9SWlL/3q2cp7MCAAAAAXRSTlMAQObYZgAAAGFJREFUCNdjAAEmJQUGMChKSwLT7E7JZmChEqdkq2SQgMtEtVUgRomnoFBaMlhAUFBJGSwgKBRqABFQDWZgaIcKMDRBBRi6FUECIMYmiACDVYYSWIBhsUWHMthGY2NjsAAABugWBjID06AAAAAASUVORK5CYII=');}
-#ペインアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAD/vQAAAAB7WgAppcrEAAAAAXRSTlMAQObYZgAAAB9JREFUCNdjAAOtVatWMOi/f/+DQTc3N4J0AmIACAAAqFUWZyWMfcYAAAAASUVORK5CYII=');}
-#グリッド1アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEUAAAAAAAD//////wB7e3vPJERoAAAAAXRSTlMAQObYZgAAACFJREFUCNdjgAMWF0dBIBBgYGFgVAYCHAwUNZQyEJbCAAB61wj/gpHNVgAAAABJRU5ErkJggg==');}
-#グリッド2アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAAAAAD//////wDo8JS4AAAAAXRSTlMAQObYZgAAACFJREFUCNdjAAPR0NAQBgHp3VuQCVGQmAADCxEExAAQAADKVAjjS/YQ1AAAAABJRU5ErkJggg==');}
-#グリッド3アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAAAAAD//////wDo8JS4AAAAAXRSTlMAQObYZgAAACFJREFUCNdjAAPR0NAQBgEBBhZkQhQkJr17CxEExAAQAAAQNhAxyyxjBAAAAABJRU5ErkJggg==');}
-#設定アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAUVBMVEUAAAAAAACEhITG3sZ7OQApOf9S/wApOVIp3gAAnFL/WgD///97/61Se/8pWv8AAIR73gApOa0Ae1IAewCte/8A/60Ava17/1JSWlIA/wB7vQDXW3VzAAAAAXRSTlMAQObYZgAAAItJREFUGNM9zQsOwyAMA1AcGj4rBdbuf/+DzhmjFkL4AYr7BRY7zKqas56EpltOve9tCHJ65XSXEYPU0yeIePGr98IeSmCPMdIk8kcpQVasgHibhZYCr9hsRYI+CKggCKIjbM//i+WyEBxqCeAAKMEZXLdbFfbDYIgq4XgbDIHBjglGBDiDGQHItn0BWkgEOp0LAPAAAAAASUVORK5CYII=');}
-#ヘルプアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEUAAAApOf8pOVIpOa17nP////+EhITG3satva1SWlKL+I0lAAAAAXRSTlMAQObYZgAAAHFJREFUCNclyDEOgzAQRNGRbzAW9AlBDim9N7BEDoCECzokCqB1R03DsVnjXz19aOaFUitFJrCoZRxUOurwp+RRsabVQcaRP7zJvg92R+OrkewWfJMPtJfAxeTZnQ6fNSbZZIZRHYsDsiYdj/J41Oi4AaXME0dzTLUNAAAAAElFTkSuQmCC');}
-#板ボタン{
-  flex: 1;
-  display: flex;
-  align-items: center;}
-#板ボタン span{
-  padding: 2px 6px;}
-#anime{
-  width: 32px;
-  height: 32px;
-  background-image: url('data:image/gif;base64,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');
-  background-repeat: no-repeat;
-  background-size: 32px;
-  background-position: center;
-  z-index: 2;}
-#anime[data-ajax="0"]{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEX4+ND42KD4uFio6ACg6AD4+MiQ6ACIUABK2ACI4ACASABAIgDwiAAi0AiY6AD48Lj4wFgy0AiA4AD46LhA0Ah44ABY2AD4yICISAD44KgYyAhg2AD4yHhw4ABo4ABo2AD40IDoiABIKADogAAAAACzzM64AAABjElEQVQ4y22QAXPaMAyFn7R5orKZzbIRp4UWWP//b6wUxwSu+bjcvcv7Ihnjx4ps5UdBtzJ+rtSt/CAIy0bG7zs66UbGr05lKvV7XgUhkPQ8UM94WRDOgViWjKHnu6AU7K2+qKjnTJYd/GloyQCItbA9MNcML7pQCUYh4sI0uDsxVxf+NTQHhKJMDixnFhYrsPTF3kGhecgDPA8SZgPnmbZBPivu1E8d6/mMd0c4w7CpoC7YvrHoOz4cpTaXERLNBBDTyPKBN0doakYwQ0Xl6v/zwhzfmlCJMp6wfjyVZMJxRp+N7N+fmG/H4yIImbHswJCJTqP1KZqwO+4cUb+fTJOZk09n763AbkHIR9uX1pSU4i1G71ehLmcbL5wcbx38NUTtt+z3Gema/qdoheFC61bjMhtdOBwqKCUC2pLczuFLDo4JkdJEZiiaQX4OfhJKAFOQx1vgcl2E/T5OjFB6H/IwkfUc9zMuEJghcOx7G2ACp7tgRru/SP0ex9J7E14Nv7VbZJvbHtsfXxe+ALc1JiQ/QQazAAAAAElFTkSuQmCC');}
-.icon{
-  padding: 1px;
-  border: solid 1px #f0f0f0;
-  width: 20px;
-  height: 18px;
-  background-repeat: no-repeat;
-  background-size: 16px;
-  background-position: center;}
-.icon:hover{
-  border-top: solid 1px #fff;
-  border-left: solid 1px #fff;
-  border-bottom: solid 1px #a0a0a0;
-  border-right: solid 1px #a0a0a0;}
-.icon:active{
-  border-top: solid 1px #a0a0a0;
-  border-left: solid 1px #a0a0a0;
-  border-bottom: solid 1px #fff;
-  border-right: solid 1px #fff;
-  transform: translate(1px, 1px);}
-.icon-separate{
-  width: 2px;
-  height: 16px;
-  margin: 0 3px;
-  background-repeat: no-repeat;
-  background-size: 2px 16px;
-  background-position: center;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAQAQMAAAAGZjz3AAAABlBMVEX///+goKD0a5EfAAAAC0lEQVQI12NowA8BgCAIAWcmA/MAAAAASUVORK5CYII=');}
-.icon-text{
-  padding: 2px 2px;
-  margin: 0 1px;
-  border: solid 1px #f0f0f0;}
-.icon-text:hover{
-  border-top: solid 1px #fff;
-  border-left: solid 1px #fff;
-  border-bottom: solid 1px #a0a0a0;
-  border-right: solid 1px #a0a0a0;}
-.icon-text:active{
-  border-top: solid 1px #a0a0a0;
-  border-left: solid 1px #a0a0a0;
-  border-bottom: solid 1px #fff;
-  border-right: solid 1px #fff;
-  transform: translate(1px, 1px);}
-</style>
-</template>
-</katjusha-toolbar>
+<toolbar id="$toolbar">
+<tool-icons>
+  <button id="$オンラインアイコン"></button>
+  <button id="$セーブアイコン"></button>
+  <icon-separate></icon-separate>
+  <button id="$検索アイコン"></button>
+  <button id="$巡回アイコン"></button>
+  <button id="$スレッド投稿アイコン" title="新規スレッド書き込み" command="show-modal" commandfor="$dialog"></button>
+  <icon-separate></icon-separate>
+  <button id="$ペインアイコン"></button>
+  <button id="$グリッド1アイコン"></button>
+  <button id="$グリッド2アイコン"></button>
+  <button id="$グリッド3アイコン"></button>
+  <icon-separate></icon-separate>
+  <button id="$設定アイコン"></button>
+  <button id="$ヘルプアイコン" title="ヘルプ"></button>
+  <icon-separate></icon-separate>
+</tool-icons>
+<board-buttons>
+  <button id="$全板ボタン">▽</button>
+</board-buttons>
+<anime id="$anime" data-ajax="0"></anime>
+</toolbar>
 
 
-
-<katjusha-border id="$border">
-<template shadowrootmode="open">
-<style>
-:host{
-  height: 7px;
-  margin-top: 1px;
-  background-color: #f0f0f0;
-  border-bottom: solid 1px #a0a0a0;
-  border-left: none;
-  border-top: none;}
-</style>
-</template>
-</katjusha-border>
+<border></border>
 
 
+<bbs id="$bbs" onclick="$bbs.select(event.target.href)" oncontextmenu="$bbs.contextmenu(event, event.target)">
+  <details open>
+    <summary>カテゴリ1</summary>
+    <a href="http://localhost/katjusha/a/">掲示板a</a>
+    <a href="http://localhost/katjusha/b/">掲示板b</a>
+  </details>
+  <details open>
+    <summary>カテゴリ2</summary>
+    <a href="http://localhost/katjusha/c/">掲示板c</a>
+  </details>
+</bbs>
 
-<katjusha-bbs id="$bbs" bbslist="
-カテゴリ1
- 掲示板a http://localhost/katjusha/a/
- 掲示板b http://localhost/katjusha/b/
-カテゴリ2
- 掲示板c http://localhost/katjusha/c/
-">
-<template shadowrootmode="open">
-<div id="bbs"></div>
-<style>
-:host{
-  padding-top: 3px;
-  border-right: solid 1px #a0a0a0;
-  overflow-y: scroll;}
-details{}
-summary{
-  outline: none;
-  padding: 1px 1px;}
-a{
-  text-decoration: none;
-  color: #000;
-  padding: 1px 8px;
-  margin: 1px 0;
-  display: block;}
-a.selected{
-  color: #fff;
-  background-color: #0078d7;}
-details:nth-of-type(33n+1){
-  border-left: 4px solid #ffffff;}
-details:nth-of-type(33n+2){
-  border-left: 4px solid #985a62;}
-details:nth-of-type(33n+3){
-  border-left: 4px solid #ddffdd;}
-details:nth-of-type(33n+4){
-  border-left: 4px solid #ffd7ff;}
-details:nth-of-type(33n+5){
-  border-left: 4px solid #519db0;}
-details:nth-of-type(33n+6){
-  border-left: 4px solid #d7d7ff;}
-details:nth-of-type(33n+7){
-  border-left: 4px solid #008080;}
-details:nth-of-type(33n+8){
-  border-left: 4px solid #ff0000;}
-details:nth-of-type(33n+9){
-  border-left: 4px solid #baa047;}
-details:nth-of-type(33n+10){
-  border-left: 4px solid #ff8686;}
-details:nth-of-type(33n+11){
-  border-left: 4px solid #c2b1ba;}
-details:nth-of-type(33n+12){
-  border-left: 4px solid #8b3f78;}
-details:nth-of-type(33n+13){
-  border-left: 4px solid #a9ba32;}
-details:nth-of-type(33n+14){
-  border-left: 4px solid #a096de;}
-details:nth-of-type(33n+15){
-  border-left: 4px solid #d3c48d;}
-details:nth-of-type(33n+16){
-  border-left: 4px solid #ff00ff;}
-details:nth-of-type(33n+17){
-  border-left: 4px solid #ffff00;}
-details:nth-of-type(33n+18){
-  border-left: 4px solid #8f8c91;}
-details:nth-of-type(33n+19){
-  border-left: 4px solid #ffa2ff;}
-details:nth-of-type(33n+20){
-  border-left: 4px solid #0000ff;}
-details:nth-of-type(33n+21){
-  border-left: 4px solid #d022c4;}
-details:nth-of-type(33n+22){
-  border-left: 4px solid #b3ffb3;}
-details:nth-of-type(33n+23){
-  border-left: 4px solid #37e6d9;}
-details:nth-of-type(33n+24){
-  border-left: 4px solid #9595ff;}
-details:nth-of-type(33n+25){
-  border-left: 4px solid #5b30c2;}
-details:nth-of-type(33n+26){
-  border-left: 4px solid #c8f1ff;}
-details:nth-of-type(33n+27){
-  border-left: 4px solid #00ff00;}
-details:nth-of-type(33n+28){
-  border-left: 4px solid #28caff;}
-details:nth-of-type(33n+29){
-  border-left: 4px solid #ffffd2;}
-details:nth-of-type(33n+30){
-  border-left: 4px solid #ffd0d0;}
-details:nth-of-type(33n+31){
-  border-left: 4px solid #008cbb;}
-details:nth-of-type(33n+32){
-  border-left: 4px solid #ea8aac;}
-details:nth-of-type(33n+33){
-  border-left: 4px solid #000000;}
-</style>
-</template>
-</katjusha-bbs>
-
-
-
-<katjusha-subject id="$subject">
-<template shadowrootmode="open">
+<subject id="$subject" oncontextmenu="event.preventDefault()">
 <table>
-  <thead id="thead">
+  <thead ondblclick="$subject.sort(event.target)">
     <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
   </thead>
-  <tbody id="tbody"></tbody>
+  <tbody id="$tbody" oncontextmenu="$tbody.contextmenu(event)" onmousedown="$tbody.select(event)">
+  </tbody>
 </table>
-<style>
-:host{
-  overflow-y: scroll;}
-table{
-  border-collapse: collapse;
-  width: 100%;
-  margin: 1px 0 3px 0;
-  /*table-layout: fixed;*/}
-thead{
-  /*position: sticky;
-  top: 0;*/}
-th{
-  background-color: #f0f0f0;
-  border-top: solid 1px #e3e3e3;
-  border-left: solid 1px #e3e3e3;
-  border-right: solid 1px #a0a0a0;
-  border-bottom: solid 3px #fff;
-  box-shadow: 0 -1px 0 0 #a0a0a0 inset;
-  font-weight: normal;
-  padding: 1px 4px 2px 4px;}
-th:nth-of-type(1){
-  text-align: right;
-  width: 40px;}
-th:nth-of-type(2){
-  text-align: left;
-  padding-left: 8px;
-  width: 450px;
-  overflow: hidden;}
-th:nth-of-type(3){
-  text-align: right;
-  width: 45px;}
-th:nth-of-type(4){
-  text-align: right;
-  width: 45px;}
-th:nth-of-type(5){
-  text-align: right;
-  width: 45px;}
-th:nth-of-type(6){
-  text-align: left;
-  width: 140px;}
-th:nth-of-type(7){
-  text-align: left;
-  width: 140px;}
-td{
-  padding: 2px 4px;}
-td:nth-of-type(1){
-  text-align: right;}
-td:nth-of-type(2){
-  text-align: left;
-  padding-left: 10px;}
-td:nth-of-type(3){
-  text-align: right;}
-td:nth-of-type(4){
-  text-align: right;}
-td:nth-of-type(5){
-  text-align: right;}
-td:nth-of-type(6){
-  text-align: left;}
-td:nth-of-type(7){
-  text-align: left;}
-td:nth-of-type(8){
-  z-index: 2;
-  background-color: #fff;}
-a{
-  text-decoration: none;
-  color: #000;
-  cursor: default;}
-tr.selected{
-  color: #fff;
-  background-color: #0078d7;}
-tr.selected a{
-  color: #fff;}
-</style>
-</template>
-</katjusha-subject>
+</subject>
+
+<headline id="$headline" oncontextmenu="event.preventDefault()">
+<header>
+  <headline-bbs id="$headlineBBS"></headline-bbs>
+  <headline-title id="$headlineTitle"></headline-title>
+</header>
+<thread-icons>
+  <button id="$リストアイコン"></button>
+  <icon-separate></icon-separate>
+  <button id="$レス更新アイコン" title="レスを取得"></button>
+  <button id="$中止アイコン" title="レス受信中止"></button>
+  <icon-separate></icon-separate>
+  <button id="$レス投稿アイコン" title="レス書き込み" command="show-modal" commandfor="$dialog"></button>
+  <button id="$お気に入りアイコン"></button>
+  <icon-separate></icon-separate>
+  <button id="$ごみ箱アイコン" title="ログ削除"></button>
+  <button id="$タブ閉じるアイコン" title="タブを閉じる"></button>
+</thread-icons>
+</headline>
+
+<tabs id="$tab" ondblclick="$katjusha.link(event.target.className)" onclick="$tab.select(event.target)" oncontextmenu="$tab.contextmenu(event)">
+  <tab id="$tabActive"></tab>
+</tabs>
+
+<threads id="$thread" onclick="$thread.clicked(event)">
+  <thread id="$threadActive"></thread>
+</threads>
+
+<status id="$status"></status>
 
 
-
-<katjusha-headline id="$headline">
-<template shadowrootmode="open">
-<div id="headline">
-  <div>
-    <span id="bbs"></span>
-    <span id="thread"></span>
-  </div>
-  <div id="icons">
-    <span id="リストアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="レス更新アイコン" class="icon" title="レスを取得"></span>
-    <span id="中止アイコン" class="icon" title="レス受信中止"></span>
-    <span class="icon-separate"></span>
-    <span id="レス投稿アイコン" class="icon" title="レス書き込み"></span>
-    <span id="お気に入りアイコン" class="icon"></span>
-    <span class="icon-separate"></span>
-    <span id="ごみ箱アイコン" class="icon" title="ログ削除"></span>
-    <span id="タブ閉じるアイコン" class="icon" title="タブを閉じる"></span>
-  </div>
-</div>
-<style>
-#headline{
-  background-color: #f0f0f0;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #c0c0c0;
-  box-shadow: 0 1px 0 0 #fff inset;}
-#bbs{
-  margin-left: 14px;}
-#bbs a{
-  color: #000;
-  text-decoration: none;}
-#icons{
-  display: flex;
-  align-items: center;
-  padding-top: 1px;}
-#リストアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAAD///+EhIQAAADG3sZSWlK9Ut21AAAAAXRSTlMAQObYZgAAAD1JREFUCNdjQAAlMAAyFAWBQAjGEAYxVJSUnIRRRVSclFBFgEpU0EWU0EVcVEKDoSIhzjCGAZChbAwEDAwApasK+zo+x0wAAAAASUVORK5CYII=');}
-#レス更新アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEUAAAD/GACEAADWAAAAAAD/WlLW5g+1AAAAAXRSTlMAQObYZgAAAD9JREFUCNdjQAJKQKAAYigKCgqSymBRAjGUVBgYnA2BDGMHoJBxoGCwCUiNs6koSAAkBBIAC4EEwEImMPtBAgBdxwlHhjWoKgAAAABJRU5ErkJggg==');}
-#中止アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAIVBMVEUAAACEAAD/AADWAACtAAD///8AAAClpaVSAAD/WlL/nK0BYpsaAAAAAXRSTlMAQObYZgAAAIZJREFUCNdjYGBgFBQUYADRwkpKhiCWsNLMmUqGQAEjJc1JSsoCDIxK5UpAJACUCS1SDwXKCRuphpcGGQMZxsZLo4yBjBZn49JwY2MPhhYX99DQEhcPhkaX0hDXcBcJBjbBUBeXUMcEBrZGERcXR4kEBoYMQSBoA9rFligoKAYUALLS0oA0ANegGhWasO0CAAAAAElFTkSuQmCC');}
-#レス投稿アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAHlBMVEUAAAD/vQBSOQAAAAB7WgD/3q3WnFJ7e1KAgIBSWlLnpR9xAAAAAXRSTlMAQObYZgAAAGFJREFUCNdjAAEmJQUGMHBKSwLTLEHJZmAh16Bky2SQQGij2kwQwzVCUCgtGSwgKKikDBYQFHIxgAioODMwlEAFGIqgAgyliiABECMIIsBgma4EFmCYbF6uDLbR2NgYLAAAk/AUIWxYH70AAAAASUVORK5CYII=');}
-#お気に入りアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAFVBMVEUAAAD/vQAAAAAAAITWnFL//wB7WgBge4O/AAAAAXRSTlMAQObYZgAAAEdJREFUCNdjQAAWFxcIwzU01AEsECgoGOLi4sDAJigoKBoaGgZkgIEQmGEIZRgaGkIYwsZgESANZMFEEGoQuhDmMClBANwRAHcUC4t31YHOAAAAAElFTkSuQmCC');}
-#ごみ箱アイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAFVBMVEUAAAClpaUAAABSWlLG3sb///f////hVKakAAAAAXRSTlMAQObYZgAAAElJREFUCNdjAAIlJQYIFWwIYjIJgoCwAgOTS2iIo6AxkGEMAkAGg0qoi6CwEQOQIQiUATNEHQMNyWEkmoAYioKCEHOMlIBAmQEAhE4QrWeW2SgAAAAASUVORK5CYII=');}
-#タブ閉じるアイコン{
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEUAAAAAAAD///+D3c/SAAAAAXRSTlMAQObYZgAAAEpJREFUCNcdxLENwCAMAMEHBSl0adynIXMwggsLuWQUlkDKuLFyxfE74ELAaD05VcskmyzYA2geFY3EorEheeuUWRVZ2Xjg5YT7A0oLCUNeetUUAAAAAElFTkSuQmCC');}
-.icon{
-  padding: 2px 3px;
-  margin: 0 1px;
-  border: solid 1px #f0f0f0;
-  width: 20px;
-  height: 20px;
-  background-repeat: no-repeat;
-  background-size: 16px;
-  background-position: center;}
-.icon:hover{
-  border-top: solid 1px #fff;
-  border-left: solid 1px #fff;
-  border-bottom: solid 1px #a0a0a0;
-  border-right: solid 1px #a0a0a0;}
-.icon:active{
-  border-top: solid 1px #a0a0a0;
-  border-left: solid 1px #a0a0a0;
-  border-bottom: solid 1px #fff;
-  border-right: solid 1px #fff;
-  transform: translate(1px, 1px);}
-.icon-separate{
-  width: 2px;
-  height: 16px;
-  margin: 0 3px;
-  background-repeat: no-repeat;
-  background-size: 2px 16px;
-  background-position: center;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAQAQMAAAAGZjz3AAAABlBMVEX///+goKD0a5EfAAAAC0lEQVQI12NowA8BgCAIAWcmA/MAAAAASUVORK5CYII=');}
-.icon-text{
-  padding: 2px 2px;
-  margin: 0 1px;
-  border: solid 1px #f0f0f0;}
-.icon-text:hover{
-  border-top: solid 1px #fff;
-  border-left: solid 1px #fff;
-  border-bottom: solid 1px #a0a0a0;
-  border-right: solid 1px #a0a0a0;}
-.icon-text:active{
-  border-top: solid 1px #a0a0a0;
-  border-left: solid 1px #a0a0a0;
-  border-bottom: solid 1px #fff;
-  border-right: solid 1px #fff;
-  transform: translate(1px, 1px);}
-</style>
-</template>
-</katjusha-headline>
-
-
-
-<katjusha-tab id="$tab">
-<template shadowrootmode="open">
-<ul id="tab"></ul>
-<style>
-ul{
-  list-style: none;
-  cursor: default;
-  display: flex;
-  align-items: flex-end;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding-left: 10px;
-  border-bottom: 1px solid #c0c0c0;}
-li{
-  text-align: left;
-  border-top: 1px solid #e3e3e3;
-  border-left: 1px solid #e3e3e3;
-  border-right: 1px solid #e3e3e3;
-  background-color: #f0f0f0;
-  color: #909090;
-  background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  width: 100px;
-  margin: 0 -5px;
-  padding-left: 10px;
-  height: 20px;
-  white-space: nowrap;
-  overflow: hidden;
-  line-height: 20px;
-  box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;}
-.selected{
-  color: #000;
-  z-index: 2;
-  height: 22px;
-  line-height: 22px;}
-.selected::before{
-  box-shadow: 2px 2px 0 #fff;}
-.selected::after{
-  box-shadow: -2px 2px 0 #fff;}
-[loading]{
-  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRoPSI2NHB4IiBoZWlnaHQ9IjY0cHgiIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTA4NmU2IiBmaWxsLW9wYWNpdHk9IjEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGQ9Ik02My44NSAwQTYzLjg1IDYzLjg1IDAgMSAxIDAgNjMuODUgNjMuODUgNjMuODUgMCAwIDEgNjMuODUgMHptLjY1IDE5LjVhNDQgNDQgMCAxIDEtNDQgNDQgNDQgNDQgMCAwIDEgNDQtNDR6IiBmaWxsPSJ1cmwoI2xpbmVhci1ncmFkaWVudCkiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDY0IDY0IiB0bz0iMzYwIDY0IDY0IiBkdXI9IjEwODBtcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiPjwvYW5pbWF0ZVRyYW5zZm9ybT48L2c+PC9zdmc+'), linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-  background-repeat: no-repeat;
-  background-size: 12px;
-  background-position: 4px center;}
-</style>
-</template>
-</katjusha-tab>
-
-
-
-<katjusha-thread id="$thread">
-<template shadowrootmode="open">
-<style>
-:host{
-  font-size: 18px;
-  user-select: text;
-  cursor: auto;
-  overflow-y: scroll;
-  padding: 2px 12px 24px 6px;
-  word-break: break-all;
-  line-height: 1.15;}
-.thread{
-  display: none;}
-.thread.selected{
-  display: block;}
-.res{
-  margin: 20px 8px;}
-.res i{
-  color: blue;
-  font-style: normal;
-  cursor: pointer;}
-.res i:hover{
-  text-decoration: underline;}
-.res .from{
-  color: forestgreen;}
-.res .from::before{
-  content: '名前：';
-  color: #000;
-  margin: 0 0.1rem 0 0.7rem;
-  user-select: text;}
-.res time{}
-.res time::before{
-  content: '投稿日：';
-  margin: 0 0.1rem 0 0.7rem;
-  user-select: text;}
-.res address{
-  display: inline;
-  font-style: normal;
-  color: red;
-  margin-left: 8px;}
-.res p{
-  margin-top: 2px;
-  margin-left: 36px;
-  white-space: pre-wrap;}
-.res a{
-  text-decoration: none;}
-.res a:hover{
-  text-decoration: underline;}
-.res .anchor{
-  position: relative;
-  cursor: pointer;
-  color: blue;}
-</style>
-</template>
-</katjusha-thread>
-
-
-
-<katjusha-status id="$status">
-<template shadowrootmode="open">
-<slot></slot>
-<style>
-:host{
-  border-top: 1px solid #c0c0c0;
-  box-shadow: 0 1px 0 0 #fff inset;
-  background-color: #f0f0f0;
-  line-height: 18px;
-  font-family: 'Meiryo', sans-serif;
-  padding-left: 4px;}
-</style>
-</template>
-</katjusha-status>
-
-
-
-<template id="$KatjushaFormTemplate">
-<div>
-  <div id="header">
-    <div id="title"></div>
-    <div id="close"></div>
-  </div>
-  <ul id="tab">
+<dialog id="$dialog">
+  <header onpointermove="$dialog.move(event)">
+    <h1 id="$dialogTitle"></h1>
+    <button command="close" commandfor="$dialog"></button>
+  </header>
+  <ul>
     <li class="selected">書き込み</li>
     <li>ローカルルール</li>
   </ul>
-  <form id="form" action="test/bbs.cgi" method="POST" spellcheck="false">
-    <div id="area1">
-      <label id="subjectlabel">タイトル</label>
-      <input id="subject" name="subject" type="text">
-    </div>
-    <div id="area2">
-      <label id="fromlabel">名前</label>
-      <input id="from" name="FROM" type="text">
-      <label id="maillabel">メール</label>
-      <input id="mail" name="mail" type="text">
-      <input id="sage" type="checkbox">
-      <label id="sagelabel" for="sage">sage</label>
-    </div>
-    <textarea id="message" name="MESSAGE"></textarea>
-    <div id="area3">
-      <input id="submit" type="submit" value="書き込む">
-      <input id="reset" type="reset" value="キャンセル">
-    </div>
-    <input id="bbs" name="bbs" type="hidden">
-    <input id="key" name="key" type="hidden">
-    <input name="submit" value="書き込む" type="hidden">
+  <form id="$form" action="test/bbs.cgi" method="POST" spellcheck="false">
+    <table>
+      <tr>
+        <th>タイトル</th>
+        <td colspan="4"><input type="text" name="subject"></td></tr>
+      <tr>
+        <th>名前</th>
+        <td><input type="text" name="FROM"></td>
+        <th>メール</th>
+        <td><input type="text" name="mail"></td>
+        <td><label><input type="checkbox" name="sage">sage</label></td></tr>
+    </table>
+    <textarea name="MESSAGE"></textarea>
+    <input type="submit" name="submit" value="書き込む">
+    <input type="hidden" name="bbs">
+    <input type="hidden" name="key">
   </form>
-</div>
-<style>
-:host{
-  position: absolute;
-  width: fit-content;
-  height: fit-content;
-  margin: auto;
-  inset: 0;
-  z-index: 5;
-  border: solid 1px #2982cc;
-  background-color: #f0f0f0;
-  font-family: 'MS PGothic', sans-serif;
-  font-size: 13px;}
-#header{
-  box-sizing: border-box;
-  background-color: #2982cc;
-  padding: 5px 0 5px 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-repeat: no-repeat;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAKlBMVEUAAAAAAAD//9T/4rH/1I7/xmvckgD/uEj/8NT/qgC5egCWYgD/qiWAAABV6iNkAAAAAXRSTlMAQObYZgAAAHlJREFUCNdjYGBgBCEQkBRgEBMAMUQFQAgIhANBCCgfZC4YbAhiGJWENPkA5aSURCyUJBcyMIgoCTtbiBcC1RoppaWYJALVWChpmLiD9EuYuIZtBNKCQsruaQJAGRcXJdOyhUBGqq2SsTtI7RQhDWN3sBrJ0NBqAQYAQ74Ta8sT5DsAAAAASUVORK5CYII=');
-  background-size: 16px;
-  background-position: 6px center;
-  height: 28px;}
-#title{
-  color: #fff;
-  font-size: 14px;
-  font-weight: normal;
-  margin-left: 20px;}
-#close{
-  width: 28px;
-  height: 28px;
-  background-repeat: no-repeat;
-  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgd2lkdGg9IjE3OTIiIGhlaWdodD0iMTc5MiIgdmlld0JveD0iMCAwIDE3OTIgMTc5MiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTQ5MCAxMzIycTAgNDAtMjggNjhsLTEzNiAxMzZxLTI4IDI4LTY4IDI4dC02OC0yOGwtMjk0LTI5NC0yOTQgMjk0cS0yOCAyOC02OCAyOHQtNjgtMjhsLTEzNi0xMzZxLTI4LTI4LTI4LTY4dDI4LTY4bDI5NC0yOTQtMjk0LTI5NHEtMjgtMjgtMjgtNjh0MjgtNjhsMTM2LTEzNnEyOC0yOCA2OC0yOHQ2OCAyOGwyOTQgMjk0IDI5NC0yOTRxMjgtMjggNjgtMjh0NjggMjhsMTM2IDEzNnEyOCAyOCAyOCA2OHQtMjggNjhsLTI5NCAyOTQgMjk0IDI5NHEyOCAyOCAyOCA2OHoiIGZpbGw9IiNmZmYiLz48L3N2Zz4NCg==');
-  background-size: 16px;
-  background-position: center center;
-  cursor: pointer;}
-#close:hover{
-  background-color: #e81123;}
-#tab{
-  height: 24px;
-  list-style: none;
-  cursor: default;
-  display: flex;
-  align-items: flex-end;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding-left: 6px;
-  border-bottom: 1px solid #c0c0c0;
-  box-shadow: 0 1px 0 #fff;}
-#tab > li{
-  text-align: center;
-  border-top: 1px solid #e3e3e3;
-  border-left: 1px solid #e3e3e3;
-  border-right: 1px solid #e3e3e3;
-  background-color: #f0f0f0;
-  color: #909090;
-  background: linear-gradient(to top, #ececec 50%, #e9e9e9 100%);
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  margin: 0 -5px;
-  padding: 0 6px;
-  height: 20px;
-  white-space: nowrap;
-  overflow: hidden;
-  line-height: 20px;
-  box-shadow: 1px 0 1px rgba(0, 0, 0, 0.4), inset 1px 1px 0 #fff;
-  user-select: none;}
-#tab .selected{
-  color: #000;
-  z-index: 2;
-  height: 22px;
-  line-height: 22px;}
-#form{
-  padding: 4px 12px 6px 12px;
-  display: flex;
-  flex-direction: column;
-  min-width: max-content;
-  min-height: 280px;
-  resize: both;
-  overflow: hidden;}
-#area1{
-  display: flex;
-  align-items: center;
-  margin-top: 6px;}
-#subjectlabel{
-  min-width: 50px;
-  text-align: right;
-  padding-right: 4px;
-  user-select: none;}
-[type="text"]{
-  border-left: solid 1px #696969;
-  border-top: solid 1px #696969;
-  border-right: solid 1px #e3e3e3;
-  border-bottom: solid 1px #e3e3e3;
-  box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
-  outline: none;
-  padding-left: 2px;
-  height: 18px;
-  font-family: 'MS PGothic', sans-serif;}
-#subject{
-  flex-grow: 1;}
-#subject:disabled{
-  color: #6d6d6d;
-  background-color: #fff;}
-#area2{
-  display: flex;
-  align-items: center;
-  margin-top: 8px;}
-#fromlabel{
-  min-width: 50px;
-  text-align: right;
-  padding-right: 4px;
-  user-select: none;}
-#from{
-  flex-grow: 1;
-  margin-right: 6px;}
-#maillabel{
-  min-width: 50px;
-  padding-right: 3px;
-  text-align: right;
-  user-select: none;}
-#mail{
-  flex-grow: 1;
-  margin-right: 6px;}
-#mail:read-only{
-  color: #6d6d6d;}
-#sagelabel{
-  padding: 2px 0;
-  user-select: none;}
-#message{
-  flex-grow: 1;
-  min-height: 160px;
-  font-size: 12px;
-  border-left: solid 1px #696969;
-  border-top: solid 1px #696969;
-  border-right: solid 1px #e3e3e3;
-  border-bottom: solid 1px #e3e3e3;
-  box-shadow: -1px -1px 0 #a0a0a0, 1px 1px 0 #fff;
-  overflow: scroll;
-  outline: none;
-  padding-left: 4px;
-  resize: none;
-  margin-top: 10px;}
-#area3{
-  text-align: center;
-  margin-top: 6px;}
-#area3 input{
-  background-color: transparent;
-  width: 80px;
-  font-size: 12px;
-  font-family: 'MS PGothic', sans-serif;
-  padding: 3px;
-  border-left: solid 1px #e3e3e3;
-  border-top: solid 1px #e3e3e3;
-  border-right: solid 1px #a0a0a0;
-  border-bottom: solid 1px #a0a0a0;
-  box-shadow: -1px -1px 0 #fff, 1px 1px 0 #696969;}
-#area3 input:active{
-  transform: translate(1px, 1px);}
-</style>
-</template>
+</dialog>
+
+<contextmenu id="$contextmenu" oncontextmenu="event.preventDefault()" popover></contextmenu>
+
+<popup id="$popup" popover></popup>
 
 
 
-<template id="$KatjushaContextTemplate">
-<ul id="context" class="menu"></ul>
-<style>
-:host{
-  display: block;
-  position: absolute;
-  z-index: 10;}
-.menu,
-.menu ul{
-  min-width: 160px;
-  margin: 0;
-  padding: 2px 0;
-  list-style: none;
-  background-color: #f0f0f0;
-  border: 1px solid #999;
-  border-radius: 2px;
-  box-shadow: 2px 2px 1px rgba(50, 50, 50, 0.1);}
-.menu li{
-  font-family: 'Yu Gothic UI', 'Meiryo', sans-serif;
-  font-size: 12px;}
-.menu li:empty{
-  height: 2px;
-  margin: 3px 1px;
-  background-color: #e5e5e5;
-  box-shadow: 0 1px 0 #fff;}
-.menu a{
-  display: block;
-  padding: 2px 20px 2px 24px;
-  line-height: 18px;
-  color: #000;
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: default;}
-.menu a:hover,
-.menu-sub:hover > a{
-  background-color: #91c9f7;}
-.menu-sub{
-  position: relative;}
-.menu-sub > a::after{
-  position: absolute;
-  right: 5px;
-  width: 0;
-  height: 0;
-  margin-top: 5px;
-  border: solid 5px transparent;
-  border-left: solid 5px #333;
-  content: '';}
-.menu-sub > ul{
-  position: absolute;
-  top: -3px;
-  left: 100%;
-  border-radius: 2px;
-  display: none;}
-.menu-sub:hover > ul{
-  display: block;}
-</style>
-</template>
+<script type="module">
+
+$katjusha.start = function(){
+    $bbs.init()
+    $base.title = document.title
+    $全板ボタン.textContent = `▽${document.title}`
+    $katjusha.aborts = new Set
+
+    if($base.href !== document.URL){
+        $katjusha.link(document.URL)
+    }
+}
+
+$katjusha.onclick = function(event){
+    const {href, target} = event.target
+
+    if(!href) return
+    else if(href === $base.href){
+        event.preventDefault()
+        history.replaceState(null, null, href)
+    }
+    else if(URLisBBS(href)){
+        event.preventDefault()
+        $katjusha.fetch(`${href}subject.txt`).then(r => $subject.recieve(r, href))
+    }
+    else if(URLisThread(href)){
+        event.preventDefault()
+        const data    = スレッド[href]
+        const headers = data.etag ? {'If-None-Match':data.etag, 'Range':`bytes=${data.byte}-`} : {}
+
+        $tab.open(href, target, data)
+        $tab.loading(href)
+        $katjusha.fetch(data.daturl, {headers}).then(r => $thread.recieve(r, data))
+    }
+}
+
+$katjusha.fetch = async function(url, option){
+    const {hostname} = new URL(url)
+    const abort      = new AbortController()
+
+    try{
+        $anime.dataset.ajax++
+        $katjusha.aborts.add(abort)
+        $status.textContent = `${hostname}に接続しています`
+        const response   = await fetch(url, {cache:'no-store', signal:abort.signal, ...option})
+        response.content = new TextDecoder('shift-jis').decode(await response.arrayBuffer())
+        response.byte    = Number(response.headers.get('Content-Length'))
+        response.etag    = response.headers.get('ETag')?.replace('W/', '').replace('-gzip', '')
+        $status.textContent = `${hostname}に接続しました`
+
+        return response
+    }
+    catch(error){ // DNSエラー・CORSエラー・Abortの時のみ来る。404の時は来ない。
+        $status.textContent = error.name === 'AbortError' ? `` : `${hostname}に接続できませんでした`
+        return error
+    }
+    finally{
+        $anime.dataset.ajax--
+        $katjusha.aborts.delete(abort)
+    }
+}
+
+$katjusha.link = function(href, target){
+    $katjusha.href   = href
+    $katjusha.target = target
+    $katjusha.click()
+}
+
+
+$bbs.init = function(){
+    let category = ''
+    for(const el of $('*summary, a', this)){
+        if(el.tagName === 'A'){
+            const url = el.href
+            $bbs[url] = {category, url, el, name:el.textContent, ...URLparseBBS(url)}
+        }
+        else{
+            category  = el.textContent
+        }
+    }
+}
+
+$bbs.select = function(url){
+    if(this[url]){
+        if(window.$bbsActive){
+            $bbsActive.id  = ""
+        }
+        this[url].el.id = "$bbsActive"
+    }
+}
+
+$bbs.contextmenu = function(event, a){
+    event.preventDefault()
+    event.stopPropagation()
+
+    if(a.tagName !== 'A') return
+
+    this.select(a.href)
+    $contextmenu.show(event, {
+        'URLをコピー'           : _=> clipboard(a.href),
+        '掲示板名とURLをコピー' : _=> clipboard(`${a.innerHTML}\n${a.href}\n`),
+    })
+}
+
+$subject.recieve = function(response, url){
+    $tbody.textContent = ''
+    if(response.status !== 200) return
+
+    $bbs.select(url)
+    $tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML).join('')
+    $title.textContent = `${$base.title} [ ${$bbs[url].name} ]`
+    $status.textContent = `${$tbody.rows.length}件のスレッドを受信 (${date()})`
+    history.replaceState(null, null, url)
+}
+
+
+$subject.toHTML = function(line, i){
+    const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
+    const url  = URLbuild($bbsActive.href, key)
+    const data = スレッド[url]
+
+    data.subject = subject
+    if(data.num === data.既得){
+        data.新着 = 0
+    }
+
+    return `
+        <tr class="${url}">
+          <td>${i+1}</td>
+          <td><a href="${url}">${subject}</a></td>
+          <td>${num}</td>
+          <td>${data.既得 || ''}</td>
+          <td>${data.新着 || ''}</td>
+          <td>${data.最終取得}</td>
+          <td>${data.最終書き込み}</td>
+          <td></td>
+        </tr>`
+}
+
+
+$subject.select = function(el){
+    if(window.$subjectActive){
+        $subjectActive.id  = ""
+    }
+    el.id = "$subjectActive"
+}
+
+
+$subject.update = function(data){
+    const tr = $(`tr[class="${data.url}"]`, this)
+    if(!tr) return
+
+    tr.cells[2].textContent = data.num || ''
+    tr.cells[3].textContent = data.既得 || ''
+    tr.cells[4].textContent = data.新着 || ''
+    tr.cells[5].textContent = data.最終取得 || ''
+    tr.cells[6].textContent = data.最終書き込み || ''
+    this.select(tr)
+}
+
+$subject.sort = function(th){
+    this.cmp ??= new Intl.Collator('ja-JP', {numeric:true}).compare
+    th.order = th.order ? -th.order : -1
+    const i  = th.cellIndex
+    const tr = [...$tbody.rows].sort((a, b) => this.cmp(a.cells[i].textContent, b.cells[i].textContent)*th.order)
+
+    $tbody.append(...tr)
+}
+
+$tbody.select = function(event){
+    const tr = event.target.closest('tr')
+
+    if(event.button === 0 && event.target.cellIndex < 7){
+        event.preventDefault()
+        $subject.select(tr)
+        $katjusha.link(tr.className)
+    }
+}
+
+$tbody.contextmenu = function(event){
+    const tr  = event.target.closest('tr')
+    const url = tr.className
+
+    $subject.select(tr)
+    $contextmenu.show(event, {
+        '新しいタブで開く'      : _=> $katjusha.link(url, '_blank'),
+        'URLをコピー'           : _=> clipboard(url),
+        'タイトルとURLをコピー' : _=> clipboard(`${tr.cells[1].textContent}\n${url}\n`),
+    })
+}
 
 
 
-<template id="$KatjushaPopupTemplate">
-<div id="popup"></div>
-<style>
-:host{
-  font-size: 14px;
-  color: #000;
-  background-color: #ffffe1;
-  position: absolute;
-  border-right: 1px solid #7f7f7f;
-  border-bottom: 1px solid #7f7f7f;
-  border-left: 1px solid #e4e4e4;
-  border-top: 1px solid #e4e4e4;
-  box-shadow: 0 1px 0 #f7f7f7;
-  z-index: 8;
-  padding: 6px 4px;
-  cursor: default;}
-.res p{
-  margin: 3px 0 0 12px !important;}
-/* 以下はKatjushaThreadのコピペ */
-.res i{
-  color: blue;
-  font-style: normal;
-  cursor: pointer;}
-.res i:hover{
-  text-decoration: underline;}
-.res .from{
-  color: forestgreen;}
-.res .from::before{
-  content: '名前：';
-  color: #000;
-  margin: 0 0.1rem 0 0.7rem;
-  user-select: text;}
-.res time{}
-.res time::before{
-  content: '投稿日：';
-  margin: 0 0.1rem 0 0.7rem;
-  user-select: text;}
-.res address{
-  display: inline;
-  font-style: normal;
-  color: red;
-  margin-left: 8px;}
-.res p{
-  margin-top: 2px;
-  margin-left: 36px;
-  white-space: pre-wrap;}
-.res a{
-  text-decoration: none;}
-.res a:hover{
-  text-decoration: underline;}
-.res .anchor{
-  position: relative;
-  cursor: pointer;
-  color: blue;}
-</style>
-</template>
+$headline.render = function(data){
+    $headlineBBS.innerHTML   = `<a href="${data.bbsurl}">[${data.bbsname}]</a>`
+    $headlineTitle.innerHTML = `${data.subject} (${data.num})`
+}
+
+$レス更新アイコン.onclick = function(event){
+    $katjusha.link($tabActive.className)
+}
+
+$中止アイコン.onclick = function(event){
+    $katjusha.aborts.forEach(v => v.abort())
+}
+
+$ごみ箱アイコン.onclick = function(event){
+    const url = $tabActive.className
+
+    if(スレッド[url]){
+        $status.textContent = `「${スレッド[url].subject}」のログを削除しました`
+        delete スレッド[url]
+    }
+}
+
+$タブ閉じるアイコン.onclick = function(event){
+    $tab.close($tabActive.className)
+}
 
 
 
-</body>
-</html>
+$tab.open = function(url, target, data = {}){
+    const tab = $tab.get(url)
+
+    if(tab){
+        this.select(tab)
+    }
+    else if(!$tabActive.className || !target){
+        $tabActive.className      = url
+        $tabActive.innerHTML      = data.subject || ''
+        $threadActive.className   = url
+        $threadActive.innerHTML   = data.html || ''
+    }
+    else{
+        const newtab = $.tab(data.subject, {'class':url})
+        const thread = $.thread(data.html, {'class':url})
+        $tab.append(newtab)
+        $thread.append(thread)
+        this.select(newtab)
+    }
+}
+
+$tab.render = function(url, data = ''){
+    const tab    = $tab.get(url)
+    const thread = $thread.children[brosNo(tab)]
+
+    if(typeof data === 'object'){
+        tab.innerHTML    = data.subject
+        tab.className    = url
+        thread.innerHTML = data.html
+        thread.className = url
+    }
+    else{
+        thread.innerHTML  += data
+    }
+
+    $tab.select(tab)
+}
+
+$tab.select = function(tab){
+    if(!tab || tab.tagName !== 'TAB' || tab === $tabActive) return
+
+    const thread = $thread.children[brosNo(tab)]
+    const url    = tab.className
+
+    $tabActive.id  = $threadActive.id = ""
+    tab.id    = "$tabActive"
+    thread.id = "$threadActive"
+
+    if(!url) return
+
+    const data = スレッド[url]
+    $title.textContent = data.subject
+    $headline.render(data)
+    history.replaceState(null, null, url)
+}
+
+
+$tab.loading = function(url, bool = true){
+    $tab.get(url)?.toggleAttribute('loading', bool)
+}
+
+$tab.get = function(url){
+    return $(`tab[class="${url}"]`, this)
+}
+
+
+$tab.close = function(url){
+    const tab = $tab.get(url)
+    if(!tab || $tab.childElementCount === 1) return
+
+    this.select(tab.nextElementSibling ?? tab.previousElementSibling)
+    $thread.children[brosNo(tab)].remove()
+    tab.remove()
+}
+
+$tab.closeElse = function(url){
+    $(`*tab:not([class='${url}'])`, this).forEach(tab => $tab.close(tab.className))
+}
+
+$tab.contextmenu = function(event){
+    event.preventDefault()
+    event.stopPropagation()
+
+    if(event.target.tagName !== 'TAB') return
+
+    const url = event.target.className
+    $contextmenu.show(event, {
+        '閉じる'                 : _=> $tab.close(url),
+        'このタブ以外全て閉じる' : _=> $tab.closeElse(url),
+        'URLをコピー'            : _=> clipboard(url),
+        'タイトルとURLをコピー'  : _=> clipboard(`${event.target.innerHTML}\n${url}\n`),
+    })
+}
+
+
+$thread.recieve = function(response, data){
+    $tab.loading(data.url, false)
+
+    if(response.status === 200){
+        const dat = this.parse(response.content)
+
+        data.subject = dat.subject
+        data.html    = dat.html
+        data.num     = dat.num
+        data.byte    = response.byte
+        data.etag    = response.etag
+        data.既得    = dat.num
+        data.新着    = dat.num
+        data.最終取得= date()
+
+        $tab.render(data.url, data)
+        $headline.render(data)
+        $subject.update(data)
+        $title.textContent  = data.subject
+        $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(data.byte)}`
+    }
+    else if(response.status === 206){
+        const dat = this.parse(response.content, data.num)
+
+        data.html   += dat.html
+        data.num    += dat.num
+        data.byte   += response.byte
+        data.etag    = response.etag
+        data.既得    = data.num
+        data.新着    = dat.num
+        data.最終取得= date()
+
+        $tab.render(data.url, dat.html)
+        $headline.render(data)
+        $subject.update(data)
+        $title.textContent  = data.subject
+        $status.textContent = `${dat.num}のレスを受信 (${date()}) ${KB(data.byte)}`
+    }
+    else if(response.status === 304){
+        data.新着  = 0
+
+        $subject.update(data)
+        $status.textContent = `新着なし (${date()}) ${KB(data.byte)}`
+    }
+    else if(response.status === 404){
+        $status.textContent = `スレッドが見つかりません (${date()})`
+    }
+    else if(response.status === 416){
+        delete スレッド[data.url]
+        $katjusha.link(data.url)
+        return
+    }
+    else{
+        return
+    }
+
+    history.replaceState(null, null, data.url)
+}
+
+
+$thread.parse = function(text, n = 0){
+    const dat = text.trim().split('\n')
+    let  html = ''
+
+    for(const v of dat){
+        const [from, mail, date, message, subject] = v.split('<>')
+
+        const messageHTML = message
+        .replace(/&gt;&gt;([1-9]\d{0,3})/g, '<anchor data-n="$1" onmouseenter="$popup.show(event, $1)" onmouseleave="$popup.hidePopover()">&gt;&gt;$1</anchor>')
+        .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+        .replace(/^ /, '')
+        //datファイルにaタグが含まれる場合: replace(/<a (.+?)>(.+?)<\/a>/g, '$2')
+
+        html += `
+          <res data-n="${n}">
+            <header><i>${++n}</i><from><b>${from}</b></from><time>${date}</time><address>${mail}</address></header>
+            <p>${messageHTML}</p>
+          </res>
+        `
+    }
+
+    return {html, num:dat.length, subject:dat[0].split('<>').pop()}
+}
+
+$thread.clicked = function(event){
+    if(event.target.tagName === 'I'){
+        event.stopPropagation()
+        $contextmenu.show(event, {'これにレス' : _=> $thread.resTo(event.target.textContent)})
+    }
+    else if(event.target.tagName === 'ANCHOR'){
+        event.stopPropagation()
+        this.goto(event.target.dataset.n)
+    }
+}
+
+$thread.goto = function(n){
+    $threadActive.children[n-1]?.scrollIntoView()
+}
+
+
+$thread.resTo = function(n){
+    $レス投稿アイコン.click()
+    $form.insert(`>>${n}\n`)
+}
+
+
+
+$dialog.onbeforetoggle = function(event){
+    if(event.newState === "closed") return
+
+    $form.reset()
+    if(event.source === $スレッド投稿アイコン){
+        $form.url = window.$bbsActive?.href
+        if(!$form.url) return event.preventDefault()
+
+        const data = $bbs[$form.url]
+        $dialogTitle.textContent = `『${data.name}』に新規スレッド`
+        $form.action             = `${data.baseurl}test/bbs.cgi`
+        $form.bbs.value          = data.bbs
+        $form.subject.disabled   = false
+        $form.subject.autofocus  = true
+    }
+    else{
+        $form.url = window.$tabActive?.className
+        if(!$form.url) return event.preventDefault()
+
+        const data = スレッド[$form.url]
+        $dialogTitle.textContent = `「${data.subject}」にレス`
+        $form.action             = `${data.baseurl}test/bbs.cgi`
+        $form.bbs.value          = data.bbs
+        $form.key.value          = data.key
+        $form.subject.value      = data.subject
+        $form.subject.disabled   = true
+        $form.MESSAGE.autofocus  = true
+    }
+}
+
+
+$dialog.move = function(event){
+    if(!event.buttons) return
+
+    event.target.setPointerCapture(event.pointerId)
+    const {x, y, width, height} = this.getBoundingClientRect()
+    this.style.inset  = `${clamp(0, y+event.movementY, innerHeight-height)}px 0 0 ${clamp(0, x+event.movementX, innerWidth-width)}px`
+    this.style.margin = 0
+}
+
+
+$form.onsubmit = async function(event){
+    event.preventDefault()
+    $form.submit.disabled = true
+
+    const res = await $katjusha.fetch($form.action, {method:'POST', body:new FormData($form)})
+
+    $form.submit.disabled = false
+    $status.textContent = ''
+
+    if(!res.ok){
+        alert('エラーが発生して投稿できませんでした')
+    }
+    else if(res.content.includes('ＥＲＲＯＲ！')){
+        alert( res.content.match(/<b>(.+?)</i)[1] )
+    }
+    else{
+        if($form.key.value){
+            スレッド[$form.url].最終書き込み = date()
+        }
+        $dialog.close()
+        $katjusha.link($form.url)
+    }
+}
+
+
+$form.sage.onchange = function(event){
+    $form.mail.value    = event.target.checked ? 'sage' : ''
+    $form.mail.readOnly = event.target.checked
+}
+
+$form.insert = function(text){
+    const pos = this.MESSAGE.selectionStart + text.length
+
+    this.MESSAGE.setRangeText(text)
+    this.MESSAGE.setSelectionRange(pos, pos)
+    this.MESSAGE.focus()
+}
+
+
+
+$contextmenu.show = function(event, menu){
+    const buttons = Object.keys(menu).map(k => $.button(k, {'.onclick':menu[k], command:'hide-popover', commandfor:'$contextmenu'}))
+    const rect    = event.target.getBoundingClientRect()
+    this.replaceChildren(...buttons)
+    this.style.inset = `-${rect.bottom-event.y}px 0 0 -${rect.right-event.x}px`
+    this.togglePopover({source:event.target})
+}
+
+
+
+$popup.show = function(event, n){
+    const el = $threadActive.children[n-1]
+    if(!el) return
+
+    //const {left, width, top} = event.target.getBoundingClientRect()
+    //new KatjushaPopup(el.outerHTML).show(left+width/2, innerHeight-top+6)
+    //this.style.inset = `-${rect.bottom-event.y}px 0 0 -${rect.right-event.x}px`
+    this.innerHTML = el.outerHTML
+    this.togglePopover({source:event.target})
+}
+
+
+
+const スレッド = new Proxy({}, {get(target, url){
+    if(url in target){
+        return target[url]
+    }
+
+    const {bbs, key, bbsurl, baseurl} = URLparse(url)
+    target[url] = {
+        url     : url,
+        key     : key,
+        bbs     : bbs,
+        bbsurl  : bbsurl,
+        bbsname : $bbs[bbsurl].name,
+        baseurl : baseurl,
+        daturl  : `${bbsurl}dat/${key}.dat`,
+        subject : '',
+        html    : '',
+        num     : 0,
+        byte    : 0,
+        etag    : '',
+        scroll  : 0,
+        既得    : 0,
+        新着    : 0,
+        最終取得: '',
+        最終書き込み: '',
+    }
+
+    return target[url]
+}})
+
+
+
+const $ = new Proxy(proxySelector, {get: (_, name) => proxyElement.bind(name)})
+
+function proxySelector(selector, context = document){
+    return selector.startsWith('*') ? [...context.querySelectorAll(selector.slice(1)||'*')] : context.querySelector(selector)
+}
+
+function proxyElement(html, attr){
+    const el = document.createElement( this.replaceAll('_', '-') )
+    if(el.outerHTML.includes('/')){
+        el.innerHTML = html ?? ''
+    }
+    else{
+        attr = html
+    }
+
+    for(let name in attr ?? {}){
+        if(name.startsWith('.')){
+            el[name.slice(1)] = attr[name]
+        }
+        else{
+            el.setAttribute(name, attr[name])
+        }
+    }
+
+    return el
+}
+
+function date(){
+    const d  = new Date()
+
+    const 年 = d.getFullYear()
+    const 月 = (d.getMonth()+1).toString().padStart(2, 0)
+    const 日 = d.getDate().toString().padStart(2, 0)
+    const 時 = d.getHours().toString().padStart(2, 0)
+    const 分 = d.getMinutes().toString().padStart(2, 0)
+    const 秒 = d.getSeconds().toString().padStart(2, 0)
+
+    return `${年}/${月}/${日} ${時}:${分}:${秒}`
+}
+
+function KB(byte = 0){
+    return Math.ceil(byte/1024) + 'KB'
+}
+
+function clamp(min, num, max){
+    return Math.min(Math.max(min, num), max)
+}
+
+function URLbuild(bbsurl, key){
+    return bbsurl.replace(/([^/]+)\/$/, `test/read.cgi/$1/${key}/`)
+}
+
+function URLparse(url){
+    const [,baseurl,bbs,key] = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
+    return {baseurl, bbs, key, bbsurl:`${baseurl}${bbs}/`}
+}
+
+function URLparseBBS(url){
+    const [, baseurl, bbs] = url.match(/(.+\/)([^/]+)\/$/)
+    return {baseurl, bbs}
+}
+
+function URLisThread(url=''){
+    const m = url.match(/^(.+)test\/read\.cgi\/([^/]+)\/(\d+)\/$/)
+    return m && URLisBBS(m[1]+m[2]+'/')
+}
+
+function URLisBBS(url=''){
+    return url in $bbs
+}
+
+
+function brosNo(el){
+    return [...el.parentElement.children].indexOf(el)
+}
+
+function clipboard(text){
+    navigator.clipboard.writeText(text)
+}
+
+
+$katjusha.start()
+</script>
