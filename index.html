@@ -156,7 +156,8 @@ $katjusha.onclick = function(event){
         const headers = data.etag ? {'If-None-Match':data.etag, 'Range':`bytes=${data.byte}-`} : {}
 
         $tab.open(href, target, data)
-        $katjusha.fetch(data.daturl, {headers}).then(r => $thread.recieve(r, data))
+        $tab.loading(href)
+        $katjusha.fetch(data.daturl, {headers}).then(r => $thread.recieve(r, data)).finally(_=> $tab.loading(data.url, false))
     }
 }
 
