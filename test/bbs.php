@@ -8,7 +8,7 @@ mb_substitute_character('entity');
 if(!$_POST){
     parse_str(file_get_contents('php://input'), $_POST);
 }
-if(post('submit') === '書き込む'){
+if(post('submit')){
     mb_convert_variables('utf-8', 'sjis', $_POST);
 }
 
