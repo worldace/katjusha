@@ -1,6 +1,6 @@
 <?php
 
-ini_set("error_log", "/www/phperror.txt");
+
 $setting = setting_load();
 $c       = (object)["isMonazilla" => str_contains($_SERVER['HTTP_USER_AGENT']??'', 'Monazilla')];
 
