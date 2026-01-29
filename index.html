@@ -550,6 +550,7 @@ $dialog.onbeforetoggle = function(event){
     if(event.newState === "closed") return
 
     $form.reset()
+
     if(event.source === $スレッド投稿アイコン){
         $form.url = window.$bbsActive?.href
         if(!$form.url) return event.preventDefault()
@@ -558,8 +559,11 @@ $dialog.onbeforetoggle = function(event){
         $dialogTitle.textContent = `『${data.name}』に新規スレッド`
         $form.action             = `${data.baseurl}test/bbs.cgi`
         $form.bbs.value          = data.bbs
+        $form.key.value          = ''
+        $form.mail.readOnly      = false
         $form.subject.disabled   = false
         $form.subject.autofocus  = true
+        $form.MESSAGE.autofocus  = false
     }
     else{
         $form.url = window.$tabActive?.className
@@ -571,7 +575,9 @@ $dialog.onbeforetoggle = function(event){
         $form.bbs.value          = data.bbs
         $form.key.value          = data.key
         $form.subject.value      = data.subject
+        $form.mail.readOnly      = false
         $form.subject.disabled   = true
+        $form.subject.autofocus  = false
         $form.MESSAGE.autofocus  = true
     }
 }
