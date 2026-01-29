@@ -18,7 +18,7 @@
   <icon-separate></icon-separate>
   <button id="$検索アイコン"></button>
   <button id="$巡回アイコン"></button>
-  <button id="$スレッド投稿アイコン" title="新規スレッド書き込み" command="show-modal" commandfor="$dialog"></button>
+  <button id="$スレッド投稿アイコン" title="新規スレッド書き込み" command="show-popover" commandfor="$dialog"></button>
   <icon-separate></icon-separate>
   <button id="$ペインアイコン"></button>
   <button id="$グリッド1アイコン"></button>
@@ -72,7 +72,7 @@
   <button id="$レス更新アイコン" title="レスを取得"></button>
   <button id="$中止アイコン" title="レス受信中止"></button>
   <icon-separate></icon-separate>
-  <button id="$レス投稿アイコン" title="レス書き込み" command="show-modal" commandfor="$dialog"></button>
+  <button id="$レス投稿アイコン" title="レス書き込み" command="show-popover" commandfor="$dialog"></button>
   <button id="$お気に入りアイコン"></button>
   <icon-separate></icon-separate>
   <button id="$ごみ箱アイコン" title="ログ削除"></button>
@@ -91,10 +91,10 @@
 <status id="$status"></status>
 
 
-<dialog id="$dialog">
+<dialog id="$dialog" popover="manual">
   <header onpointermove="$dialog.move(event)">
     <h1 id="$dialogTitle"></h1>
-    <button command="close" commandfor="$dialog"></button>
+    <button command="hide-popover" commandfor="$dialog"></button>
   </header>
   <ul>
     <li class="selected">書き込み</li>
@@ -614,7 +614,7 @@ $form.onsubmit = async function(event){
         if($form.key.value){
             スレッド[$form.url].最終書き込み = date()
         }
-        $dialog.close()
+        $dialog.hidePopover()
         $katjusha.link($form.url)
     }
 }
