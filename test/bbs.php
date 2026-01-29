@@ -331,18 +331,15 @@ function 管理倉庫($c){
 
 function 管理復帰($c){
     file_edit($c->subjectFile, function() use($c){
-        foreach(glob("$c->bbsDir/dat/*.dat") as $v){
-            $list[$v] = filemtime($v);
-        }
-        arsort($list);
+        $list = glob("$c->bbsDir/dat/*.dat");
+        usort($list, fn($a, $b) => filemtime($b) - filemtime($a));
 
-        foreach(array_keys($list) as $v){
-            $filename = basename($v);
-            $dat      = file($v);
-            $subject  = explode("<>", $dat[0])[4];
-            $subject  = rtrim($subject);
-            $count    = count($dat);
-            $content[] = "$filename<>$subject ($count)\n";
+        foreach($list as $v){
+            $file      = basename($v);
+            $dat       = file($v);
+            $subject   = rtrim( explode("<>", $dat[0])[4] );
+            $count     = count($dat);
+            $content[] = "$file<>$subject ($count)\n";
         }
 
         return $content;
