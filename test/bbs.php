@@ -9,7 +9,7 @@ if(!$_POST) parse_str(file_get_contents('php://input'), $_POST);
 if($c->isMonazilla) mb_convert_variables('utf-8', 'sjis', $_POST);
 
 
-$c->isRes   = preg_match("/\d/", $_POST['key'] ?? '');
+$c->isRes   = !empty(post('key'));
 $c->bbs     = post('bbs');
 $c->key     = post('key') ?: $_SERVER['REQUEST_TIME'];
 $c->from    = post('FROM');
@@ -83,13 +83,14 @@ $c->from    = dat_from($c->from, $setting['nanashi'], $c->admin);
 $c->mail    = dat_mail($c->mail);
 $c->message = dat_message($c->message);
 $c->subject = dat_subject($c->subject);
+$c->date    = dat_date();
 
 
 if($c->isRes){
-    file_edit($c->subjectFile, 'res_save') ? ok($c->bbs, $c->key) : error('レス書き込みエラー');
+    file_edit($c->subjectFile, res_save(...)) ? ok($c->bbs, $c->key) : error('レス書き込みエラー');
 }
 else{
-    file_edit($c->subjectFile, 'thread_save') ? ok($c->bbs, $c->key) : error('スレッド書き込みエラー');
+    file_edit($c->subjectFile, thread_save(...)) ? ok($c->bbs, $c->key) : error('スレッド書き込みエラー');
 }
 
 exit;
@@ -101,10 +102,9 @@ function res_save($content){
 
     $line = subject_select($content, $c->key);
     if(!$line) error('このスレッドは存在しません');
-    if($line->num >= 1000)  error('このスレッドにはこれ以上書き込めません');
+    if($line->num >= 1000) error('このスレッドにはこれ以上書き込めません');
 
-    $date = dat_date();
-    $dat  = mb_convert_encoding("$c->from<>$c->mail<>$date<> $c->message <>\n", 'sjis', 'utf-8');
+    $dat = mb_convert_encoding("$c->from<>$c->mail<>$c->date<> $c->message <>\n", 'sjis', 'utf-8');
     file_put_contents($c->datFile, $dat, LOCK_EX|FILE_APPEND);
 
     $line->num++;
@@ -127,8 +127,7 @@ function res_delete($dat, $kako, $num){
 function thread_save($content){
     global $c;
 
-    $date = dat_date();
-    $dat  = mb_convert_encoding("$c->from<>$c->mail<>$date<> $c->message <>$c->subject\n", 'sjis', 'utf-8');
+    $dat  = mb_convert_encoding("$c->from<>$c->mail<>$c->date<> $c->message <>$c->subject\n", 'sjis', 'utf-8');
     $txt  = mb_convert_encoding("$c->key.dat<>$c->subject (1)\n", 'sjis', 'utf-8');
 
     file_put_contents($c->datFile, $dat, LOCK_EX);
@@ -275,7 +274,7 @@ function setting_load(){
 function setting_admin($setting, $mail){
     $i = array_search($mail, array_column($setting['admin'], 'password'));
 
-    return is_int($i) ? $setting['admin'][$i] : false;
+    return is_int($i) ? $setting['admin'][$i] : null;
 }
 
 
@@ -307,8 +306,7 @@ function 管理削除($c){
         if(preg_match("/>>(\d+)-?(\d+)?/", $v, $m)){
             if($m[1] == 1) return '1番目のレスは削除できません';
 
-            $m[2] = $m[2] ?? $m[1];
-            foreach(range($m[1], $m[2]) as $i){
+            foreach(range($m[1], $m[2] ?? $m[1]) as $i){
                 res_delete($c->datFile, $c->kakoFile, $i);
             }
         }

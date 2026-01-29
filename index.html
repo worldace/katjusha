@@ -549,15 +549,15 @@ $thread.resTo = function(n){
 $dialog.onbeforetoggle = function(event){
     if(event.newState === "closed") return
 
-    $form.reset()
-
     if(event.source === $スレッド投稿アイコン){
-        $form.url = window.$bbsActive?.href
-        if(!$form.url) return event.preventDefault()
+        const url  = window.$bbsActive?.href
+        if(!url) return event.preventDefault()
+        if(url !== $form.url) $form.reset()
 
-        const data = $bbs[$form.url]
+        const data = $bbs[url]
         $dialogTitle.textContent = `『${data.name}』に新規スレッド`
         $form.action             = `${data.baseurl}test/bbs.cgi`
+        $form.url                = url
         $form.bbs.value          = data.bbs
         $form.key.value          = ''
         $form.mail.readOnly      = false
@@ -566,12 +566,14 @@ $dialog.onbeforetoggle = function(event){
         $form.MESSAGE.autofocus  = false
     }
     else{
-        $form.url = window.$tabActive?.className
-        if(!$form.url) return event.preventDefault()
+        const url = window.$tabActive?.className
+        if(!url) return event.preventDefault()
+        if(url !== $form.url) $form.reset()
 
-        const data = スレッド[$form.url]
+        const data = スレッド[url]
         $dialogTitle.textContent = `「${data.subject}」にレス`
         $form.action             = `${data.baseurl}test/bbs.cgi`
+        $form.url                = url
         $form.bbs.value          = data.bbs
         $form.key.value          = data.key
         $form.subject.value      = data.subject
