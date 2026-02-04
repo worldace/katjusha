@@ -148,16 +148,11 @@ $katjusha.onclick = function(event){
     }
     else if(URLisBBS(href)){
         event.preventDefault()
-        $katjusha.fetch(`${href}subject.txt`).then(r => $subject.recieve(r, href))
+        $subject.fetch(href)
     }
     else if(URLisThread(href)){
         event.preventDefault()
-        const data    = スレッド[href]
-        const headers = data.etag ? {'If-None-Match':data.etag, 'Range':`bytes=${data.byte}-`} : {}
-
-        $tab.open(href, target, data)
-        $tab.loading(href)
-        $katjusha.fetch(data.daturl, {headers}).then(r => $thread.recieve(r, data)).finally(_=> $tab.loading(data.url, false))
+        $thread.fetch(href, target)
     }
 }
 
@@ -196,13 +191,12 @@ $katjusha.link = function(href, target){
 
 $bbs.init = function(){
     let category = ''
-    for(const el of $('*summary, a', this)){
+    for(const el of $('*a, summary', this)){
         if(el.tagName === 'A'){
-            const url = el.href
-            $bbs[url] = {category, url, el, name:el.textContent, ...URLparseBBS(url)}
+            $bbs[el.href] = {el, category, url:el.href, name:el.textContent, ...URLparseBBS(el.href)}
         }
         else{
-            category  = el.textContent
+            category = el.textContent
         }
     }
 }
@@ -229,7 +223,9 @@ $bbs.contextmenu = function(event, a){
     })
 }
 
-$subject.recieve = function(response, url){
+$subject.fetch = async function(url){
+    const response = await $katjusha.fetch(`${url}subject.txt`)
+
     $tbody.textContent = ''
     if(response.status !== 200) return
 
@@ -440,7 +436,13 @@ $tab.contextmenu = function(event){
 }
 
 
-$thread.recieve = function(response, data){
+$thread.fetch = async function(href, target){
+    const data    = スレッド[href]
+    const headers = data.etag ? {'If-None-Match':data.etag, 'Range':`bytes=${data.byte}-`} : {}
+
+    $tab.open(href, target, data)
+    $tab.loading(href)
+    const response = await $katjusha.fetch(data.daturl, {headers}).finally(_=> $tab.loading(data.url, false))
 
     if(response.status === 200){
         const dat = this.parse(response.content)
@@ -590,7 +592,7 @@ $dialog.move = function(event){
 
     event.target.setPointerCapture(event.pointerId)
     const {x, y, width, height} = this.getBoundingClientRect()
-    this.style.inset  = `${clamp(0, y+event.movementY, innerHeight-height)}px 0 0 ${clamp(0, x+event.movementX, innerWidth-width)}px`
+    this.style.inset  = `${clamp(0, y+event.movementY, innerHeight-height)}px 0 0 ${clamp(0, x+event.movementX, innerWidth-width)}px` // yに+1すると何故か正常に動く。Edge144
     this.style.margin = 0
 }
 

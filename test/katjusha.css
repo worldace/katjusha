@@ -28,10 +28,10 @@ body{
 
 
 toolbar{
+  grid-area: toolbar;
   background-color: #f0f0f0;
   display: flex;
   border-bottom: solid 1px #a0a0a0;
-  grid-area: toolbar;
   tool-icons{
     display: flex;
     align-items: center;}
