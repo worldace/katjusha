@@ -131,6 +131,7 @@ $katjusha.start = function(){
     $bbs.init()
     $base.title = document.title
     $全板ボタン.textContent = `▽${document.title}`
+    $tabActive.thread = $threadActive
     $katjusha.aborts = new Set
 
     if($base.href !== document.URL){
@@ -356,8 +357,8 @@ $tab.open = function(url, target, data = {}){
         return $tabActive
     }
     else{
-        const newtab = $.tab(data.subject, {'class':url})
         const thread = $.thread(data.html, {'class':url})
+        const newtab = $.tab(data.subject, {'class':url, '.thread':thread})
         $tab.append(newtab)
         $thread.append(thread)
         return this.select(newtab)
@@ -365,16 +366,14 @@ $tab.open = function(url, target, data = {}){
 }
 
 $tab.render = function(tab, data = ''){
-    const thread = $thread.children[brosNo(tab)]
-
     if(typeof data === 'object'){
-        tab.innerHTML    = data.subject
-        tab.className    = data.url
-        thread.innerHTML = data.html
-        thread.className = data.url
+        tab.innerHTML        = data.subject
+        tab.className        = data.url
+        tab.thread.innerHTML = data.html
+        tab.thread.className = data.url
     }
     else{
-        thread.innerHTML  += data
+        tab.thread.innerHTML += data
     }
 
     $tab.select(tab)
@@ -383,17 +382,15 @@ $tab.render = function(tab, data = ''){
 $tab.select = function(tab){
     if(!tab || tab.tagName !== 'TAB' || tab === $tabActive) return tab
 
-    const thread  = $thread.children[brosNo(tab)]
     $tabActive.id = $threadActive.id = ""
     tab.id        = "$tabActive"
-    thread.id     = "$threadActive"
+    tab.thread.id = "$threadActive"
 
-    const url = tab.className
-    if(url){
-        const data = スレッド[url]
+    if(tab.className){
+        const data = スレッド[tab.className]
         $title.textContent = data.subject
         $headline.render(data)
-        history.replaceState(null, null, url)
+        history.replaceState(null, null, tab.className)
     }
 
     return tab
@@ -407,7 +404,7 @@ $tab.close = function(tab){
     if($tab.childElementCount === 1) return
 
     this.select(tab.nextElementSibling ?? tab.previousElementSibling)
-    $thread.children[brosNo(tab)].remove()
+    tab.thread.remove()
     tab.remove()
 }
 
@@ -519,6 +516,7 @@ $thread.parse = function(text, n = 0){
 
     return {html, num:dat.length, subject:dat[0].split('<>').pop()}
 }
+
 
 $thread.clicked = function(event){
     if(event.target.tagName === 'I'){
@@ -755,11 +753,6 @@ function URLisThread(url=''){
 
 function URLisBBS(url=''){
     return url in $bbs
-}
-
-
-function brosNo(el){
-    return [...el.parentElement.children].indexOf(el)
 }
 
 function clipboard(text){
