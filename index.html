@@ -56,7 +56,7 @@
   <thead ondblclick="$subject.sort(event.target)">
     <tr><th>No.</th><th>タイトル</th><th>レス</th><th>既得</th><th>新着</th><th>最終取得</th><th>最終書き込み</th><th></th></tr>
   </thead>
-  <tbody id="$tbody" oncontextmenu="$tbody.contextmenu(event)" onmousedown="$tbody.select(event)">
+  <tbody id="$tbody" oncontextmenu="$subject.contextmenu(event)" onmousedown="$subject.mousedown(event)">
   </tbody>
 </table>
 </subject>
@@ -142,10 +142,6 @@ $katjusha.onclick = function(event){
     const {href, target} = event.target
 
     if(!href) return
-    else if(href === $base.href){
-        event.preventDefault()
-        history.replaceState(null, null, href)
-    }
     else if(URLisBBS(href)){
         event.preventDefault()
         $subject.fetch(href)
@@ -153,6 +149,10 @@ $katjusha.onclick = function(event){
     else if(URLisThread(href)){
         event.preventDefault()
         $thread.fetch(href, target)
+    }
+    else if(href === $base.href){
+        event.preventDefault()
+        history.replaceState(null, null, href)
     }
 }
 
@@ -230,7 +230,7 @@ $subject.fetch = async function(url){
     if(response.status !== 200) return
 
     $bbs.select(url)
-    $tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML).join('')
+    $tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML, url).join('')
     $title.textContent = `${$base.title} [ ${$bbs[url].name} ]`
     $status.textContent = `${$tbody.rows.length}件のスレッドを受信 (${date()})`
     history.replaceState(null, null, url)
@@ -239,7 +239,7 @@ $subject.fetch = async function(url){
 
 $subject.toHTML = function(line, i){
     const [, key, subject, num] = line.match(/(\d+)\.dat<>(.+?) \((\d+)\)$/)
-    const url  = URLbuild($bbsActive.href, key)
+    const url  = URLbuild(this, key)
     const data = スレッド[url]
 
     data.subject = subject
@@ -290,7 +290,7 @@ $subject.sort = function(th){
     $tbody.append(...tr)
 }
 
-$tbody.select = function(event){
+$subject.mousedown = function(event){
     const tr = event.target.closest('tr')
 
     if(event.button === 0 && event.target.cellIndex < 7){
@@ -300,7 +300,7 @@ $tbody.select = function(event){
     }
 }
 
-$tbody.contextmenu = function(event){
+$subject.contextmenu = function(event){
     const tr  = event.target.closest('tr')
     const url = tr.className
 
@@ -442,7 +442,7 @@ $thread.fetch = async function(href, target){
 
     $tab.open(href, target, data)
     $tab.loading(href)
-    const response = await $katjusha.fetch(data.daturl, {headers}).finally(_=> $tab.loading(data.url, false))
+    const response = await $katjusha.fetch(data.daturl, {headers}).finally(_=> $tab.loading(href, false))
 
     if(response.status === 200){
         const dat = this.parse(response.content)
@@ -456,7 +456,7 @@ $thread.fetch = async function(href, target){
         data.新着    = dat.num
         data.最終取得= date()
 
-        $tab.render(data.url, data)
+        $tab.render(href, data)
         $headline.render(data)
         $subject.update(data)
         $title.textContent  = data.subject
@@ -473,7 +473,7 @@ $thread.fetch = async function(href, target){
         data.新着    = dat.num
         data.最終取得= date()
 
-        $tab.render(data.url, dat.html)
+        $tab.render(href, dat.html)
         $headline.render(data)
         $subject.update(data)
         $title.textContent  = data.subject
@@ -489,15 +489,15 @@ $thread.fetch = async function(href, target){
         $status.textContent = `スレッドが見つかりません (${date()})`
     }
     else if(response.status === 416){
-        delete スレッド[data.url]
-        $katjusha.link(data.url)
+        delete スレッド[href]
+        $katjusha.link(href)
         return
     }
     else{
         return
     }
 
-    history.replaceState(null, null, data.url)
+    history.replaceState(null, null, href)
 }
 
 
