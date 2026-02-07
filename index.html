@@ -343,35 +343,35 @@ $タブ閉じるアイコン.onclick = function(event){
 
 
 $tab.open = function(url, target, data = {}){
-    const tab = $tab.get(url)
+    const tab = $(`tab[class="${url}"]`, this)
 
     if(tab){
-        this.select(tab)
+        return this.select(tab)
     }
     else if(!$tabActive.className || !target){
-        $tabActive.className      = url
-        $tabActive.innerHTML      = data.subject || ''
-        $threadActive.className   = url
-        $threadActive.innerHTML   = data.html || ''
+        $tabActive.className    = url
+        $tabActive.innerHTML    = data.subject || ''
+        $threadActive.className = url
+        $threadActive.innerHTML = data.html || ''
+        return $tabActive
     }
     else{
         const newtab = $.tab(data.subject, {'class':url})
         const thread = $.thread(data.html, {'class':url})
         $tab.append(newtab)
         $thread.append(thread)
-        this.select(newtab)
+        return this.select(newtab)
     }
 }
 
-$tab.render = function(url, data = ''){
-    const tab    = $tab.get(url)
+$tab.render = function(tab, data = ''){
     const thread = $thread.children[brosNo(tab)]
 
     if(typeof data === 'object'){
         tab.innerHTML    = data.subject
-        tab.className    = url
+        tab.className    = data.url
         thread.innerHTML = data.html
-        thread.className = url
+        thread.className = data.url
     }
     else{
         thread.innerHTML  += data
@@ -381,32 +381,27 @@ $tab.render = function(url, data = ''){
 }
 
 $tab.select = function(tab){
-    if(!tab || tab.tagName !== 'TAB' || tab === $tabActive) return
+    if(!tab || tab.tagName !== 'TAB' || tab === $tabActive) return tab
 
-    const thread = $thread.children[brosNo(tab)]
-    const url    = tab.className
+    const thread  = $thread.children[brosNo(tab)]
+    $tabActive.id = $threadActive.id = ""
+    tab.id        = "$tabActive"
+    thread.id     = "$threadActive"
 
-    $tabActive.id  = $threadActive.id = ""
-    tab.id    = "$tabActive"
-    thread.id = "$threadActive"
+    const url = tab.className
+    if(url){
+        const data = スレッド[url]
+        $title.textContent = data.subject
+        $headline.render(data)
+        history.replaceState(null, null, url)
+    }
 
-    if(!url) return
-
-    const data = スレッド[url]
-    $title.textContent = data.subject
-    $headline.render(data)
-    history.replaceState(null, null, url)
+    return tab
 }
 
-
-$tab.loading = function(url, bool = true){
-    $tab.get(url)?.toggleAttribute('loading', bool)
+$tab.loading = function(tab, bool = true){
+    tab.toggleAttribute('loading', bool)
 }
-
-$tab.get = function(url){
-    return $(`tab[class="${url}"]`, this)
-}
-
 
 $tab.close = function(tab){
     if($tab.childElementCount === 1) return
@@ -440,9 +435,9 @@ $thread.fetch = async function(href, target){
     const data    = スレッド[href]
     const headers = data.etag ? {'If-None-Match':data.etag, 'Range':`bytes=${data.byte}-`} : {}
 
-    $tab.open(href, target, data)
-    $tab.loading(href)
-    const response = await $katjusha.fetch(data.daturl, {headers}).finally(_=> $tab.loading(href, false))
+    const tab = $tab.open(href, target, data)
+    $tab.loading(tab)
+    const response = await $katjusha.fetch(data.daturl, {headers}).finally(_=> $tab.loading(tab, false))
 
     if(response.status === 200){
         const dat = this.parse(response.content)
@@ -456,7 +451,7 @@ $thread.fetch = async function(href, target){
         data.新着    = dat.num
         data.最終取得= date()
 
-        $tab.render(href, data)
+        $tab.render(tab, data)
         $headline.render(data)
         $subject.update(data)
         $title.textContent  = data.subject
@@ -473,7 +468,7 @@ $thread.fetch = async function(href, target){
         data.新着    = dat.num
         data.最終取得= date()
 
-        $tab.render(href, dat.html)
+        $tab.render(tab, dat.html)
         $headline.render(data)
         $subject.update(data)
         $title.textContent  = data.subject
