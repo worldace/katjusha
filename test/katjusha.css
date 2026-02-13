@@ -555,13 +555,12 @@ dialog{
     padding: 10px 12px 8px 12px;
     display: grid;
     row-gap: 8px;
-    grid-template-columns: 55px 1fr 55px 1fr 65px;
-    grid-template-rows: auto auto 1fr auto;
-    grid-template-areas:
+    grid-template:
       "label1 subject subject subject subject"
       "label2 FROM label3 mail label4"
-      "textarea textarea textarea textarea textarea"
-      "submit submit submit submit submit";
+      "textarea textarea textarea textarea textarea" 1fr
+      "submit submit submit submit submit"
+      / 55px 1fr 55px 1fr 65px;
     min-width: max-content;
     min-height: 280px;
     resize: both;
