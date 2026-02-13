@@ -1,9 +1,11 @@
 *{
-  box-sizing: border-box;}
+  box-sizing: border-box;
+}
 html{
   --font-default: 'MS PGothic';
   font-family: var(--font-default), sans-serif;
-  font-size: 12px;}
+  font-size: 12px;
+}
 body{
   width: 100%;
   height: 100dvh;
@@ -550,9 +552,16 @@ dialog{
     height: 22px;
     line-height: 22px;}
   form{
-    padding: 4px 12px 6px 12px;
-    display: flex;
-    flex-direction: column;
+    padding: 10px 12px 8px 12px;
+    display: grid;
+    row-gap: 8px;
+    grid-template-columns: 55px 1fr 55px 1fr 65px;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      "label1 subject subject subject subject"
+      "label2 FROM label3 mail label4"
+      "textarea textarea textarea textarea textarea"
+      "submit submit submit submit submit";
     min-width: max-content;
     min-height: 280px;
     resize: both;
@@ -567,31 +576,33 @@ dialog{
     padding-left: 2px;
     height: 18px;
     font-family: 'MS PGothic', sans-serif;}
-  table{
-    margin-top: 8px;}
-  th{
-    min-width: 45px;
+  label:nth-of-type(1){
+    grid-area: label1;
     text-align: right;
-    padding-right: 3px;
-    user-select: none;
-    font-weight: normal;}
-  tr{
-    line-height: 1.5;}
-  td:has(input=text){
-    padding: 0 8px;}
-  td input[type=text]{
-    width: stretch;}
-  td:has(label){
-    min-width: 60px;}
-  td label{vertical-align:top;
-    user-select: none;}
+    padding-right: 4px;}
+  [name=subject]{
+    grid-area: subject;}
   [name=subject]:disabled{
     color: #6d6d6d;
     background-color: #fff;}
+  label:nth-of-type(2){
+    grid-area: label2;
+    text-align: right;
+    padding-right: 4px;}
+  [name=FROM]{
+    grid-area: FROM;}
+  label:nth-of-type(3){
+    grid-area: label3;
+    text-align: right;
+    padding-right: 4px;}
+  [name=mail]{
+    grid-area: mail;}
   [name=mail]:read-only{
     color: #6d6d6d;}
+  label:nth-of-type(4){
+    grid-area: label4;}
   textarea{
-    flex-grow: 1;
+    grid-area: textarea;
     min-height: 160px;
     font-size: 12px;
     border-left: solid 1px #696969;
@@ -605,11 +616,10 @@ dialog{
     overflow: scroll;
     outline: none;
     padding-left: 4px;
-    resize: none;
-    margin-top: 8px;}
+    resize: none;}
   [type=submit]{
-    display: inline-block;
-    margin: 6px auto 0 auto;
+    grid-area: submit;
+    justify-self: center;
     background-color: transparent;
     width: 80px;
     font-size: 12px;

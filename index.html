@@ -101,17 +101,8 @@
     <li>ローカルルール</li>
   </ul>
   <form id="$form" action="test/bbs.cgi" method="POST" spellcheck="false">
-    <table>
-      <tr>
-        <th>タイトル</th>
-        <td colspan="4"><input type="text" name="subject"></td></tr>
-      <tr>
-        <th>名前</th>
-        <td><input type="text" name="FROM"></td>
-        <th>メール</th>
-        <td><input type="text" name="mail"></td>
-        <td><label><input type="checkbox" name="sage">sage</label></td></tr>
-    </table>
+    <label>タイトル</label><input type="text" name="subject">
+    <label>名前</label><input type="text" name="FROM"><label>メール</label><input type="text" name="mail"><label><input type="checkbox" name="sage">sage</label>
     <textarea name="MESSAGE"></textarea>
     <input type="submit" name="submit" value="書き込む">
     <input type="hidden" name="bbs">
