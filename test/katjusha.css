@@ -554,13 +554,13 @@ dialog{
   form{
     padding: 10px 12px 8px 12px;
     display: grid;
-    row-gap: 8px;
+    gap: 8px 4px;
     grid-template:
       "label1 subject subject subject subject"
       "label2 FROM label3 mail label4"
       "textarea textarea textarea textarea textarea" 1fr
       "submit submit submit submit submit"
-      / 55px 1fr 55px 1fr 65px;
+      / 50px 1fr 50px 1fr 60px;
     min-width: max-content;
     min-height: 280px;
     resize: both;
@@ -577,8 +577,7 @@ dialog{
     font-family: 'MS PGothic', sans-serif;}
   label:nth-of-type(1){
     grid-area: label1;
-    text-align: right;
-    padding-right: 4px;}
+    text-align: right;}
   [name=subject]{
     grid-area: subject;}
   [name=subject]:disabled{
@@ -586,14 +585,12 @@ dialog{
     background-color: #fff;}
   label:nth-of-type(2){
     grid-area: label2;
-    text-align: right;
-    padding-right: 4px;}
+    text-align: right;}
   [name=FROM]{
     grid-area: FROM;}
   label:nth-of-type(3){
     grid-area: label3;
-    text-align: right;
-    padding-right: 4px;}
+    text-align: right;}
   [name=mail]{
     grid-area: mail;}
   [name=mail]:read-only{
