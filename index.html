@@ -39,7 +39,7 @@
 <border></border>
 
 
-<bbs id="$bbs" onclick="$bbs.select(event.target.href)" oncontextmenu="$bbs.contextmenu(event, event.target)">
+<bbs id="$bbs" onmousedown="$bbs.select(event.target.href)" oncontextmenu="$bbs.contextmenu(event, event.target)">
   <details open>
     <summary>カテゴリ1</summary>
     <a href="http://localhost/katjusha/a/">掲示板a</a>
@@ -80,7 +80,7 @@
 </thread-icons>
 </headline>
 
-<tabs id="$tab" ondblclick="$katjusha.link(event.target.className)" onclick="$tab.select(event.target)" oncontextmenu="$tab.contextmenu(event)">
+<tabs id="$tab" ondblclick="$katjusha.link(event.target.className)" onmousedown="$tab.select(event.target)" oncontextmenu="$tab.contextmenu(event)">
   <tab id="$tabActive"></tab>
 </tabs>
 
@@ -749,7 +749,6 @@ function URLisBBS(url=''){
 function clipboard(text){
     navigator.clipboard.writeText(text)
 }
-
 
 $katjusha.start()
 </script>
