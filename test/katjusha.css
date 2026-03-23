@@ -660,7 +660,7 @@ contextmenu{
 
 
 popup{
-  position-area: end;
+  position-area: right top;
   font-size: 14px;
   color: #000;
   background-color: #ffffe1;
