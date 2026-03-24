@@ -482,8 +482,8 @@ status{
 dialog{
   position: absolute;
   padding: 0;
-  width: 600px;
-  min-width: 600px;
+  width: 550px;
+  min-width: 550px;
   min-height: fit-content;
   border: solid 1px #2982cc;
   background-color: #f0f0f0;
