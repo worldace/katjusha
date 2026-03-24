@@ -482,12 +482,14 @@ status{
 dialog{
   position: absolute;
   padding: 0;
-  width: fit-content;
-  height: fit-content;
+  width: 600px;
+  min-width: 600px;
+  min-height: fit-content;
   border: solid 1px #2982cc;
   background-color: #f0f0f0;
   font-family: 'MS PGothic', sans-serif;
   font-size: 13px;
+  overflow: hidden;
   resize: both;
   &:popover-open{
     display:flex;
@@ -495,7 +497,6 @@ dialog{
   &::backdrop{
     background-color: transparent;}
   header{
-    box-sizing: border-box;
     background-color: #2982cc;
     padding: 5px 0 5px 8px;
     display: flex;
@@ -511,7 +512,7 @@ dialog{
     color: #fff;
     font-size: 14px;
     font-weight: normal;
-    margin-left: 20px;
+    margin: 0 20px;
     overflow: hidden;
     white-space: nowrap;}
   header button{
@@ -572,7 +573,6 @@ dialog{
       "textarea textarea textarea textarea textarea" 1fr
       "submit submit submit submit submit"
       / 50px 1fr 50px 1fr 60px;
-    min-width: max-content;
     min-height: 280px;
     overflow: hidden;}
   [type="text"]{
