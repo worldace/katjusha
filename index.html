@@ -511,6 +511,7 @@ $thread.clicked = function(event){
         $contextmenu.show(event, {'これにレス' : _=> $thread.resTo(event.target.textContent)})
     }
     else if(event.target.tagName === 'ANCHOR'){
+        event.preventDefault()
         event.stopPropagation()
         this.goto(event.target.dataset.n)
     }
