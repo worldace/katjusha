@@ -220,6 +220,7 @@ $subject.fetch = async function(url){
 
     $bbs.select(url)
     $tbody.innerHTML = response.content.trim().split('\n').map(this.toHTML, url).join('')
+    $subject.scrollTo(0, 0)
     $title.textContent = `${$base.title} [ ${$bbs[url].name} ]`
     $status.textContent = `${$tbody.rows.length}件のスレッドを受信 (${date()})`
     history.replaceState(null, null, url)
