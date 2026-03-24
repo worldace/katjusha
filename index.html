@@ -62,10 +62,7 @@
 </subject>
 
 <headline id="$headline" oncontextmenu="event.preventDefault()">
-<header>
-  <headline-bbs id="$headlineBBS"></headline-bbs>
-  <headline-title id="$headlineTitle"></headline-title>
-</header>
+<headline-title id="$headlineTitle"></headline-title>
 <thread-icons>
   <button id="$リストアイコン"></button>
   <icon-separate></icon-separate>
@@ -307,8 +304,7 @@ $subject.contextmenu = function(event){
 
 
 $headline.render = function(data){
-    $headlineBBS.innerHTML   = `<a href="${data.bbsurl}">[${data.bbsname}]</a>`
-    $headlineTitle.innerHTML = `${data.subject} (${data.num})`
+    $headlineTitle.innerHTML = `<a href="${data.bbsurl}">[${data.bbsname}]</a> ${data.subject} (${data.num})`
 }
 
 $レス更新アイコン.onclick = function(event){
