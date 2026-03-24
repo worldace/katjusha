@@ -146,7 +146,9 @@ bbs{
     color: #000;
     padding: 1px 8px;
     margin: 1px 0;
-    display: block;}
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;}
   details a#\$bbsActive{
     color: #fff;
     background-color: #0078d7;}
