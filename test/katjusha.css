@@ -488,6 +488,10 @@ dialog{
   background-color: #f0f0f0;
   font-family: 'MS PGothic', sans-serif;
   font-size: 13px;
+  resize: both;
+  &:popover-open{
+    display:flex;
+    flex-flow: column;}
   &::backdrop{
     background-color: transparent;}
   header{
@@ -507,7 +511,9 @@ dialog{
     color: #fff;
     font-size: 14px;
     font-weight: normal;
-    margin-left: 20px;}
+    margin-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;}
   header button{
     appearance: none;
     background: none;
@@ -557,6 +563,7 @@ dialog{
     line-height: 22px;}
   form{
     padding: 10px 12px 8px 12px;
+    flex: 1;
     display: grid;
     gap: 8px 4px;
     grid-template:
@@ -567,7 +574,6 @@ dialog{
       / 50px 1fr 50px 1fr 60px;
     min-width: max-content;
     min-height: 280px;
-    resize: both;
     overflow: hidden;}
   [type="text"]{
     border-left: solid 1px #696969;
@@ -583,7 +589,8 @@ dialog{
     grid-area: label1;
     text-align: right;}
   [name=subject]{
-    grid-area: subject;}
+    grid-area: subject;
+    overflow: hidden;}
   [name=subject]:disabled{
     color: #6d6d6d;
     background-color: #fff;}
