@@ -456,7 +456,7 @@ res{
     color: red;
     margin-left: 8px;}
   p{
-    margin: 2px 0 0 36px;
+    margin: 2px 0 0 32px;
     white-space: pre-wrap;}
   a{
     text-decoration: none;}
@@ -683,5 +683,8 @@ popup{
   padding: 0;
   cursor: default;
   res{
-    margin: 6px;}
+    margin: 4px;
+    p{
+      margin-left: 22px;
+      line-height: 1.15}}
 }
