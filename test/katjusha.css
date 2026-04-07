@@ -19,7 +19,7 @@ body{
   grid-template-columns: 150px 1fr;
   grid-template-rows: 26px 8px 0.4fr 28px 24px 1fr 18px;
   grid-template-areas:
-    "toolbar toolbar"
+    "menubar menubar"
     "border border"
     "bbs subject"
     "bbs headline"
@@ -29,15 +29,15 @@ body{
 }
 
 
-toolbar{
-  grid-area: toolbar;
+menubar{
+  grid-area: menubar;
   background-color: #f0f0f0;
   display: flex;
   border-bottom: solid 1px #a0a0a0;
-  tool-icons{
+  menu-icons{
     display: flex;
     align-items: center;}
-  tool-icons button{
+  menu-icons button{
     appearance: none;
     padding: 1px;
     border: solid 1px #f0f0f0;
